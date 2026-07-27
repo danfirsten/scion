@@ -70,6 +70,25 @@ all in place and tested.
   the field it trails; the two copyright header lines stayed floating at their
   structural position.
 
+### Session 3 (2026-07-27)
+
+**Status:** User authorized completing M1–M6 without per-milestone confirmation
+gates, with maximum parallelism. Spec rule 1's gating is superseded by that
+instruction; rule 3's ordering (corpus before the merge algorithm is *evaluated*)
+is preserved — mining runs first/in parallel and M5 still consumes it.
+
+**Execution plan (dependency-aware waves, Opus subagents build, orchestrator
+integrates and commits per wave):**
+- Wave 1 (parallel): M1 miner + mining run; M2 matcher; TypeScript `Language`
+  support (pulled forward from M5 — touches only `sm-cst/languages`, and proves
+  the abstraction early, when changing it is still cheap).
+- Wave 2 (after M2): M3 edit scripts + viewer; M4a merge+emit libraries.
+  `sm-merge` will NOT depend on `sm-diff` — both consume `Matching` directly and
+  the merge computes its own fate classification (~small duplication) so the two
+  can be built and evolved in parallel.
+- Wave 3: M4b git driver + property tests (integration).
+- Wave 4 (parallel): M5 evaluation + report; M6 name binding.
+
 ## Decisions
 
 | # | Decision | Rationale |
