@@ -1,0 +1,37 @@
+[workspace]
+resolver = "3"
+members = ["crates/*"]
+
+[workspace.package]
+version = "0.0.0"
+edition = "2024"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/danfirsten/scion"
+rust-version = "1.85"
+
+[workspace.dependencies]
+# Parsing. These two must stay ABI-compatible: tree-sitter-java 0.23.5 ships a
+# grammar generated at ABI 14, which tree-sitter 0.26.x still loads.
+tree-sitter = "0.26.11"
+tree-sitter-java = "0.23.5"
+
+# CLI / errors.
+anyhow = "1.0.104"
+clap = { version = "4.6.4", features = ["derive"] }
+thiserror = "2.0.19"
+
+# Serialization.
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.151"
+
+# Testing.
+insta = "1.48.0"
+
+# Internal crates.
+sm-bind = { path = "crates/sm-bind", version = "0.0.0" }
+sm-cst = { path = "crates/sm-cst", version = "0.0.0" }
+sm-diff = { path = "crates/sm-diff", version = "0.0.0" }
+sm-emit = { path = "crates/sm-emit", version = "0.0.0" }
+sm-eval = { path = "crates/sm-eval", version = "0.0.0" }
+sm-match = { path = "crates/sm-match", version = "0.0.0" }
+sm-merge = { path = "crates/sm-merge", version = "0.0.0" }

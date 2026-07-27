@@ -1,0 +1,235 @@
+---
+source: crates/sm-cst/tests/render.rs
+expression: "render(\"typical\", snapshot_options(\"typical.java\"))"
+---
+typical.java  language=java  nodes=230
+program [0..1308]
+  line_comment [0..45] extra "// Copyright 2026 the semantic-merge aut"...
+  line_comment [46..91] extra "// SPDX-License-Identifier: MIT OR Apach"...
+  package_declaration [93..123]
+    package [93..100]
+    scoped_identifier [101..122]
+      scoped_identifier [101..112]
+        identifier [101..104] "com"
+        . [104..105]
+        identifier [105..112] "example"
+      . [112..113]
+      identifier [113..122] "inventory"
+    ; [122..123]
+  import_declaration [125..152]
+    import [125..131]
+    scoped_identifier [132..151]
+      scoped_identifier [132..141]
+        identifier [132..136] "java"
+        . [136..137]
+        identifier [137..141] "util"
+      . [141..142]
+      identifier [142..151] "ArrayList"
+    ; [151..152]
+  import_declaration [153..175]
+    import [153..159]
+    scoped_identifier [160..174]
+      scoped_identifier [160..169]
+        identifier [160..164] "java"
+        . [164..165]
+        identifier [165..169] "util"
+      . [169..170]
+      identifier [170..174] "List"
+    ; [174..175]
+  import_declaration [176..201]
+    import [176..182]
+    scoped_identifier [183..200]
+      scoped_identifier [183..192]
+        identifier [183..187] "java"
+        . [187..188]
+        identifier [188..192] "util"
+      . [192..193]
+      identifier [193..200] "Objects"
+    ; [200..201]
+  block_comment [203..373] extra "/**\n * A warehouse of {@link Item}s.\n *\n"...
+  class_declaration [374..1307]
+    modifiers [374..380]
+      public [374..380]
+    class [381..386]
+    identifier [387..396] "Warehouse"
+    class_body [397..1307]
+      { [397..398]
+      block_comment [404..460] extra "/** How many items we will hold before r"...
+      field_declaration [465..505]
+        modifiers [465..485]
+          private [465..472]
+          static [473..479]
+          final [480..485]
+        integral_type [486..489]
+          int [486..489]
+        variable_declarator [490..504]
+          identifier [490..498] "CAPACITY"
+          = [499..500]
+          decimal_integer_literal [501..504] "128"
+        ; [504..505]
+      block_comment [511..552] extra "/* The backing store. Not thread safe. *"...
+      field_declaration [557..608]
+        modifiers [557..570]
+          private [557..564]
+          final [565..570]
+        generic_type [571..581]
+          type_identifier [571..575] "List"
+          type_arguments [575..581]
+            < [575..576]
+            type_identifier [576..580] "Item"
+            > [580..581]
+        variable_declarator [582..607]
+          identifier [582..587] "items"
+          = [588..589]
+          object_creation_expression [590..607]
+            new [590..593]
+            generic_type [594..605]
+              type_identifier [594..603] "ArrayList"
+              type_arguments [603..605]
+                < [603..604]
+                > [604..605]
+            argument_list [605..607]
+              ( [605..606]
+              ) [606..607]
+        ; [607..608]
+      field_declaration [614..634]
+        modifiers [614..621]
+          private [614..621]
+        type_identifier [622..628] "String"
+        variable_declarator [629..633]
+          identifier [629..633] "name"
+        ; [633..634]
+      line_comment [635..662] extra "// mutable, set by rename()"
+      constructor_declaration [668..763]
+        modifiers [668..674]
+          public [668..674]
+        identifier [675..684] "Warehouse"
+        formal_parameters [684..697]
+          ( [684..685]
+          formal_parameter [685..696]
+            type_identifier [685..691] "String"
+            identifier [692..696] "name"
+          ) [696..697]
+        constructor_body [698..763]
+          { [698..699]
+          expression_statement [708..757]
+            assignment_expression [708..756]
+              field_access [708..717]
+                this [708..712]
+                . [712..713]
+                identifier [713..717] "name"
+              = [718..719]
+              method_invocation [720..756]
+                identifier [720..727] "Objects"
+                . [727..728]
+                identifier [728..742] "requireNonNull"
+                argument_list [742..756]
+                  ( [742..743]
+                  identifier [743..747] "name"
+                  , [747..748]
+                  string_literal [749..755] "\"name\""
+                    " [749..750]
+                    string_fragment [750..754] "name"
+                    " [754..755]
+                  ) [755..756]
+            ; [756..757]
+          } [762..763]
+      block_comment [769..897] extra "/**\n     * Adds an item.\n     *\n     * @"...
+      method_declaration [902..1118]
+        modifiers [902..908]
+          public [902..908]
+        boolean_type [909..916]
+        identifier [917..920] "add"
+        formal_parameters [920..931]
+          ( [920..921]
+          formal_parameter [921..930]
+            type_identifier [921..925] "Item"
+            identifier [926..930] "item"
+          ) [930..931]
+        block [932..1118]
+          { [932..933]
+          if_statement [942..1066]
+            if [942..944]
+            parenthesized_expression [945..971]
+              ( [945..946]
+              binary_expression [946..970]
+                method_invocation [946..958]
+                  identifier [946..951] "items"
+                  . [951..952]
+                  identifier [952..956] "size"
+                  argument_list [956..958]
+                    ( [956..957]
+                    ) [957..958]
+                >= [959..961]
+                identifier [962..970] "CAPACITY"
+              ) [970..971]
+            block [972..1066]
+              { [972..973]
+              line_comment [986..1030] extra "// Full. Callers are expected to check t"...
+              return_statement [1043..1056]
+                return [1043..1049]
+                false [1050..1055]
+                ; [1055..1056]
+              } [1065..1066]
+          expression_statement [1075..1091]
+            method_invocation [1075..1090]
+              identifier [1075..1080] "items"
+              . [1080..1081]
+              identifier [1081..1084] "add"
+              argument_list [1084..1090]
+                ( [1084..1085]
+                identifier [1085..1089] "item"
+                ) [1089..1090]
+            ; [1090..1091]
+          return_statement [1100..1112]
+            return [1100..1106]
+            true [1107..1111]
+            ; [1111..1112]
+          } [1117..1118]
+      method_declaration [1124..1195]
+        modifiers [1124..1130]
+          public [1124..1130]
+        void_type [1131..1135]
+        identifier [1136..1142] "rename"
+        formal_parameters [1142..1158]
+          ( [1142..1143]
+          formal_parameter [1143..1157]
+            type_identifier [1143..1149] "String"
+            identifier [1150..1157] "newName"
+          ) [1157..1158]
+        block [1159..1195]
+          { [1159..1160]
+          expression_statement [1169..1189]
+            assignment_expression [1169..1188]
+              field_access [1169..1178]
+                this [1169..1173]
+                . [1173..1174]
+                identifier [1174..1178] "name"
+              = [1179..1180]
+              identifier [1181..1188] "newName"
+            ; [1188..1189]
+          } [1194..1195]
+      line_comment [1201..1246] extra "// A trailing comment for the class, sor"...
+      method_declaration [1251..1305]
+        modifiers [1251..1257]
+          public [1251..1257]
+        integral_type [1258..1261]
+          int [1258..1261]
+        identifier [1262..1266] "size"
+        formal_parameters [1266..1268]
+          ( [1266..1267]
+          ) [1267..1268]
+        block [1269..1305]
+          { [1269..1270]
+          return_statement [1279..1299]
+            return [1279..1285]
+            method_invocation [1286..1298]
+              identifier [1286..1291] "items"
+              . [1291..1292]
+              identifier [1292..1296] "size"
+              argument_list [1296..1298]
+                ( [1296..1297]
+                ) [1297..1298]
+            ; [1298..1299]
+          } [1304..1305]
+      } [1306..1307]
