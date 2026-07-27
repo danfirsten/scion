@@ -10,10 +10,16 @@ repository = "https://github.com/danfirsten/scion"
 rust-version = "1.85"
 
 [workspace.dependencies]
-# Parsing. These two must stay ABI-compatible: tree-sitter-java 0.23.5 ships a
-# grammar generated at ABI 14, which tree-sitter 0.26.x still loads.
+# Parsing. The grammar crates version independently of the core crate: each
+# depends only on `tree-sitter-language ^0.1` and exports a `LanguageFn`, so the
+# numbers are not meant to line up (docs/prior-art.md §6.2). What has to hold is
+# the *parser ABI*, and that is verified empirically — `tests/language_config.rs`
+# loads every grammar and `tests/*` parse every fixture with it.
+# tree-sitter-java 0.23.5 and tree-sitter-typescript 0.23.2 both ship ABI 14
+# grammars, which the 0.26.x runtime still loads.
 tree-sitter = "0.26.11"
 tree-sitter-java = "0.23.5"
+tree-sitter-typescript = "0.23.2"
 
 # CLI / errors.
 anyhow = "1.0.104"

@@ -62,6 +62,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "anyhow"
+version = "1.0.104"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "330a5ed07fa54e4702c9d6c4174f74427fc0ef6e214bbd677ae50a5099946470"
+
+[[package]]
 name = "bitflags"
 version = "2.13.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -394,6 +400,7 @@ dependencies = [
  "clap",
  "serde_json",
  "sm-cst",
+ "sm-match",
 ]
 
 [[package]]
@@ -406,6 +413,7 @@ dependencies = [
  "thiserror",
  "tree-sitter",
  "tree-sitter-java",
+ "tree-sitter-typescript",
 ]
 
 [[package]]
@@ -419,10 +427,23 @@ version = "0.0.0"
 [[package]]
 name = "sm-eval"
 version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "clap",
+ "serde",
+ "serde_json",
+ "tempfile",
+]
 
 [[package]]
 name = "sm-match"
 version = "0.0.0"
+dependencies = [
+ "insta",
+ "serde",
+ "serde_json",
+ "sm-cst",
+]
 
 [[package]]
 name = "sm-merge"
@@ -513,6 +534,16 @@ name = "tree-sitter-language"
 version = "0.1.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "009994f150cc0cd50ff54917d5bc8bffe8cad10ca10d81c34da2ec421ae61782"
+
+[[package]]
+name = "tree-sitter-typescript"
+version = "0.23.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6c5f76ed8d947a75cc446d5fccd8b602ebf0cde64ccf2ffa434d873d7a575eff"
+dependencies = [
+ "cc",
+ "tree-sitter-language",
+]
 
 [[package]]
 name = "unicode-ident"

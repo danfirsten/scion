@@ -1,0 +1,979 @@
+---
+source: crates/sm-cst/tests/ts_render.rs
+expression: "render(\"ts_typical.ts\")"
+---
+ts_typical.ts  language=typescript  nodes=974
+program [0..3654]
+  comment [0..45] extra "// Copyright 2026 the semantic-merge aut"...
+  comment [46..91] extra "// SPDX-License-Identifier: MIT OR Apach"...
+  import_statement [245..265]
+    leading: comment [93..169] extra attached=leading(5) "// A side-effect-only import: no import "...
+    leading: comment [170..244] extra attached=leading(5) "// that it runs before everything below."...
+    import [245..251]
+    string [252..264]
+      " [252..253]
+      string_fragment [253..263] "./polyfill"
+      " [263..264]
+    ; [264..265]
+  import_statement [267..322]
+    import [267..273]
+    import_clause [274..297]
+      named_imports [274..297]
+        { [274..275]
+        import_specifier [276..284]
+          identifier [276..284] "readFile"
+        , [284..285]
+        import_specifier [286..295]
+          identifier [286..295] "writeFile"
+        } [296..297]
+    from [298..302]
+    string [303..321]
+      " [303..304]
+      string_fragment [304..320] "node:fs/promises"
+      " [320..321]
+    ; [321..322]
+  import_statement [323..360]
+    import [323..329]
+    type [330..334]
+    import_clause [335..344]
+      named_imports [335..344]
+        { [335..336]
+        import_specifier [337..342]
+          identifier [337..342] "Stats"
+        } [343..344]
+    from [345..349]
+    string [350..359]
+      " [350..351]
+      string_fragment [351..358] "node:fs"
+      " [358..359]
+    ; [359..360]
+  import_statement [361..395]
+    import [361..367]
+    import_clause [368..377]
+      namespace_import [368..377]
+        * [368..369]
+        as [370..372]
+        identifier [373..377] "path"
+    from [378..382]
+    string [383..394]
+      " [383..384]
+      string_fragment [384..393] "node:path"
+      " [393..394]
+    ; [394..395]
+  import_statement [396..466]
+    import [396..402]
+    import_clause [403..448]
+      identifier [403..416] "defaultExport"
+      , [416..417]
+      named_imports [418..448]
+        { [418..419]
+        import_specifier [420..425]
+          identifier [420..425] "alpha"
+        , [425..426]
+        import_specifier [427..446]
+          identifier [427..431] "beta"
+          as [432..434]
+          identifier [435..446] "renamedBeta"
+        } [447..448]
+    from [449..453]
+    string [454..465]
+      " [454..455]
+      string_fragment [455..464] "./helpers"
+      " [464..465]
+    ; [465..466]
+  export_statement [468..508]
+    export [468..474]
+    lexical_declaration [475..508]
+      const [475..480]
+      variable_declarator [481..507]
+        identifier [481..499] "DEFAULT_TIMEOUT_MS"
+        = [500..501]
+        number [502..507] "5_000"
+      ; [507..508]
+    trailing: comment [509..524] extra attached=trailing(78) "// milliseconds"
+  export_statement [734..1839]
+    leading: comment [526..733] extra attached=leading(89) "/**\n * A store of user records, keyed by"...
+    export [734..740]
+    class_declaration [741..1839]
+      class [741..746]
+      type_identifier [747..756] "UserStore"
+      type_parameters [756..782]
+        < [756..757]
+        type_parameter [757..781]
+          type_identifier [757..758] "T"
+          constraint [759..781]
+            extends [759..766]
+            object_type [767..781]
+              { [767..768]
+              property_signature [769..779]
+                property_identifier [769..771] "id"
+                type_annotation [771..779]
+                  : [771..772]
+                  predefined_type [773..779] "string"
+                    string [773..779]
+              } [780..781]
+        > [781..782]
+      class_heritage [783..805]
+        implements_clause [783..805]
+          implements [783..793]
+          generic_type [794..805]
+            type_identifier [794..802] "Readable"
+            type_arguments [802..805]
+              < [802..803]
+              type_identifier [803..804] "T"
+              > [804..805]
+      class_body [806..1839]
+        { [806..807]
+        public_field_definition [886..933]
+          leading: comment [810..883] extra attached=leading(122) "/** Records by id. Initialised before `c"...
+          accessibility_modifier [886..893] "private"
+            private [886..893]
+          readonly [894..902]
+          property_identifier [903..910] "records"
+          = [911..912]
+          new_expression [913..933]
+            new [913..916]
+            identifier [917..920] "Map"
+            type_arguments [920..931]
+              < [920..921]
+              predefined_type [921..927] "string"
+                string [921..927]
+              , [927..928]
+              type_identifier [929..930] "T"
+              > [930..931]
+            arguments [931..933]
+              ( [931..932]
+              ) [932..933]
+        ; [933..934]
+        public_field_definition [967..992]
+          leading: comment [938..964] extra attached=leading(143) "// mutable, set by clear()"
+          accessibility_modifier [967..974] "private"
+            private [967..974]
+          property_identifier [975..980] "count"
+          type_annotation [980..988]
+            : [980..981]
+            predefined_type [982..988] "number"
+              number [982..988] "number"
+          = [989..990]
+          number [991..992] "0"
+        ; [992..993]
+        class_static_block [997..1191]
+          static [997..1003]
+          statement_block [1004..1191]
+            { [1004..1005]
+            expression_statement [1151..1187]
+              leading: comment [1010..1073] extra attached=leading(160) "// A static initialiser block. Runs in t"...
+              leading: comment [1078..1146] extra attached=leading(160) "// initialisers, which is the caveat cla"...
+              assignment_expression [1151..1186]
+                member_expression [1151..1179]
+                  identifier [1151..1161] "globalThis"
+                  . [1161..1162]
+                  property_identifier [1162..1179] "__userStoreLoaded"
+                = [1180..1181]
+                true [1182..1186]
+              ; [1186..1187]
+            } [1190..1191]
+        method_definition [1195..1342]
+          property_identifier [1195..1206] "constructor"
+          formal_parameters [1206..1231]
+            ( [1206..1207]
+            required_parameter [1207..1230]
+              identifier [1207..1211] "seed"
+              type_annotation [1211..1225]
+                : [1211..1212]
+                readonly_type [1213..1225]
+                  readonly [1213..1221]
+                  array_type [1222..1225]
+                    type_identifier [1222..1223] "T"
+                    [ [1223..1224]
+                    ] [1224..1225]
+              = [1226..1227]
+              array [1228..1230]
+                [ [1228..1229]
+                ] [1229..1230]
+            ) [1230..1231]
+          statement_block [1232..1342]
+            { [1232..1233]
+            for_in_statement [1238..1338]
+              for [1238..1241]
+              ( [1242..1243]
+              const [1243..1248]
+              identifier [1249..1255] "record"
+              of [1256..1258]
+              identifier [1259..1263] "seed"
+              ) [1263..1264]
+              statement_block [1265..1338]
+                { [1265..1266]
+                expression_statement [1273..1309]
+                  call_expression [1273..1308]
+                    member_expression [1273..1289]
+                      member_expression [1273..1285]
+                        this [1273..1277]
+                        . [1277..1278]
+                        property_identifier [1278..1285] "records"
+                      . [1285..1286]
+                      property_identifier [1286..1289] "set"
+                    arguments [1289..1308]
+                      ( [1289..1290]
+                      member_expression [1290..1299]
+                        identifier [1290..1296] "record"
+                        . [1296..1297]
+                        property_identifier [1297..1299] "id"
+                      , [1299..1300]
+                      identifier [1301..1307] "record"
+                      ) [1307..1308]
+                  ; [1308..1309]
+                expression_statement [1316..1332]
+                  augmented_assignment_expression [1316..1331]
+                    member_expression [1316..1326]
+                      this [1316..1320]
+                      . [1320..1321]
+                      property_identifier [1321..1326] "count"
+                    += [1327..1329]
+                    number [1330..1331] "1"
+                  ; [1331..1332]
+                } [1337..1338]
+            } [1341..1342]
+        method_definition [1346..1393]
+          get [1346..1349]
+          property_identifier [1350..1354] "size"
+          formal_parameters [1354..1356]
+            ( [1354..1355]
+            ) [1355..1356]
+          type_annotation [1356..1364]
+            : [1356..1357]
+            predefined_type [1358..1364] "number"
+              number [1358..1364] "number"
+          statement_block [1365..1393]
+            { [1365..1366]
+            return_statement [1371..1389]
+              return [1371..1377]
+              member_expression [1378..1388]
+                this [1378..1382]
+                . [1382..1383]
+                property_identifier [1383..1388] "count"
+              ; [1388..1389]
+            } [1392..1393]
+        method_definition [1397..1474]
+          accessibility_modifier [1397..1403] "public"
+            public [1397..1403]
+          property_identifier [1404..1408] "find"
+          formal_parameters [1408..1420]
+            ( [1408..1409]
+            required_parameter [1409..1419]
+              identifier [1409..1411] "id"
+              type_annotation [1411..1419]
+                : [1411..1412]
+                predefined_type [1413..1419] "string"
+                  string [1413..1419]
+            ) [1419..1420]
+          type_annotation [1420..1435]
+            : [1420..1421]
+            union_type [1422..1435]
+              type_identifier [1422..1423] "T"
+              | [1424..1425]
+              literal_type [1426..1435]
+                undefined [1426..1435]
+          statement_block [1436..1474]
+            { [1436..1437]
+            return_statement [1442..1470]
+              return [1442..1448]
+              call_expression [1449..1469]
+                member_expression [1449..1465]
+                  member_expression [1449..1461]
+                    this [1449..1453]
+                    . [1453..1454]
+                    property_identifier [1454..1461] "records"
+                  . [1461..1462]
+                  property_identifier [1462..1465] "get"
+                arguments [1465..1469]
+                  ( [1465..1466]
+                  identifier [1466..1468] "id"
+                  ) [1468..1469]
+              ; [1469..1470]
+            } [1473..1474]
+        method_definition [1478..1768]
+          async [1478..1483]
+          property_identifier [1484..1488] "load"
+          formal_parameters [1488..1537]
+            ( [1488..1489]
+            required_parameter [1489..1501]
+              identifier [1489..1493] "file"
+              type_annotation [1493..1501]
+                : [1493..1494]
+                predefined_type [1495..1501] "string"
+                  string [1495..1501]
+            , [1501..1502]
+            required_parameter [1503..1536]
+              identifier [1503..1511] "encoding"
+              type_annotation [1511..1527]
+                : [1511..1512]
+                type_identifier [1513..1527] "BufferEncoding"
+              = [1528..1529]
+              string [1530..1536]
+                " [1530..1531]
+                string_fragment [1531..1535] "utf8"
+                " [1535..1536]
+            ) [1536..1537]
+          type_annotation [1537..1552]
+            : [1537..1538]
+            generic_type [1539..1552]
+              type_identifier [1539..1546] "Promise"
+              type_arguments [1546..1552]
+                < [1546..1547]
+                predefined_type [1547..1551] "void"
+                  void [1547..1551]
+                > [1551..1552]
+          statement_block [1553..1768]
+            { [1553..1554]
+            lexical_declaration [1559..1616]
+              const [1559..1564]
+              variable_declarator [1565..1615]
+                identifier [1565..1568] "raw"
+                = [1569..1570]
+                await_expression [1571..1615]
+                  await [1571..1576]
+                  call_expression [1577..1615]
+                    identifier [1577..1585] "readFile"
+                    arguments [1585..1615]
+                      ( [1585..1586]
+                      call_expression [1586..1604]
+                        member_expression [1586..1598]
+                          identifier [1586..1590] "path"
+                          . [1590..1591]
+                          property_identifier [1591..1598] "resolve"
+                        arguments [1598..1604]
+                          ( [1598..1599]
+                          identifier [1599..1603] "file"
+                          ) [1603..1604]
+                      , [1604..1605]
+                      identifier [1606..1614] "encoding"
+                      ) [1614..1615]
+              ; [1615..1616]
+            lexical_declaration [1621..1659]
+              const [1621..1626]
+              variable_declarator [1627..1658]
+                identifier [1627..1633] "parsed"
+                = [1634..1635]
+                as_expression [1636..1658]
+                  call_expression [1636..1651]
+                    member_expression [1636..1646]
+                      identifier [1636..1640] "JSON"
+                      . [1640..1641]
+                      property_identifier [1641..1646] "parse"
+                    arguments [1646..1651]
+                      ( [1646..1647]
+                      identifier [1647..1650] "raw"
+                      ) [1650..1651]
+                  as [1652..1654]
+                  array_type [1655..1658]
+                    type_identifier [1655..1656] "T"
+                    [ [1656..1657]
+                    ] [1657..1658]
+              ; [1658..1659]
+            expression_statement [1664..1728]
+              call_expression [1664..1727]
+                member_expression [1664..1678]
+                  identifier [1664..1670] "parsed"
+                  . [1670..1671]
+                  property_identifier [1671..1678] "forEach"
+                arguments [1678..1727]
+                  ( [1678..1679]
+                  arrow_function [1679..1726]
+                    formal_parameters [1679..1687]
+                      ( [1679..1680]
+                      required_parameter [1680..1686]
+                        identifier [1680..1686] "record"
+                      ) [1686..1687]
+                    => [1688..1690]
+                    call_expression [1691..1726]
+                      member_expression [1691..1707]
+                        member_expression [1691..1703]
+                          this [1691..1695]
+                          . [1695..1696]
+                          property_identifier [1696..1703] "records"
+                        . [1703..1704]
+                        property_identifier [1704..1707] "set"
+                      arguments [1707..1726]
+                        ( [1707..1708]
+                        member_expression [1708..1717]
+                          identifier [1708..1714] "record"
+                          . [1714..1715]
+                          property_identifier [1715..1717] "id"
+                        , [1717..1718]
+                        identifier [1719..1725] "record"
+                        ) [1725..1726]
+                  ) [1726..1727]
+              ; [1727..1728]
+            expression_statement [1733..1764]
+              assignment_expression [1733..1763]
+                member_expression [1733..1743]
+                  this [1733..1737]
+                  . [1737..1738]
+                  property_identifier [1738..1743] "count"
+                = [1744..1745]
+                member_expression [1746..1763]
+                  member_expression [1746..1758]
+                    this [1746..1750]
+                    . [1750..1751]
+                    property_identifier [1751..1758] "records"
+                  . [1758..1759]
+                  property_identifier [1759..1763] "size"
+              ; [1763..1764]
+            } [1767..1768]
+        method_definition [1772..1837]
+          property_identifier [1772..1777] "clear"
+          formal_parameters [1777..1779]
+            ( [1777..1778]
+            ) [1778..1779]
+          type_annotation [1779..1785]
+            : [1779..1780]
+            predefined_type [1781..1785] "void"
+              void [1781..1785]
+          statement_block [1786..1837]
+            { [1786..1787]
+            expression_statement [1792..1813]
+              call_expression [1792..1812]
+                member_expression [1792..1810]
+                  member_expression [1792..1804]
+                    this [1792..1796]
+                    . [1796..1797]
+                    property_identifier [1797..1804] "records"
+                  . [1804..1805]
+                  property_identifier [1805..1810] "clear"
+                arguments [1810..1812]
+                  ( [1810..1811]
+                  ) [1811..1812]
+              ; [1812..1813]
+            expression_statement [1818..1833]
+              assignment_expression [1818..1832]
+                member_expression [1818..1828]
+                  this [1818..1822]
+                  . [1822..1823]
+                  property_identifier [1823..1828] "count"
+                = [1829..1830]
+                number [1831..1832] "0"
+              ; [1832..1833]
+            } [1836..1837]
+        } [1838..1839]
+  export_statement [1900..2087]
+    leading: comment [1841..1899] extra attached=leading(454) "/** Anything that can be read out one re"...
+    export [1900..1906]
+    interface_declaration [1907..2087]
+      interface [1907..1916]
+      type_identifier [1917..1925] "Readable"
+      type_parameters [1925..1928]
+        < [1925..1926]
+        type_parameter [1926..1927]
+          type_identifier [1926..1927] "T"
+        > [1927..1928]
+      interface_body [1929..2087]
+        { [1929..1930]
+        property_signature [2011..2032]
+          leading: comment [1933..2008] extra attached=leading(467) "// Interface members are order-insensiti"...
+          readonly [2011..2019]
+          property_identifier [2020..2024] "size"
+          type_annotation [2024..2032]
+            : [2024..2025]
+            predefined_type [2026..2032] "number"
+              number [2026..2032] "number"
+        ; [2032..2033]
+        method_signature [2036..2067]
+          property_identifier [2036..2040] "find"
+          formal_parameters [2040..2052]
+            ( [2040..2041]
+            required_parameter [2041..2051]
+              identifier [2041..2043] "id"
+              type_annotation [2043..2051]
+                : [2043..2044]
+                predefined_type [2045..2051] "string"
+                  string [2045..2051]
+            ) [2051..2052]
+          type_annotation [2052..2067]
+            : [2052..2053]
+            union_type [2054..2067]
+              type_identifier [2054..2055] "T"
+              | [2056..2057]
+              literal_type [2058..2067]
+                undefined [2058..2067]
+        ; [2067..2068]
+        method_signature [2071..2084]
+          property_identifier [2071..2076] "clear"
+          formal_parameters [2076..2078]
+            ( [2076..2077]
+            ) [2077..2078]
+          type_annotation [2078..2084]
+            : [2078..2079]
+            predefined_type [2080..2084] "void"
+              void [2080..2084]
+        ; [2084..2085]
+        } [2086..2087]
+  export_statement [2162..2238]
+    leading: comment [2089..2161] extra attached=leading(506) "/** A type literal — the same child inve"...
+    export [2162..2168]
+    type_alias_declaration [2169..2238]
+      type [2169..2173]
+      type_identifier [2174..2182] "Snapshot"
+      = [2183..2184]
+      object_type [2185..2237]
+        { [2185..2186]
+        property_signature [2189..2204]
+          property_identifier [2189..2196] "takenAt"
+          type_annotation [2196..2204]
+            : [2196..2197]
+            predefined_type [2198..2204] "number"
+              number [2198..2204] "number"
+        ; [2204..2205]
+        property_signature [2208..2234]
+          property_identifier [2208..2215] "records"
+          type_annotation [2215..2234]
+            : [2215..2216]
+            readonly_type [2217..2234]
+              readonly [2217..2225]
+              array_type [2226..2234]
+                predefined_type [2226..2232] "string"
+                  string [2226..2232]
+                [ [2232..2233]
+                ] [2233..2234]
+        ; [2234..2235]
+        } [2236..2237]
+      ; [2237..2238]
+  export_statement [2402..2462]
+    leading: comment [2240..2401] extra attached=leading(536) "/**\n * Numeric enum members auto-increme"...
+    export [2402..2408]
+    enum_declaration [2409..2462]
+      enum [2409..2413]
+      identifier [2414..2419] "Level"
+      enum_body [2420..2462]
+        { [2420..2421]
+        property_identifier [2424..2429] "Debug"
+        , [2429..2430]
+        property_identifier [2433..2437] "Info"
+        , [2437..2438]
+        enum_assignment [2441..2450]
+          property_identifier [2441..2445] "Warn"
+          = [2446..2447]
+          number [2448..2450] "10"
+        , [2450..2451]
+        property_identifier [2454..2459] "Error"
+        , [2459..2460]
+        } [2461..2462]
+  export_statement [2464..2515]
+    export [2464..2470]
+    lexical_declaration [2471..2515]
+      const [2471..2476]
+      variable_declarator [2477..2514]
+        identifier [2477..2485] "identity"
+        = [2486..2487]
+        arrow_function [2488..2514]
+          type_parameters [2488..2492]
+            < [2488..2489]
+            type_parameter [2489..2490]
+              type_identifier [2489..2490] "T"
+            , [2490..2491]
+            > [2491..2492]
+          formal_parameters [2492..2502]
+            ( [2492..2493]
+            required_parameter [2493..2501]
+              identifier [2493..2498] "value"
+              type_annotation [2498..2501]
+                : [2498..2499]
+                type_identifier [2500..2501] "T"
+            ) [2501..2502]
+          type_annotation [2502..2505]
+            : [2502..2503]
+            type_identifier [2504..2505] "T"
+          => [2506..2508]
+          identifier [2509..2514] "value"
+      ; [2514..2515]
+  export_statement [2517..2653]
+    export [2517..2523]
+    lexical_declaration [2524..2653]
+      const [2524..2529]
+      variable_declarator [2530..2652]
+        identifier [2530..2538] "describe"
+        = [2539..2540]
+        arrow_function [2541..2652]
+          formal_parameters [2541..2572]
+            ( [2541..2542]
+            required_parameter [2542..2554]
+              identifier [2542..2547] "level"
+              type_annotation [2547..2554]
+                : [2547..2548]
+                type_identifier [2549..2554] "Level"
+            , [2554..2555]
+            optional_parameter [2556..2571]
+              identifier [2556..2562] "detail"
+              ? [2562..2563]
+              type_annotation [2563..2571]
+                : [2563..2564]
+                predefined_type [2565..2571] "string"
+                  string [2565..2571]
+            ) [2571..2572]
+          type_annotation [2572..2580]
+            : [2572..2573]
+            predefined_type [2574..2580] "string"
+              string [2574..2580]
+          => [2581..2583]
+          ternary_expression [2586..2652]
+            binary_expression [2586..2606]
+              identifier [2586..2592] "detail"
+              === [2593..2596]
+              undefined [2597..2606]
+            ? [2607..2608]
+            subscript_expression [2609..2621]
+              identifier [2609..2614] "Level"
+              [ [2614..2615]
+              identifier [2615..2620] "level"
+              ] [2620..2621]
+            : [2622..2623]
+            template_string [2624..2652]
+              ` [2624..2625]
+              template_substitution [2625..2640]
+                ${ [2625..2627]
+                subscript_expression [2627..2639]
+                  identifier [2627..2632] "Level"
+                  [ [2632..2633]
+                  identifier [2633..2638] "level"
+                  ] [2638..2639]
+                } [2639..2640]
+              string_fragment [2640..2642] ": "
+              template_substitution [2642..2651]
+                ${ [2642..2644]
+                identifier [2644..2650] "detail"
+                } [2650..2651]
+              ` [2651..2652]
+      ; [2652..2653]
+  export_statement [2655..2977]
+    export [2655..2661]
+    function_declaration [2662..2977]
+      function [2662..2670]
+      identifier [2671..2680] "partition"
+      type_parameters [2680..2683]
+        < [2680..2681]
+        type_parameter [2681..2682]
+          type_identifier [2681..2682] "T"
+        > [2682..2683]
+      formal_parameters [2683..2759]
+        ( [2683..2684]
+        required_parameter [2687..2706]
+          identifier [2687..2692] "items"
+          type_annotation [2692..2706]
+            : [2692..2693]
+            readonly_type [2694..2706]
+              readonly [2694..2702]
+              array_type [2703..2706]
+                type_identifier [2703..2704] "T"
+                [ [2704..2705]
+                ] [2705..2706]
+        , [2706..2707]
+        required_parameter [2710..2756]
+          identifier [2710..2719] "predicate"
+          type_annotation [2719..2756]
+            : [2719..2720]
+            function_type [2721..2756]
+              formal_parameters [2721..2745]
+                ( [2721..2722]
+                required_parameter [2722..2729]
+                  identifier [2722..2726] "item"
+                  type_annotation [2726..2729]
+                    : [2726..2727]
+                    type_identifier [2728..2729] "T"
+                , [2729..2730]
+                required_parameter [2731..2744]
+                  identifier [2731..2736] "index"
+                  type_annotation [2736..2744]
+                    : [2736..2737]
+                    predefined_type [2738..2744] "number"
+                      number [2738..2744] "number"
+                ) [2744..2745]
+              => [2746..2748]
+              predefined_type [2749..2756] "boolean"
+                boolean [2749..2756]
+        , [2756..2757]
+        ) [2758..2759]
+      type_annotation [2759..2771]
+        : [2759..2760]
+        tuple_type [2761..2771]
+          [ [2761..2762]
+          array_type [2762..2765]
+            type_identifier [2762..2763] "T"
+            [ [2763..2764]
+            ] [2764..2765]
+          , [2765..2766]
+          array_type [2767..2770]
+            type_identifier [2767..2768] "T"
+            [ [2768..2769]
+            ] [2769..2770]
+          ] [2770..2771]
+      statement_block [2772..2977]
+        { [2772..2773]
+        lexical_declaration [2776..2796]
+          const [2776..2781]
+          variable_declarator [2782..2795]
+            identifier [2782..2785] "yes"
+            type_annotation [2785..2790]
+              : [2785..2786]
+              array_type [2787..2790]
+                type_identifier [2787..2788] "T"
+                [ [2788..2789]
+                ] [2789..2790]
+            = [2791..2792]
+            array [2793..2795]
+              [ [2793..2794]
+              ] [2794..2795]
+          ; [2795..2796]
+        lexical_declaration [2799..2818]
+          const [2799..2804]
+          variable_declarator [2805..2817]
+            identifier [2805..2807] "no"
+            type_annotation [2807..2812]
+              : [2807..2808]
+              array_type [2809..2812]
+                type_identifier [2809..2810] "T"
+                [ [2810..2811]
+                ] [2811..2812]
+            = [2813..2814]
+            array [2815..2817]
+              [ [2815..2816]
+              ] [2816..2817]
+          ; [2817..2818]
+        expression_statement [2821..2955]
+          call_expression [2821..2954]
+            member_expression [2821..2834]
+              identifier [2821..2826] "items"
+              . [2826..2827]
+              property_identifier [2827..2834] "forEach"
+            arguments [2834..2954]
+              ( [2834..2835]
+              arrow_function [2835..2953]
+                formal_parameters [2835..2848]
+                  ( [2835..2836]
+                  required_parameter [2836..2840]
+                    identifier [2836..2840] "item"
+                  , [2840..2841]
+                  required_parameter [2842..2847]
+                    identifier [2842..2847] "index"
+                  ) [2847..2848]
+                => [2849..2851]
+                statement_block [2852..2953]
+                  { [2852..2853]
+                  if_statement [2858..2949]
+                    if [2858..2860]
+                    parenthesized_expression [2861..2885]
+                      ( [2861..2862]
+                      call_expression [2862..2884]
+                        identifier [2862..2871] "predicate"
+                        arguments [2871..2884]
+                          ( [2871..2872]
+                          identifier [2872..2876] "item"
+                          , [2876..2877]
+                          identifier [2878..2883] "index"
+                          ) [2883..2884]
+                      ) [2884..2885]
+                    statement_block [2886..2915]
+                      { [2886..2887]
+                      expression_statement [2894..2909]
+                        call_expression [2894..2908]
+                          member_expression [2894..2902]
+                            identifier [2894..2897] "yes"
+                            . [2897..2898]
+                            property_identifier [2898..2902] "push"
+                          arguments [2902..2908]
+                            ( [2902..2903]
+                            identifier [2903..2907] "item"
+                            ) [2907..2908]
+                        ; [2908..2909]
+                      } [2914..2915]
+                    else_clause [2916..2949]
+                      else [2916..2920]
+                      statement_block [2921..2949]
+                        { [2921..2922]
+                        expression_statement [2929..2943]
+                          call_expression [2929..2942]
+                            member_expression [2929..2936]
+                              identifier [2929..2931] "no"
+                              . [2931..2932]
+                              property_identifier [2932..2936] "push"
+                            arguments [2936..2942]
+                              ( [2936..2937]
+                              identifier [2937..2941] "item"
+                              ) [2941..2942]
+                          ; [2942..2943]
+                        } [2948..2949]
+                  } [2952..2953]
+              ) [2953..2954]
+          ; [2954..2955]
+        return_statement [2958..2975]
+          return [2958..2964]
+          array [2965..2974]
+            [ [2965..2966]
+            identifier [2966..2969] "yes"
+            , [2969..2970]
+            identifier [2971..2973] "no"
+            ] [2973..2974]
+          ; [2974..2975]
+        } [2976..2977]
+  export_statement [2979..3281]
+    export [2979..2985]
+    internal_module [2986..3281]
+      namespace [2986..2995]
+      identifier [2996..3007] "Diagnostics"
+      statement_block [3008..3281]
+        { [3008..3009]
+        export_statement [3012..3040]
+          export [3012..3018]
+          lexical_declaration [3019..3040]
+            const [3019..3024]
+            variable_declarator [3025..3039]
+              identifier [3025..3032] "enabled"
+              = [3033..3034]
+              true [3035..3039]
+            ; [3039..3040]
+        export_statement [3044..3279]
+          export [3044..3050]
+          function_declaration [3051..3279]
+            function [3051..3059]
+            identifier [3060..3066] "report"
+            formal_parameters [3066..3083]
+              ( [3066..3067]
+              required_parameter [3067..3082]
+                identifier [3067..3074] "message"
+                type_annotation [3074..3082]
+                  : [3074..3075]
+                  predefined_type [3076..3082] "string"
+                    string [3076..3082]
+              ) [3082..3083]
+            type_annotation [3083..3089]
+              : [3083..3084]
+              predefined_type [3085..3089] "void"
+                void [3085..3089]
+            statement_block [3090..3279]
+              { [3090..3091]
+              if_statement [3096..3131]
+                if [3096..3098]
+                parenthesized_expression [3099..3109]
+                  ( [3099..3100]
+                  unary_expression [3100..3108]
+                    ! [3100..3101]
+                    identifier [3101..3108] "enabled"
+                  ) [3108..3109]
+                statement_block [3110..3131]
+                  { [3110..3111]
+                  return_statement [3118..3125]
+                    return [3118..3124]
+                    ; [3124..3125]
+                  } [3130..3131]
+              try_statement [3136..3275]
+                try [3136..3139]
+                statement_block [3140..3176]
+                  { [3140..3141]
+                  expression_statement [3148..3170]
+                    call_expression [3148..3169]
+                      member_expression [3148..3160]
+                        identifier [3148..3155] "console"
+                        . [3155..3156]
+                        property_identifier [3156..3160] "warn"
+                      arguments [3160..3169]
+                        ( [3160..3161]
+                        identifier [3161..3168] "message"
+                        ) [3168..3169]
+                    ; [3169..3170]
+                  } [3175..3176]
+                catch_clause [3177..3275]
+                  catch [3177..3182]
+                  ( [3183..3184]
+                  identifier [3184..3189] "error"
+                  ) [3189..3190]
+                  statement_block [3191..3275]
+                    { [3191..3192]
+                    expression_statement [3258..3269]
+                      leading: comment [3199..3251] extra attached=leading(885) "// Swallowed on purpose: reporting must "...
+                      unary_expression [3258..3268]
+                        void [3258..3262]
+                        identifier [3263..3268] "error"
+                      ; [3268..3269]
+                    } [3274..3275]
+              } [3278..3279]
+        } [3280..3281]
+  lexical_declaration [3401..3497]
+    leading: comment [3283..3358] extra attached=leading(895) "// Object literals are Ordered: a later "...
+    leading: comment [3359..3400] extra attached=leading(895) "// spread interleaves with explicit keys"...
+    const [3401..3406]
+    variable_declarator [3407..3496]
+      identifier [3407..3415] "defaults"
+      = [3416..3417]
+      object [3418..3496]
+        { [3418..3419]
+        pair [3422..3449]
+          property_identifier [3422..3429] "timeout"
+          : [3429..3430]
+          identifier [3431..3449] "DEFAULT_TIMEOUT_MS"
+        , [3449..3450]
+        pair [3453..3463]
+          property_identifier [3453..3460] "retries"
+          : [3460..3461]
+          number [3462..3463] "3"
+        , [3463..3464]
+        spread_element [3467..3479]
+          ... [3467..3470]
+          identifier [3470..3479] "overrides"
+        , [3479..3480]
+        pair [3483..3493]
+          property_identifier [3483..3490] "retries"
+          : [3490..3491]
+          number [3492..3493] "5"
+        , [3493..3494]
+        } [3495..3496]
+    ; [3496..3497]
+  labeled_statement [3499..3585]
+    statement_identifier [3499..3504] "label"
+    : [3504..3505]
+    for_in_statement [3506..3585]
+      for [3506..3509]
+      ( [3510..3511]
+      const [3511..3516]
+      identifier [3517..3520] "key"
+      in [3521..3523]
+      identifier [3524..3532] "defaults"
+      ) [3532..3533]
+      statement_block [3534..3585]
+        { [3534..3535]
+        if_statement [3538..3583]
+          if [3538..3540]
+          parenthesized_expression [3541..3560]
+            ( [3541..3542]
+            binary_expression [3542..3559]
+              identifier [3542..3545] "key"
+              === [3546..3549]
+              string [3550..3559]
+                " [3550..3551]
+                string_fragment [3551..3558] "retries"
+                " [3558..3559]
+            ) [3559..3560]
+          statement_block [3561..3583]
+            { [3561..3562]
+            break_statement [3567..3579]
+              break [3567..3572]
+              statement_identifier [3573..3578] "label"
+              ; [3578..3579]
+            } [3582..3583]
+        } [3584..3585]
+  export_statement [3587..3627]
+    export [3587..3593]
+    export_clause [3594..3626]
+      { [3594..3595]
+      export_specifier [3596..3604]
+        identifier [3596..3604] "defaults"
+      , [3604..3605]
+      export_specifier [3606..3624]
+        identifier [3606..3615] "partition"
+        as [3616..3618]
+        identifier [3619..3624] "split"
+      } [3625..3626]
+    ; [3626..3627]
+  export_statement [3628..3653]
+    export [3628..3634]
+    default [3635..3642]
+    identifier [3643..3652] "UserStore"
+    ; [3652..3653]

@@ -248,7 +248,9 @@ fn language_detection_is_by_extension_and_case_insensitive() {
         Some("java")
     );
     assert!(sm_cst::languages::by_name("cobol").is_none());
-    assert_eq!(sm_cst::languages::all().len(), 1);
+    // Java, plus TypeScript's two dialects. The TypeScript side of the registry
+    // is asserted in `tests/ts_language_config.rs`.
+    assert_eq!(sm_cst::languages::all().len(), 3);
 }
 
 fn languages_detect_name(path: &std::path::Path) -> Option<&'static str> {

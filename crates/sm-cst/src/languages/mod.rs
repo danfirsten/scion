@@ -1,20 +1,31 @@
 //! The language registry.
 //!
-//! Java only, for now. TypeScript arrives in M5 to prove the [`Language`]
-//! abstraction actually holds (SPEC.md §3).
+//! Java and TypeScript. TypeScript was pulled forward from M5 to prove the
+//! [`Language`] abstraction actually holds (SPEC.md §3), and it is registered
+//! twice — once per `tree-sitter-typescript` grammar — because `.ts` and `.tsx`
+//! genuinely need different parsers. See [`TypeScriptLanguage`] for why that is
+//! one parameterised type rather than two.
 
 mod java;
+mod typescript;
 
 pub use java::JavaLanguage;
+pub use typescript::{TsDialect, TypeScriptLanguage};
 
 use std::path::Path;
 
 use crate::language::Language;
 
 static JAVA: JavaLanguage = JavaLanguage;
+static TYPESCRIPT: TypeScriptLanguage = TypeScriptLanguage::TYPESCRIPT;
+static TSX: TypeScriptLanguage = TypeScriptLanguage::TSX;
 
 /// Every language this build supports.
-static REGISTRY: &[&'static dyn Language] = &[&JAVA];
+///
+/// Order matters only in that [`detect`] takes the first entry claiming an
+/// extension; the extension sets are disjoint, and a test asserts they stay that
+/// way.
+static REGISTRY: &[&'static dyn Language] = &[&JAVA, &TYPESCRIPT, &TSX];
 
 /// All registered languages.
 #[must_use]
