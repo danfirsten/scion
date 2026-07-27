@@ -2,6 +2,7 @@
 
 use crate::arena::{Attachment, Node, NodeId, SourceTree};
 use crate::language::Language;
+use crate::trivia::{TriviaConfig, attach_trivia};
 
 /// A *hard* parse failure.
 ///
@@ -59,11 +60,32 @@ pub const MAX_SOURCE_LEN: usize = u32::MAX as usize;
 /// splices bytes and needs the punctuation, and discarding comments would
 /// violate the never-lose-bytes rule (SPEC.md §4.2).
 ///
+/// Comments are attached to their owning siblings by the trivia attachment pass
+/// under [`TriviaConfig::DEFAULT`]. Use [`parse_with_trivia_config`] to vary
+/// that policy.
+///
 /// # Errors
 ///
 /// See [`ParseError`]. A file with syntax errors is *not* an error here — check
 /// [`SourceTree::has_errors`] on the returned tree.
 pub fn parse(source: &[u8], lang: &dyn Language) -> Result<SourceTree, ParseError> {
+    parse_with_trivia_config(source, lang, &TriviaConfig::DEFAULT)
+}
+
+/// [`parse`], with the trivia attachment policy spelled out.
+///
+/// The only difference is which [`TriviaConfig`] the attachment pass runs under;
+/// the tree is otherwise identical, since attachment annotates the tree rather
+/// than reshaping it.
+///
+/// # Errors
+///
+/// See [`parse`].
+pub fn parse_with_trivia_config(
+    source: &[u8],
+    lang: &dyn Language,
+    trivia: &TriviaConfig,
+) -> Result<SourceTree, ParseError> {
     if source.len() > MAX_SOURCE_LEN {
         return Err(ParseError::SourceTooLarge {
             len: source.len(),
@@ -84,7 +106,9 @@ pub fn parse(source: &[u8], lang: &dyn Language) -> Result<SourceTree, ParseErro
     })?;
 
     let nodes = build_arena(&tree);
-    Ok(SourceTree::new(source.to_vec(), nodes, lang.name()))
+    let mut tree = SourceTree::new(source.to_vec(), nodes, lang.name());
+    attach_trivia(&mut tree, lang, trivia);
+    Ok(tree)
 }
 
 /// Flatten a tree-sitter tree into a preorder arena.

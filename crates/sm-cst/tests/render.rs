@@ -113,16 +113,31 @@ fn every_node_is_rendered_exactly_once() {
     }
 }
 
+/// Undo the trivia attachment pass, returning every comment to
+/// [`Attachment::Floating`].
+///
+/// The tests below drive the renderer's trivia path by hand, one attachment at
+/// a time; starting from the pass's real output would make them assert on the
+/// policy rather than on the printer. `tests/trivia.rs` covers the policy, and
+/// the gallery snapshot there covers the two together.
+fn detach_everything(tree: &mut sm_cst::SourceTree) {
+    let comments: Vec<_> = tree
+        .ids()
+        .filter(|&id| java().is_comment(tree.node(id).kind))
+        .collect();
+    for id in comments {
+        tree.detach(id);
+    }
+}
+
 /// The trivia rendering path — a comment attached to a node is printed under
 /// that node and *not* at its structural position, so it still appears exactly
 /// once.
-///
-/// Nothing attaches trivia yet; this drives the seam by hand so that the
-/// attachment pass inherits a renderer that is already known to work.
 #[test]
 fn attached_trivia_renders_under_its_owner_and_only_there() {
     let mut tree = parse_fixture("typical");
     let lang = java();
+    detach_everything(&mut tree);
 
     let comment = tree
         .ids()
@@ -172,6 +187,7 @@ fn attached_trivia_renders_under_its_owner_and_only_there() {
 fn no_trivia_also_hides_attached_comments() {
     let mut tree = parse_fixture("typical");
     let lang = java();
+    detach_everything(&mut tree);
     let comment = tree
         .ids()
         .find(|&id| lang.is_comment(tree.node(id).kind))

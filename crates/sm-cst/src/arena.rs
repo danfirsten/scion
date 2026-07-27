@@ -37,11 +37,12 @@ impl std::fmt::Display for NodeId {
 
 /// Where a comment node has been attached by the trivia attachment pass.
 ///
-/// **Populated by the trivia attachment pass** (not implemented in M0). Every
-/// comment node parses with [`Attachment::Floating`], which is also the correct
-/// terminal value for a comment that belongs to no particular sibling — a
-/// section banner in the middle of a class body, say. Non-comment nodes always
-/// carry [`Attachment::Floating`] and it is meaningless for them.
+/// **Populated by the trivia attachment pass** ([`crate::attach_trivia`], which
+/// [`crate::parse`] runs). [`Attachment::Floating`] is both the pre-attachment
+/// default and the correct terminal value for a comment that belongs to no
+/// particular sibling — a section banner surrounded by blank lines, say.
+/// Non-comment nodes always carry [`Attachment::Floating`] and it is
+/// meaningless for them.
 #[derive(Clone, Copy, PartialEq, Eq, Debug, Default, Serialize, Deserialize)]
 #[serde(tag = "kind", content = "owner", rename_all = "snake_case")]
 pub enum Attachment {
@@ -103,20 +104,20 @@ pub struct Node {
     pub has_error: bool,
     /// Comments that introduce this node, in source order.
     ///
-    /// **Populated by the trivia attachment pass** (not implemented in M0);
-    /// always empty until then. Each ID refers to a comment node that also still
-    /// occupies its structural position in some ancestor's [`Node::children`] —
-    /// attachment annotates the tree, it never removes nodes from it, because
-    /// removing them would break the byte-coverage invariant.
+    /// **Populated by the trivia attachment pass** ([`crate::attach_trivia`]).
+    /// Each ID refers to a comment node that also still occupies its structural
+    /// position in some ancestor's [`Node::children`] — attachment annotates the
+    /// tree, it never removes nodes from it, because removing them would break
+    /// the byte-coverage invariant.
     pub leading_trivia: Vec<NodeId>,
     /// Comments that trail this node, in source order. **Populated by the trivia
     /// attachment pass**; see [`Node::leading_trivia`].
     pub trailing_trivia: Vec<NodeId>,
     /// For comment nodes, where this comment was attached.
     ///
-    /// **Populated by the trivia attachment pass**; [`Attachment::Floating`]
-    /// until then. This is the inverse of [`Node::leading_trivia`] /
-    /// [`Node::trailing_trivia`] and the two must be kept consistent.
+    /// **Populated by the trivia attachment pass**. This is the inverse of
+    /// [`Node::leading_trivia`] / [`Node::trailing_trivia`] and the two must be
+    /// kept consistent.
     pub attachment: Attachment,
 }
 

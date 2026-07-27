@@ -62,12 +62,12 @@ pub struct JsonNode<'a> {
     pub missing: bool,
     /// Whether this node or a descendant is `ERROR`/`MISSING`.
     pub has_error: bool,
-    /// Attached leading comments. Empty until the trivia attachment pass runs.
+    /// Attached leading comments, in source order.
     pub leading_trivia: &'a [NodeId],
-    /// Attached trailing comments. Empty until the trivia attachment pass runs.
+    /// Attached trailing comments, in source order.
     pub trailing_trivia: &'a [NodeId],
-    /// Where this comment was attached. `"floating"` until the trivia
-    /// attachment pass runs.
+    /// Where this comment was attached: `"leading"` or `"trailing"` with an
+    /// owner, or `"floating"`. Always `"floating"` for a non-comment node.
     pub attachment: Attachment,
     /// Source text, present for leaf (token) nodes only.
     ///

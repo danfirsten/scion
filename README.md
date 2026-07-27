@@ -20,6 +20,11 @@ layer and a `sm parse` command to inspect it:
   byte of the input (whitespace, comments, punctuation), and exposes the
   language-agnostic `Language` trait that the rest of the pipeline is written
   against.
+- **Trivia attachment** decides which declaration each comment belongs to — a
+  Javadoc block leads the method below it, `// like this` trails the statement it
+  sits on, a banner between blank lines floats. The policy is documented and
+  configurable (`TriviaConfig`), and has its own test suite; the comment nodes
+  themselves never move, so no byte is ever lost.
 - The structural invariants — range containment, sibling ordering, byte
   coverage, preorder ID numbering — are enforced by tests over a fixture corpus,
   not just asserted in prose.
@@ -27,8 +32,7 @@ layer and a `sm parse` command to inspect it:
   `sm-eval`) are empty. Each has a doc comment describing the role it will play
   and no code, so nothing can accidentally depend on a stub.
 
-Not yet implemented, in the order it is coming: **trivia attachment** (deciding
-which comment belongs to which declaration), corpus mining (M1), GumTree
+Not yet implemented, in the order it is coming: corpus mining (M1), GumTree
 matching (M2), structural diff (M3), **the three-way merge and the git driver
 (M4)**, the evaluation (M5), and name binding (M6). See `SPEC.md` for the full
 plan and `PROGRESS.md` for where things actually stand.

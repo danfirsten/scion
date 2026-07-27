@@ -1,0 +1,260 @@
+---
+source: crates/sm-cst/tests/trivia.rs
+expression: "render_parse(&tree, java(), &RenderOptions::default())"
+---
+program [0..2942]
+  line_comment [0..77] extra "// g01 copyright header, separated from "...
+  line_comment [78..127] extra "// g02 second line of that header run ->"...
+  package_declaration [129..157]
+    package [129..136]
+    scoped_identifier [137..156]
+      scoped_identifier [137..148]
+        identifier [137..140] "com"
+        . [140..141]
+        identifier [141..148] "example"
+      . [148..149]
+      identifier [149..156] "gallery"
+    ; [156..157]
+  import_declaration [226..248]
+    leading: line_comment [159..225] extra attached=leading(14) "// g03 glued to the import below -> lead"...
+    import [226..232]
+    scoped_identifier [233..247]
+      scoped_identifier [233..242]
+        identifier [233..237] "java"
+        . [237..238]
+        identifier [238..242] "util"
+      . [242..243]
+      identifier [243..247] "List"
+    ; [247..248]
+  import_declaration [250..271]
+    import [250..256]
+    scoped_identifier [257..270]
+      scoped_identifier [257..266]
+        identifier [257..261] "java"
+        . [261..262]
+        identifier [262..266] "util"
+      . [266..267]
+      identifier [267..270] "Map"
+    ; [270..271]
+    trailing: line_comment [272..336] extra attached=trailing(24) "// g04 same line as the import -> traili"...
+  class_declaration [487..2889]
+    leading: line_comment [338..364] extra attached=leading(38) "// g05 first line of a run"
+    leading: line_comment [365..399] extra attached=leading(38) "// g06 second line of the same run"
+    leading: block_comment [400..486] extra attached=leading(38) "/**\n * g07 Javadoc closing the run; all "...
+    modifiers [487..493]
+      public [487..493]
+    class [494..499]
+    identifier [500..507] "Gallery"
+    class_body [508..2889]
+      { [508..509]
+      field_declaration [724..751]
+        leading: line_comment [510..566] extra attached=leading(48) "// g08 the `{` is anonymous, so nothing "...
+        leading: line_comment [590..646] extra attached=leading(48) "//     could own it; it chains forward -"...
+        leading: block_comment [651..719] extra attached=leading(48) "/** g09 Javadoc for a field, closing tha"...
+        modifiers [724..736]
+          static [724..730]
+          final [731..736]
+        integral_type [737..740]
+          int [737..740]
+        variable_declarator [741..750]
+          identifier [741..746] "FLOOR"
+          = [747..748]
+          decimal_integer_literal [749..750] "0"
+        ; [750..751]
+      line_comment [757..819] extra "// g10 separated from what follows by a "...
+      field_declaration [889..914]
+        leading: block_comment [825..884] extra attached=leading(61) "/* g11 block comment on its own line -> "...
+        modifiers [889..896]
+          private [889..896]
+        integral_type [897..900]
+          int [897..900]
+        variable_declarator [901..913]
+          identifier [901..908] "ceiling"
+          = [909..910]
+          decimal_integer_literal [911..913] "10"
+        ; [913..914]
+        trailing: line_comment [915..939] extra attached=trailing(61) "// g12 trailing(ceiling)"
+      field_declaration [1112..1134]
+        leading: block_comment [945..1107] extra attached=leading(73) "/* g13 a block comment that\n       spans"...
+        modifiers [1112..1119]
+          private [1112..1119]
+        integral_type [1120..1123]
+          int [1120..1123]
+        variable_declarator [1124..1133]
+          identifier [1124..1129] "depth"
+          = [1130..1131]
+          decimal_integer_literal [1132..1133] "1"
+        ; [1133..1134]
+      field_declaration [1140..1162]
+        modifiers [1140..1147]
+          private [1140..1147]
+        integral_type [1148..1151]
+          int [1148..1151]
+        variable_declarator [1152..1161]
+          identifier [1152..1157] "width"
+          = [1158..1159]
+          decimal_integer_literal [1160..1161] "2"
+        ; [1161..1162]
+        trailing: block_comment [1163..1404] extra attached=trailing(83) "/* g14 a block comment that starts on th"...
+      method_declaration [1481..2136]
+        leading: block_comment [1410..1476] extra attached=leading(95) "/** g15 Javadoc above an annotated metho"...
+        modifiers [1481..1711]
+          marker_annotation [1481..1492]
+            @ [1481..1482]
+            identifier [1482..1492] "Deprecated"
+          annotation [1497..1524]
+            @ [1497..1498]
+            identifier [1498..1514] "SuppressWarnings"
+            annotation_argument_list [1514..1524]
+              ( [1514..1515]
+              string_literal [1515..1523] "\"unused\""
+                " [1515..1516]
+                string_fragment [1516..1522] "unused"
+                " [1522..1523]
+              ) [1523..1524]
+          line_comment [1529..1598] extra "// g16 wedged between the annotations an"...
+          line_comment [1603..1670] extra "// `modifiers`, where the only candidate"...
+          line_comment [1675..1700] extra "// themselves -> floating"
+          public [1705..1711]
+        void_type [1712..1716]
+        identifier [1717..1726] "annotated"
+        formal_parameters [1726..1728]
+          ( [1726..1727]
+          ) [1727..1728]
+        block [1729..2136]
+          { [1729..1730]
+          local_variable_declaration [1814..1828]
+            leading: line_comment [1739..1805] extra attached=leading(122) "// g17 first statement's leading comment"...
+            integral_type [1814..1817]
+              int [1814..1817]
+            variable_declarator [1818..1827]
+              identifier [1818..1823] "local"
+              = [1824..1825]
+              decimal_integer_literal [1826..1827] "1"
+            ; [1827..1828]
+            trailing: line_comment [1829..1851] extra attached=trailing(122) "// g18 trailing(local)"
+          if_statement [1940..1990]
+            leading: line_comment [1861..1931] extra attached=leading(132) "// g19 after a blank line but glued to w"...
+            if [1940..1942]
+            parenthesized_expression [1943..1958]
+              ( [1943..1944]
+              binary_expression [1944..1957]
+                identifier [1944..1949] "local"
+                > [1950..1951]
+                identifier [1952..1957] "FLOOR"
+              ) [1957..1958]
+            block [1959..1990]
+              { [1959..1960]
+              return_statement [1973..1980]
+                return [1973..1979]
+                ; [1979..1980]
+              } [1989..1990]
+          line_comment [2000..2062] extra "// g20 last child of the method body, no"...
+          line_comment [2071..2130] extra "// -> floating, and it does NOT reach th"...
+          } [2135..2136]
+      method_declaration [2142..2361]
+        integral_type [2142..2145]
+          int [2142..2145]
+        identifier [2146..2149] "sum"
+        formal_parameters [2149..2163]
+          ( [2149..2150]
+          formal_parameter [2150..2155]
+            integral_type [2150..2153]
+              int [2150..2153]
+            identifier [2154..2155] "a"
+          , [2155..2156]
+          formal_parameter [2157..2162]
+            integral_type [2157..2160]
+              int [2157..2160]
+            identifier [2161..2162] "b"
+          ) [2162..2163]
+        block [2164..2361]
+          { [2164..2165]
+          return_statement [2174..2355]
+            return [2174..2180]
+            method_invocation [2181..2354]
+              identifier [2181..2184] "add"
+              argument_list [2184..2354]
+                ( [2184..2185]
+                identifier [2202..2203] "a"
+                , [2203..2204]
+                identifier [2352..2353] "b"
+                  leading: line_comment [2205..2260] extra attached=leading(178) "// g21 after a `,`, so the trailing rule"...
+                  leading: line_comment [2280..2335] extra attached=leading(178) "// -> leading(b), and g22 here chains to"...
+                ) [2353..2354]
+            ; [2354..2355]
+          } [2360..2361]
+      method_declaration [2367..2426]
+        modifiers [2367..2374]
+          private [2367..2374]
+        integral_type [2375..2378]
+          int [2375..2378]
+        identifier [2379..2382] "add"
+        formal_parameters [2382..2396]
+          ( [2382..2383]
+          formal_parameter [2383..2388]
+            integral_type [2383..2386]
+              int [2383..2386]
+            identifier [2387..2388] "a"
+          , [2388..2389]
+          formal_parameter [2390..2395]
+            integral_type [2390..2393]
+              int [2390..2393]
+            identifier [2394..2395] "b"
+          ) [2395..2396]
+        block [2397..2426]
+          { [2397..2398]
+          return_statement [2407..2420]
+            return [2407..2413]
+            binary_expression [2414..2419]
+              identifier [2414..2415] "a"
+              + [2416..2417]
+              identifier [2418..2419] "b"
+            ; [2419..2420]
+          } [2425..2426]
+      method_declaration [2489..2691]
+        leading: line_comment [2432..2484] extra attached=leading(211) "// g23 comments inside a nested block st"...
+        void_type [2489..2493]
+        identifier [2494..2500] "nested"
+        formal_parameters [2500..2502]
+          ( [2500..2501]
+          ) [2501..2502]
+        block [2503..2691]
+          { [2503..2504]
+          block [2513..2662]
+            { [2513..2514]
+            local_variable_declaration [2527..2541]
+              integral_type [2527..2530]
+                int [2527..2530]
+              variable_declarator [2531..2540]
+                identifier [2531..2536] "inner"
+                = [2537..2538]
+                decimal_integer_literal [2539..2540] "0"
+              ; [2540..2541]
+              trailing: line_comment [2542..2597] extra attached=trailing(221) "// g24 trailing(inner), owner is inside "...
+            line_comment [2610..2652] extra "// g25 last in the inner block -> floati"...
+            } [2661..2662]
+          local_variable_declaration [2671..2685]
+            integral_type [2671..2674]
+              int [2671..2674]
+            variable_declarator [2675..2684]
+              identifier [2675..2680] "outer"
+              = [2681..2682]
+              decimal_integer_literal [2683..2684] "1"
+            ; [2684..2685]
+          } [2690..2691]
+      field_declaration [2781..2809]
+        leading: line_comment [2697..2776] extra attached=leading(242) "// g26 Ünïcödé: multi-byte characters be"...
+        type_identifier [2781..2787] "String"
+        variable_declarator [2788..2808]
+          identifier [2788..2794] "naïve"
+          = [2795..2796]
+          string_literal [2797..2808] "\"café ☕\""
+            " [2797..2798]
+            string_fragment [2798..2807] "café ☕"
+            " [2807..2808]
+        ; [2808..2809]
+        trailing: line_comment [2810..2833] extra attached=trailing(242) "// g27 trailing(naïve)"
+      line_comment [2839..2887] extra "// g28 last member of the class body -> "...
+      } [2888..2889]
+  line_comment [2890..2941] extra "// g29 after the class, on its own line "...

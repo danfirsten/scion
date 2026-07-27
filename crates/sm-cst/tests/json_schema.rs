@@ -55,36 +55,53 @@ fn leaves_carry_text_and_interior_nodes_do_not() {
 #[test]
 fn attachment_serializes_as_a_tagged_object() {
     let json = json_for("typical");
-    let comment = json["nodes"]
-        .as_array()
-        .unwrap()
-        .iter()
-        .find(|n| n["kind"] == "line_comment")
-        .expect("the typical fixture has a line comment");
-    assert_eq!(comment["attachment"]["kind"], "floating");
-    assert_eq!(comment["extra"], true);
-    assert!(comment["leading_trivia"].as_array().unwrap().is_empty());
+    // The fixture's copyright header is separated from `package` by a blank
+    // line, so the trivia pass leaves it floating — the unit variant.
+    let header = &json["nodes"][1];
+    assert_eq!(header["kind"], "line_comment");
+    assert_eq!(header["extra"], true);
+    assert_eq!(header["attachment"]["kind"], "floating");
+    assert!(header["attachment"].get("owner").is_none());
+    assert!(header["leading_trivia"].as_array().unwrap().is_empty());
 
-    // With an attachment recorded, the owner shows up in the payload.
-    let mut tree = parse_fixture("typical");
+    // An attached comment carries its owner, and the owner lists it back.
+    let tree = parse_fixture("typical");
     let lang = support::java();
-    let comment_id = tree
+    let (comment_id, owner_id) = tree
         .ids()
-        .find(|&id| lang.is_comment(tree.node(id).kind))
-        .unwrap();
-    let owner_id = tree
-        .ids()
-        .find(|&id| tree.node(id).kind == "class_declaration")
-        .unwrap();
-    tree.attach_leading(owner_id, comment_id);
+        .find_map(|id| match tree.node(id).attachment {
+            sm_cst::Attachment::Leading(owner) => Some((id, owner)),
+            _ => None,
+        })
+        .expect("the typical fixture has Javadoc that attaches");
+    assert!(lang.is_comment(tree.node(comment_id).kind));
 
-    let json = serde_json::to_value(JsonTree::new(&tree)).unwrap();
     let node = &json["nodes"][comment_id.index()];
     assert_eq!(node["attachment"]["kind"], "leading");
     assert_eq!(node["attachment"]["owner"], owner_id.0);
-    assert_eq!(
-        json["nodes"][owner_id.index()]["leading_trivia"][0],
-        comment_id.0
+    assert!(
+        json["nodes"][owner_id.index()]["leading_trivia"]
+            .as_array()
+            .unwrap()
+            .contains(&Value::from(comment_id.0))
+    );
+
+    // And the trailing side, which uses the other tag.
+    let (comment_id, owner_id) = tree
+        .ids()
+        .find_map(|id| match tree.node(id).attachment {
+            sm_cst::Attachment::Trailing(owner) => Some((id, owner)),
+            _ => None,
+        })
+        .expect("the typical fixture has a trailing comment");
+    let node = &json["nodes"][comment_id.index()];
+    assert_eq!(node["attachment"]["kind"], "trailing");
+    assert_eq!(node["attachment"]["owner"], owner_id.0);
+    assert!(
+        json["nodes"][owner_id.index()]["trailing_trivia"]
+            .as_array()
+            .unwrap()
+            .contains(&Value::from(comment_id.0))
     );
 }
 

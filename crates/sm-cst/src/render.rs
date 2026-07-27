@@ -62,13 +62,12 @@ pub const ERROR_WARNING: &str = "!! WARNING: this file did not parse cleanly (ER
 ///
 /// # Trivia
 ///
-/// The renderer already handles attached trivia, even though nothing attaches
-/// any yet: a comment listed in some node's `leading_trivia` or
-/// `trailing_trivia` is printed *under that node* as a `leading:` / `trailing:`
-/// line and suppressed at its structural position, so it appears exactly once.
-/// Until the trivia attachment pass lands, every comment is
-/// [`Attachment::Floating`] and therefore renders at its structural position,
-/// which is the honest description of what the tree currently knows.
+/// A comment listed in some node's `leading_trivia` or `trailing_trivia` is
+/// printed *under that node* as a `leading:` / `trailing:` line and suppressed
+/// at its structural position, so it appears exactly once either way. A comment
+/// the trivia attachment pass left [`Attachment::Floating`] renders at its
+/// structural position, which is the honest description of what the tree knows
+/// about it.
 #[must_use]
 pub fn render_parse(tree: &SourceTree, lang: &dyn Language, opts: &RenderOptions<'_>) -> String {
     let mut out = String::with_capacity(tree.len() * 48);

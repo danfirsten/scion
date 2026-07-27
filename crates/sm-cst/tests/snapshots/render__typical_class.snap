@@ -46,16 +46,16 @@ program [0..1308]
       . [192..193]
       identifier [193..200] "Objects"
     ; [200..201]
-  block_comment [203..373] extra "/**\n * A warehouse of {@link Item}s.\n *\n"...
   class_declaration [374..1307]
+    leading: block_comment [203..373] extra attached=leading(44) "/**\n * A warehouse of {@link Item}s.\n *\n"...
     modifiers [374..380]
       public [374..380]
     class [381..386]
     identifier [387..396] "Warehouse"
     class_body [397..1307]
       { [397..398]
-      block_comment [404..460] extra "/** How many items we will hold before r"...
       field_declaration [465..505]
+        leading: block_comment [404..460] extra attached=leading(52) "/** How many items we will hold before r"...
         modifiers [465..485]
           private [465..472]
           static [473..479]
@@ -67,8 +67,8 @@ program [0..1308]
           = [499..500]
           decimal_integer_literal [501..504] "128"
         ; [504..505]
-      block_comment [511..552] extra "/* The backing store. Not thread safe. *"...
       field_declaration [557..608]
+        leading: block_comment [511..552] extra attached=leading(65) "/* The backing store. Not thread safe. *"...
         modifiers [557..570]
           private [557..564]
           final [565..570]
@@ -99,7 +99,7 @@ program [0..1308]
         variable_declarator [629..633]
           identifier [629..633] "name"
         ; [633..634]
-      line_comment [635..662] extra "// mutable, set by rename()"
+        trailing: line_comment [635..662] extra attached=trailing(89) "// mutable, set by rename()"
       constructor_declaration [668..763]
         modifiers [668..674]
           public [668..674]
@@ -134,8 +134,8 @@ program [0..1308]
                   ) [755..756]
             ; [756..757]
           } [762..763]
-      block_comment [769..897] extra "/**\n     * Adds an item.\n     *\n     * @"...
       method_declaration [902..1118]
+        leading: block_comment [769..897] extra attached=leading(132) "/**\n     * Adds an item.\n     *\n     * @"...
         modifiers [902..908]
           public [902..908]
         boolean_type [909..916]
@@ -165,8 +165,8 @@ program [0..1308]
               ) [970..971]
             block [972..1066]
               { [972..973]
-              line_comment [986..1030] extra "// Full. Callers are expected to check t"...
               return_statement [1043..1056]
+                leading: line_comment [986..1030] extra attached=leading(163) "// Full. Callers are expected to check t"...
                 return [1043..1049]
                 false [1050..1055]
                 ; [1055..1056]
@@ -209,8 +209,8 @@ program [0..1308]
               identifier [1181..1188] "newName"
             ; [1188..1189]
           } [1194..1195]
-      line_comment [1201..1246] extra "// A trailing comment for the class, sor"...
       method_declaration [1251..1305]
+        leading: line_comment [1201..1246] extra attached=leading(207) "// A trailing comment for the class, sor"...
         modifiers [1251..1257]
           public [1251..1257]
         integral_type [1258..1261]

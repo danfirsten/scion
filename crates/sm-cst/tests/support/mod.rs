@@ -21,6 +21,7 @@ pub const FIXTURES: &[&str] = &[
     "empty",
     "only_comment",
     "broken",
+    "trivia_gallery",
 ];
 
 /// Fixtures that are expected to contain syntax errors.

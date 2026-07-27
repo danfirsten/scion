@@ -15,17 +15,18 @@
 //!   child lists, scope-introducing kinds, identifier kinds, comment kinds) so
 //!   that nothing above this crate mentions Java.
 //!
+//! - The trivia attachment pass ([`attach_trivia`], configured by
+//!   [`TriviaConfig`]) decides which node each comment belongs to, recording
+//!   the answer in [`Node::leading_trivia`], [`Node::trailing_trivia`] and
+//!   [`Attachment`]. It runs as part of [`parse`], so every tree in the system
+//!   arrives attached. The comment nodes stay where they are in the tree —
+//!   attachment annotates, it never restructures.
+//!
 //! # Milestone status
 //!
-//! M0 implements parsing, the arena, the invariant checks, the `Language` trait
-//! with a Java implementation, and the tree renderer used by `sm parse`. The
-//! *trivia attachment pass* — the heuristic that decides which comment belongs
-//! to which node — is not implemented yet. The data model for it is in place:
-//! see [`Node::leading_trivia`], [`Node::trailing_trivia`] and [`Attachment`],
-//! which are respectively empty and [`Attachment::Floating`] until that pass
-//! runs. Until then comments appear only at their structural position in the
-//! tree as `extra` nodes, which is a complete and correct — just not yet
-//! useful — description of the file.
+//! M0 is complete: parsing, the arena, the invariant checks, the `Language`
+//! trait with a Java implementation, the trivia attachment pass and the tree
+//! renderer used by `sm parse`.
 
 mod arena;
 pub mod invariants;
@@ -34,9 +35,11 @@ mod language;
 pub mod languages;
 mod parse;
 mod render;
+mod trivia;
 
 pub use arena::{Attachment, Node, NodeId, SourceTree};
 pub use json::JsonTree;
 pub use language::{ChildListKind, Language};
-pub use parse::{MAX_SOURCE_LEN, ParseError, parse};
+pub use parse::{MAX_SOURCE_LEN, ParseError, parse, parse_with_trivia_config};
 pub use render::{ERROR_WARNING, HeaderInfo, RenderOptions, render_parse};
+pub use trivia::{TriviaConfig, attach_trivia};
