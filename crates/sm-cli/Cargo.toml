@@ -13,10 +13,15 @@ path = "src/main.rs"
 
 [dependencies]
 clap = { workspace = true }
+serde = { workspace = true }
 serde_json = { workspace = true }
 sm-cst = { workspace = true }
 sm-diff = { workspace = true }
+sm-emit = { workspace = true }
 sm-match = { workspace = true }
+sm-merge = { workspace = true }
 
 [dev-dependencies]
+proptest = { workspace = true }
 serde_json = { workspace = true }
+tempfile = { workspace = true }

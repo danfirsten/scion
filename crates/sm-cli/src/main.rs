@@ -1,16 +1,18 @@
 //! `sm` — the `semantic-merge` command-line front end (SPEC.md §4.7).
 //!
-//! Three subcommands so far. `sm parse` makes the CST layer inspectable (M0);
-//! `sm match` makes a matching inspectable (M2), which SPEC.md §4.3 requires
-//! because "matching bugs are almost invisible in assertions and obvious
-//! visually"; `sm diff` renders the edit script derived from that matching
-//! (M3), and is the milestone's demo-able moment. The merge driver
-//! (`sm merge %O %A %B %L %P`) lands in M4 and is not registered here yet,
-//! because a subcommand that exists and does nothing is worse than one that
-//! does not exist.
+//! Five subcommands. `sm merge` is the one git runs and the only one that
+//! writes to a file the user cares about; its contract, its exit codes and its
+//! fallback ladder are documented in the `merge` module, which is the place to
+//! start. `sm install-driver` registers it. The other three are inspection
+//! tools: `sm parse` for the CST layer (M0), `sm match` for a matching (M2) —
+//! which SPEC.md §4.3 requires because "matching bugs are almost invisible in
+//! assertions and obvious visually" — and `sm diff` for the edit script derived
+//! from it (M3).
 
 mod cmd_diff;
+mod cmd_install;
 mod cmd_match;
+mod merge;
 
 use std::path::{Path, PathBuf};
 use std::process::ExitCode;
@@ -28,9 +30,14 @@ const EXIT_USAGE: u8 = 2;
     about = "semantic-merge: an AST-aware three-way merge driver for git",
     long_about = "semantic-merge parses source with tree-sitter and merges on the tree \
                   rather than on lines.\n\n\
-                  Status: M3 — CST layer, structural matching and structural diff. \
-                  `sm parse`, `sm match` and `sm diff` are implemented; the merge \
-                  driver lands in M4."
+                  `sm install-driver` registers `sm merge` with git; git then calls it \
+                  as `sm merge %O %A %B %L %P %S %X %Y`. It exits 0 when the file merged \
+                  cleanly, 1 when conflict markers remain, and 2 only when it failed \
+                  without touching the file. Anything it cannot merge confidently — an \
+                  unparseable input, an oversized file, a timeout, an internal error — \
+                  falls back to `git merge-file`.\n\n\
+                  `sm parse`, `sm match` and `sm diff` are inspection tools for the \
+                  layers underneath."
 )]
 struct Cli {
     #[command(subcommand)]
@@ -39,6 +46,13 @@ struct Cli {
 
 #[derive(Subcommand, Debug)]
 enum Command {
+    /// Three-way merge one file. This is what git runs.
+    ///
+    /// Positional arguments are git's `%O %A %B %L %P %S %X %Y`, in that
+    /// order. The result is written to `%A`.
+    Merge(Box<merge::MergeArgs>),
+    /// Register `sm merge` as a git merge driver.
+    InstallDriver(cmd_install::InstallArgs),
     /// Parse a file and print its concrete syntax tree.
     Parse(ParseArgs),
     /// Match two files structurally and show the result side by side.
@@ -70,6 +84,8 @@ struct ParseArgs {
 fn main() -> ExitCode {
     let cli = Cli::parse();
     match cli.command {
+        Command::Merge(args) => merge::run(&args),
+        Command::InstallDriver(args) => cmd_install::run(&args),
         Command::Parse(args) => run_parse(&args),
         Command::Match(args) => cmd_match::run(&args),
         Command::Diff(args) => cmd_diff::run(&args),

@@ -14,4 +14,11 @@ sm-match = { workspace = true }
 
 [dev-dependencies]
 insta = { workspace = true }
+proptest = { workspace = true }
 serde_json = { workspace = true }
+# A dev-dependency cycle: `sm-emit` depends on `sm-merge`, and `sm-merge`'s
+# property tests depend on `sm-emit`. Cargo permits cycles through
+# dev-dependencies, and this one is load-bearing — SPEC.md §5's byte-preservation
+# and parse-stability properties are statements about *emitted bytes*, so they
+# cannot be tested from the merge crate without the emitter.
+sm-emit = { workspace = true }
