@@ -8,8 +8,16 @@ use anyhow::{Context, Result};
 use clap::{Parser, Subcommand};
 
 use sm_eval::mine::{MineOptions, mine_all, parse_repos};
+use sm_eval::replay::{ReplayOptions, Subset, replay};
+use sm_eval::report;
 use sm_eval::sample::{SampleOptions, build_sample};
 use sm_eval::stats;
+
+/// One driver subprocess per core. The work is in another address space, so a
+/// thread here is a `wait()` slot rather than a worker.
+fn default_jobs() -> usize {
+    std::thread::available_parallelism().map_or(4, std::num::NonZero::get)
+}
 
 #[derive(Parser, Debug)]
 #[command(
@@ -69,6 +77,61 @@ enum Command {
         /// Write the markdown to a file as well as stdout.
         #[arg(long, value_name = "FILE")]
         out: Option<PathBuf>,
+    },
+
+    /// Run the merge driver over the corpus and record what it did (SPEC §6.2).
+    Replay {
+        #[arg(long, value_name = "DIR")]
+        corpus: PathBuf,
+        /// The `sm` binary to replay. Use a release build: the numbers are a
+        /// latency claim about this machine.
+        #[arg(long, value_name = "PATH", default_value = "target/release/sm")]
+        sm: PathBuf,
+        /// Where to write `records.jsonl` and `run.json`.
+        #[arg(long, value_name = "DIR")]
+        out: PathBuf,
+        /// Concurrent driver subprocesses. Defaults to the core count.
+        #[arg(long, value_name = "N")]
+        jobs: Option<usize>,
+        /// `all`, `conflicted`, `clean`, `repo:<owner/name>` or
+        /// `sample:<n>[:<seed>]`.
+        #[arg(long, value_name = "SPEC", default_value = "all")]
+        subset: String,
+        /// A JSON `MergeConfig` handed to the driver as `--merge-config`.
+        #[arg(long, value_name = "FILE")]
+        profile_overrides: Option<PathBuf>,
+        /// `off`, `report` or `conflict` for the driver's `--semantic`.
+        #[arg(long, value_name = "MODE", default_value = "report")]
+        semantic: String,
+        /// Also run the `git merge-file` control arm.
+        #[arg(long)]
+        control: bool,
+        /// Skip cases already recorded in `records.jsonl`.
+        #[arg(long)]
+        resume: bool,
+        /// Do not keep the merged output of interesting cases.
+        #[arg(long)]
+        no_keep_outputs: bool,
+        /// The driver's `--timeout-ms`.
+        #[arg(long, value_name = "N", default_value_t = 5000)]
+        timeout_ms: u64,
+        #[arg(long)]
+        quiet: bool,
+    },
+
+    /// Turn a replay directory into the evaluation report (SPEC §6.3).
+    Report {
+        #[arg(long, value_name = "DIR")]
+        replay: PathBuf,
+        /// Markdown output.
+        #[arg(long, value_name = "FILE")]
+        out: Option<PathBuf>,
+        /// Machine-readable metrics.
+        #[arg(long, value_name = "FILE")]
+        json: Option<PathBuf>,
+        /// How many incorrect resolutions to list in the gallery.
+        #[arg(long, value_name = "N", default_value_t = 40)]
+        gallery: usize,
     },
 
     /// Copy a small, permissively licensed slice of the corpus somewhere it can
@@ -151,6 +214,76 @@ fn run() -> Result<()> {
                     .with_context(|| format!("writing {}", path.display()))?;
             }
             print!("{md}");
+            Ok(())
+        }
+
+        Command::Replay {
+            corpus,
+            sm,
+            out,
+            jobs,
+            subset,
+            profile_overrides,
+            semantic,
+            control,
+            resume,
+            no_keep_outputs,
+            timeout_ms,
+            quiet,
+        } => {
+            let opts = ReplayOptions {
+                corpus,
+                sm,
+                out,
+                jobs: jobs.unwrap_or_else(default_jobs),
+                subset: Subset::parse(&subset)?,
+                profile_overrides,
+                semantic,
+                control,
+                resume,
+                keep_outputs: !no_keep_outputs,
+                quiet,
+                timeout_ms,
+            };
+            let info = replay(&opts)?;
+            eprintln!(
+                "replayed {} cases ({} records) in {:.0} s",
+                info.cases_selected, info.records_written, info.duration_secs
+            );
+            Ok(())
+        }
+
+        Command::Report {
+            replay,
+            out,
+            json,
+            gallery,
+        } => {
+            let records = report::load(&replay)?;
+            let metrics = report::compute(&records);
+            let run = report::load_run(&replay);
+            let md = report::render(&metrics, run.as_ref(), &records);
+            if let Some(path) = &out {
+                if let Some(parent) = path.parent().filter(|p| !p.as_os_str().is_empty()) {
+                    std::fs::create_dir_all(parent)?;
+                }
+                std::fs::write(path, &md).with_context(|| format!("writing {}", path.display()))?;
+            } else {
+                print!("{md}");
+            }
+            if let Some(path) = &json {
+                if let Some(parent) = path.parent().filter(|p| !p.as_os_str().is_empty()) {
+                    std::fs::create_dir_all(parent)?;
+                }
+                let doc = serde_json::json!({
+                    "schema_version": sm_eval::replay::REPLAY_SCHEMA_VERSION,
+                    "run": run,
+                    "metrics": metrics,
+                    "gallery": report::gallery(&records, gallery),
+                });
+                std::fs::write(path, serde_json::to_string_pretty(&doc)? + "\n")
+                    .with_context(|| format!("writing {}", path.display()))?;
+            }
             Ok(())
         }
 

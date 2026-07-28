@@ -470,6 +470,76 @@ fn line_merge_only_never_consults_the_tree() {
     assert_eq!(case.ours_bytes(), bytes);
 }
 
+// ------------------------------------------------------------ --merge-config
+
+/// SPEC.md §4.3 requires the matcher constants to be tunable via config
+/// "because M5 will sweep them against the corpus". This is the seam the sweep
+/// actually drives, so it is tested through the binary.
+#[test]
+fn merge_config_is_read_from_json_and_partial_files_keep_the_other_defaults() {
+    let case = Case::new(BASE, OURS_MOVED, THEIRS_EDITED_BODY);
+    let cfg = case.dir.path().join("cfg.json");
+    std::fs::write(
+        &cfg,
+        r#"{"base_to_ours":{"min_height":2,"min_dice":0.5,"max_size":100},
+            "base_to_theirs":{"min_height":2,"min_dice":0.5,"max_size":100}}"#,
+    )
+    .expect("write config");
+
+    let run = case.run(
+        "app/Service.java",
+        &[
+            "--no-fast-path",
+            "--merge-config",
+            cfg.to_str().expect("utf-8"),
+        ],
+    );
+    assert_eq!(run.code(), 0, "stderr: {}", run.stderr());
+    assert_eq!(run.path_taken(), "semantic");
+    // The paper's constants merge this pair just as the shipped ones do; the
+    // point of the test is that the flag was honoured rather than ignored.
+    let text = case.ours_text();
+    assert!(parses_cleanly(&text) && !has_markers(&text), "{text}");
+}
+
+/// A typo in a swept configuration must not silently measure the defaults.
+#[test]
+fn an_unreadable_or_invalid_merge_config_falls_back_and_says_so() {
+    for (name, contents) in [
+        (
+            "bad-field.json",
+            Some(r#"{"base_to_ourz":{"min_dice":0.5}}"#),
+        ),
+        ("bad-json.json", Some("{ not json")),
+        ("missing.json", None),
+    ] {
+        let case = Case::new(BASE, OURS_MOVED, THEIRS_EDITED_BODY);
+        let cfg = case.dir.path().join(name);
+        if let Some(text) = contents {
+            std::fs::write(&cfg, text).expect("write config");
+        }
+        let run = case.run(
+            "app/Service.java",
+            &[
+                "--no-fast-path",
+                "--merge-config",
+                cfg.to_str().expect("utf-8"),
+            ],
+        );
+        assert_eq!(run.path_taken(), "fallback", "{name}");
+        assert!(
+            run.record()["warnings"].as_array().is_some_and(|w| w
+                .iter()
+                .any(|s| s.as_str().is_some_and(|s| s.contains("--merge-config")))),
+            "{name}: the record must say the config was rejected: {}",
+            run.record()
+        );
+        // And `%A` still holds a usable line merge, not a half-written file.
+        let text = case.ours_text();
+        assert!(!text.is_empty(), "{name}");
+    }
+}
+
 // --------------------------------------------------------- fallback ladder
 
 /// Every fallback rung, checked the same way: the driver must end up writing

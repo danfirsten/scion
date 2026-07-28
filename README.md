@@ -11,29 +11,97 @@ tree-sitter, matches nodes structurally, and merges on the tree rather than on
 lines — and it carries a name-resolution layer that re-resolves every reference
 in the candidate merge, so it can catch the second class of failure too.
 
-## Status: M4 + M6 — the merge driver works, is installable, and checks names
+## Status: M5 complete — the evaluation is published
 
-`sm merge` is a real git merge driver: it merges Java and TypeScript on the
-tree, writes conflict markers when it cannot, falls back to `git merge-file`
-whenever it is unsure, and is wrapped so that a panic or a timeout degrades to a
-line merge rather than to a damaged file. On a clean merge it also re-resolves
-every name in the result and warns about the ones the merge broke.
+| Metric | Value | Denominator | SPEC §6.2 target |
+|---|---:|---|---|
+| **Resolve rate** | **52.34%** | 16,238 gradeable conflicted cases | maximize |
+| **Correct-resolve rate** (AST-equal) | 55.23% | 8,499 clean results | maximize |
+| **Correct-resolve rate** (byte-exact) | 44.16% | 8,499 clean results | — |
+| **Incorrect-resolve rate** | **44.77%** | 8,499 clean results | **< 1% — missed** |
+| — of those, differing only in comments | 36.08% | 3,805 incorrect | — |
+| **Correct decline** | 47.66% | 16,238 gradeable cases | acceptable |
+| **Regression rate** vs `git merge-file` | **0.00%** (0 of 4,781) | clean cases the line merge also merged | ≈ 0 — met |
+| **Divergence** vs `git merge-file` | **0.02%** (1 of 4,781) | clean cases the line merge also merged | ≈ 0 — met |
+| **Latency** p50 / p90 / p99 | **24 / 93 / 304 ms** | 25,671 invocations | p99 < 1000 ms — met |
+| Parsable / universal (ASE 2025) | 99.99% / 99.99% | 8,499 clean results | — |
+| `git merge-file` control, same inputs | resolved **0** of 16,109 | gradeable cases the line merge saw | — |
 
-What is **not** done is the part that matters most: the evaluation. SPEC.md §6
-asks for a resolve rate and an incorrect-resolve rate over thousands of mined
-merge conflicts, and until that exists you should read the paragraph above as a
-description of the code, not as a claim about quality.
+69,622 driver invocations over 34,811 cases mined from 62 Java repositories.
+**`semantic-merge` merges half of the files git cannot merge at all, and it does
+so without ever conflicting on a file the line merge handles cleanly** — the
+regression rate against `git merge-file` is zero by construction, because the
+driver runs the line merge first and returns its answer unchanged when it is
+clean, and the replay confirms it empirically. **The incorrect-resolve rate
+misses its target by a wide margin and that is the headline finding of M5**, not
+a footnote: 34% of the incorrect population is a single defect — a both-sides
+edit to a *floating* comment (a file's copyright header) is invisible to the
+merge and one side's version is silently kept — and another 19% is
+declaration-order differences in containers where Java attaches no meaning to
+order. A hand audit of 30 sampled incorrect resolutions found **1** that a
+reviewer would call a broken program; extrapolated that is roughly 0.7%–7.5% of
+clean results, an estimate with a wide interval that is still at or above the 1%
+target. The full analysis, the failure-mode taxonomy, the incorrect-resolution
+gallery, the constant sweep and the semantic-check audit are in
+**[docs/evaluation.md](docs/evaluation.md)**.
 
-> **Evaluation pending (M5).** No resolve-rate or incorrect-resolve-rate numbers
-> are published yet. They land in M5, together with the failure-mode analysis
-> and a comparison against Mergiraf.
+The number that should be read most sceptically is the correct-resolve rate,
+because **the human resolution is ground truth for what was *committed*, not for
+what was *correct***. A third of the audited "incorrect" cases are ones where the
+merge applied an edit from a branch that the human deliberately discarded.
 
-Name binding — the part that catches a rename/use collision that git and every
-other syntactic merge tool miss — exists and runs inside the driver by default,
-in report-only mode. What it can see is bounded in a way that has to be stated
-up front: **a merge driver is handed one file at a time**, so it catches the
-*within-file* case and nothing cross-file. How often that fires on real merges
-is one of the numbers M5 will produce. See "The semantic check" below.
+Name binding — the part that catches a rename/use collision no *merge driver*
+performs (see "What is actually new here" below) — runs inside the driver by
+default, in report-only mode. It fires on **8.50%** of clean structural merges (869 of
+10,226). A 40-finding hand audit puts its precision at **≈ 15%** (95% interval
+roughly 6%–30%), with 72% of the false positives traced to a single modelled
+simplification: a wildcard import binds nothing in our scope tree. It stays
+report-only until that is fixed. Five confirmed real hits are written up in
+docs/evaluation.md §11.3, including an `apache/ignite` merge where one branch
+renamed a type and the other kept eleven uses of the old name — a clean merge
+that does not compile, and whose human resolution had to complete the rename by
+hand.
+
+## What is actually new here
+
+Semantic conflict detection is not new. **Bucond** (ASE 2022) detects exactly
+this class of build conflict with reported 100% precision and 88–100% recall;
+**IntelliMerge**, **static-semantic-merge** and the SAM/TOM line of work attack
+the same problem. What they have in common is that they live *outside* the
+merge: Java-specific, graph- or SOOT- or test-generation-based, run after the
+fact, usually needing a compilable project and a build. Saying "no tool detects
+semantic merge conflicts" would be wrong and would not survive review.
+
+What appears to be unimplemented, and is what `semantic-merge` does:
+
+> Semantic conflict detection exists as a research subfield, but it lives
+> outside the merge, as a separate post-hoc analysis. **No production merge
+> driver performs it.** `semantic-merge` integrates name-binding-based conflict
+> detection into the merge driver itself: it re-resolves references in the
+> candidate merged tree using the same language-agnostic tree-sitter substrate
+> that produced the merge, in-process, within a sub-second latency budget, and
+> reports the result as an ordinary merge conflict.
+
+Four claims that survive scrutiny, and their status:
+
+1. **Position in the pipeline** — inside the driver, on the candidate merged
+   tree, before the bytes are written, not as a separate CI step. *Shipped.*
+2. **Language-agnosticism** — every prior semantic-conflict tool is Java-only
+   and most need a compilable project. This needs a tree-sitter grammar and a
+   per-language scope config, and works on one file with no classpath. *Shipped;
+   the scope model is exercised by both Java and TypeScript tests.*
+3. **Latency and determinism** — sub-second, no build, no solver, no LLM.
+   *Measured: p99 304 ms including the check.*
+4. **Measurement** — a corpus-scale measurement of how often merge-time
+   reference breakage actually occurs in real merges, next to a
+   resolve/incorrect-rate evaluation of the syntactic merge, which Mergiraf (the
+   closest tool) has never published at all. *Measured: 8.50% of clean
+   structural merges produce a finding, at ≈ 15% audited precision.*
+
+The honest limitation, stated up front: **a merge driver sees one file.** The
+canonical rename-in-A / call-in-B case is frequently cross-file, and cross-file
+is exactly where Bucond and IntelliMerge operate. Within-file detection is real
+and worth measuring; it is a subset of the problem.
 
 ## Install
 
@@ -189,8 +257,15 @@ Everything it reports is **differential**: a name is only reported when it
 resolved in the branch it came from and stops resolving, or starts resolving
 somewhere else, once the two branches are put together. A name that resolved to
 nothing in its own branch — a library name, an inherited member, anything from
-another file — is silent. That rule is what keeps the false-positive rate near
-zero despite the resolver being deliberately simple.
+another file — is silent. That rule is what makes the check usable at all
+despite the resolver being deliberately simple; it is not enough to make it
+precise. **Measured over the corpus: it fires on 8.50% of clean structural
+merges, and a 40-finding hand audit puts its precision at ≈ 15%** (docs/
+evaluation.md §11). Nearly three quarters of the false positives come from one
+modelled simplification — a wildcard import binds nothing in our scope tree, so
+replacing single-type imports with `import pkg.*;` reads as a removal. That is
+why `report` is the default and why `conflict` should stay off until it is
+fixed.
 
 ```
 $ sm merge ... # (git runs this)
@@ -240,8 +315,9 @@ fine, `git add`, `git commit`.
   merge plan to check. A line-clean merge is exactly where a broken reference
   hides, so this is a real gap — accepted for now because it is also what every
   other tool ships, and because running it there would cost three parses and a
-  merge on every invocation. `sm check` and `--no-fast-path` both reach it, which
-  is how M5 will measure the population before anyone pays for it online.
+  merge on every invocation. `sm check` and `--no-fast-path` both reach it. The
+  M5 replay therefore measures the check over the 10,226 merges git could *not*
+  do on its own; the fast-path population is still unmeasured.
 - **No types and no inheritance.** `user.getName()` is a member reference and is
   never resolved; a name inherited from a superclass in another file resolves to
   nothing. Both are false *negatives* — a missed conflict, never a wrong one.
@@ -293,13 +369,35 @@ merge driver uses to fall back.
 ## Supported languages
 
 Java and TypeScript/TSX. TypeScript exists to test whether the `Language`
-abstraction actually holds, and it does carry the full pipeline, but Java is
-where the design decisions were made and where the evaluation will run.
+abstraction actually holds, and it does carry the full pipeline — parsing,
+trivia, matching, merging, emitting and the scope model all have TypeScript
+tests.
+
+**The evaluation corpus is Java-only.** TypeScript support is demonstrated by
+the test suite, not corpus-evaluated: no TypeScript repository has been mined
+and no TypeScript merge has been replayed, so none of the numbers above say
+anything about TypeScript merge quality. Mining TypeScript history is future
+work.
 
 ## Honest limitations
 
-- **No published numbers yet.** See the status section. Everything below is a
-  known shortcoming rather than a measured one.
+- **The incorrect-resolve rate misses SPEC's < 1% target**, at a measured
+  44.77% of clean results against the human resolution. Most of that is not
+  broken output — see the status section and docs/evaluation.md §3 — but a hand
+  audit still puts the genuinely-broken rate at roughly 0.7%–7.5% of clean
+  results, above target. **This is the project's main open problem.**
+- **A both-sides edit to a floating comment is silently resolved in ours'
+  favour.** 1,280 corpus cases, 34% of all incorrect resolutions. An *attached*
+  comment already conflicts correctly; a floating one (a file's copyright
+  header) lives in a gap, and gaps come from the frame side.
+  docs/evaluation.md §3.2.
+- **Insertions into an unordered container are appended after our whole run**
+  rather than anchored where the contributing branch put them, so the output is
+  a permutation of the human's. 712 cases, 19% of incorrect resolutions.
+  docs/evaluation.md §3.3.
+- **The human resolution is ground truth for what was committed, not for what
+  was correct.** A third of audited "incorrect" resolutions are cases where the
+  merge applied an edit the human deliberately discarded.
 - **Whole-file fallback only.** A single unparseable or pathological file
   degrades entirely to a line merge; there is no per-method fallback, so one bad
   region costs the whole file's structural merge.
@@ -308,15 +406,23 @@ where the design decisions were made and where the evaluation will run.
   git could not do on its own. See "The semantic check".
 - **`class_body` is merged as an unordered set**, which is not strictly true:
   instance field initialisers and static blocks run in textual order.
-- **Two branches adding methods with the same signature at different places
-  both apply**, where Spork and Mergiraf would conflict.
+- **Two branches adding a declaration with the same signature** merge to two
+  declarations inside `sm-merge`. The driver catches this as a self-check and
+  falls back to `git merge-file` rather than shipping it (fallback rung 7b,
+  `crates/sm-cli/src/merge/dedup.rs`); it fired on 225 corpus merges, every one
+  of which was otherwise a wrong answer. The better fix — a conflict region in
+  the merged tree, as Spork and Mergiraf do — is not implemented, and the check
+  does not run on the fast path.
 - **Multi-line leaves are atomic**: a block comment or text block edited on both
   sides conflicts wholesale instead of merging line by line.
 - **Comment placement is a heuristic.** It is documented and predictable (see
   `crates/sm-cst/src/trivia.rs`), and it is sometimes wrong.
-- **Parsing is the latency floor**, at roughly 2.5 MB/s. On mined real-world
-  conflicts the driver's median end-to-end time is tens of milliseconds and its
-  p99 a few hundred; the fast path is a few milliseconds.
+- **Parsing is the latency floor**, at roughly 2.5 MB/s. Measured over the
+  corpus: p50 24 ms, p90 93 ms, p99 304 ms end to end including process
+  start-up, on a 4-core container running four replays in parallel.
+- **Corpus bias.** 62 repositories that merge locally rather than squash or
+  rebase; eleven hit the miner's 1,500-case cap; 35.7% of the incorrect
+  population comes from ten merge commits. docs/evaluation.md §13.
 
 ## Build and test
 
@@ -334,9 +440,13 @@ which installs the driver in a throwaway repository and runs `git merge`.
 
 ## Documentation
 
-`SPEC.md` is the plan, `PROGRESS.md` is the running record of decisions and
-limitations, and `docs/prior-art.md` is a verified survey of GumTree, Mergiraf,
-difftastic and Spork. The crate-level doc comments on `sm-merge`, `sm-emit` and
+`docs/evaluation.md` is the M5 report — the numbers, the failure-mode taxonomy,
+the incorrect-resolution gallery, the constant sweep and the semantic-check
+audit — with `docs/evaluation.json` as its machine-readable form and
+`docs/corpus-summary.md` describing what was mined. `SPEC.md` is the plan,
+`PROGRESS.md` is the running record of decisions and limitations, and
+`docs/prior-art.md` is a verified survey of GumTree, Mergiraf, difftastic and
+Spork. The crate-level doc comments on `sm-merge`, `sm-emit` and
 `sm-cli`'s `merge` module are the design records for the merge algorithm, the
 emitter and the driver respectively; read those before changing them.
 

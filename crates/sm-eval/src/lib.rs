@@ -13,14 +13,23 @@
 //! * [`sample`] carves a small permissively licensed slice out of the corpus
 //!   for use as test fixtures.
 //!
-//! The replay half — re-running the merge driver over the corpus and reporting
-//! resolve rate, correct- and incorrect-resolve rate, regression rate,
-//! divergence and latency — is milestone M5 and is not here yet. Nothing in
-//! this crate calls into it.
+//! Milestone **M5** is the replay half, and it is here too:
+//!
+//! * [`replay`] runs the `sm merge` binary over every case — and over a
+//!   `--line-merge-only` control arm — recording one JSONL record per
+//!   invocation.
+//! * [`compare`] is how a merged file is graded: byte-exact, AST-equal modulo
+//!   formatting, and the two ground-truth-free criteria (parsable, universal)
+//!   from Mori & Hashimoto (docs/prior-art.md §8.3.3).
+//! * [`report`] folds a replay log into SPEC.md §6.2's table, the per-repository
+//!   breakdown, the histograms and the incorrect-resolution gallery.
 
+pub mod compare;
 pub mod git;
 pub mod mine;
 pub mod model;
+pub mod replay;
+pub mod report;
 pub mod sample;
 pub mod stats;
 pub mod util;

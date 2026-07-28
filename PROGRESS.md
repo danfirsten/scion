@@ -1,6 +1,6 @@
 # PROGRESS
 
-## Current milestone: M0 — Scaffold + CST layer (complete)
+## Current milestone: ALL MILESTONES COMPLETE (M0–M6 + evaluation)
 
 ## Session log
 
@@ -214,10 +214,87 @@ Implemented in session 2. Kept here as a map rather than as a handoff.
   `trivia_gallery.java` fixture and its two snapshots. `render.rs` still tests
   the printer in isolation by detaching everything first.
 
-## Next
+### Session 4 (2026-07-27/28) — waves executed, project complete
 
-- M0's exit criteria are met: `sm parse Foo.java` prints a readable tree with
-  byte ranges and attached comments, and trivia attachment has its own passing
-  test suite. `cargo fmt --all --check`, `cargo clippy --workspace --all-targets
-  -- -D warnings` and `cargo test --workspace` (85 tests) are green.
-- Commit, then await user confirmation before starting M1 (corpus miner).
+All waves from the session-3 plan ran to completion. Per-wave detail lives in
+the commit messages (each wave landed as one verified commit); this is the map.
+
+**M2 (matcher).** Two-phase GumTree in `sm-match` with dual profiles
+(`base_to_side` 1/0.4/100 permissive, `ours_to_theirs` 2/0.6/100 strict, per
+Mergiraf's finding in docs/prior-art.md). Node identity includes anonymous
+token *kinds* (else `a+b` ≡ `a-b` — found during development); hash matches are
+always confirmed structurally. Oversized duplicate groups go through positional
+alignment (300-identical-methods regression test). `sm match` visualizer.
+
+**TypeScript** (pulled forward): `TypeScriptLanguage { TS | TSX }` through the
+unchanged CST core. TS `program` stays Ordered — ES imports are evaluated
+module-graph edges; the named-import commute optimisation needs a node-aware
+`Language` hook (recorded gap, not implemented).
+
+**M3 (diff).** `sm-diff`: Insert/Delete at highest unmatched node,
+local-signature Updates, LIS-minimal Reorders, Reparent/Reorder split.
+Unordered containers never emit moves. `sm diff` renders moved/reindented
+subtrees as `[body unchanged, reindented ±n]`.
+
+**M4 (merge + emit + driver).** `sm-merge`/`sm-emit`: three change grades
+(none/formatting/content), full decision table with MovedAndUpdated as
+composition, commutative-group set merging, atomic text-keyed imports,
+conflict promotion to statement boundaries, provenance-total splicing emitter
+with observed-indent reindentation. Driver: fast path (line merge first),
+eight-rung fallback ladder ending in `git merge-file`, atomic replace of %A,
+literal-%S detection, `catch_unwind`, timeout, self-checks (token authenticity;
+duplicate-declaration count — added in M5 after measurement showed it declines
+225 previously-wrong merges at zero cost). Proptests: 6 bases × 13 mutation
+kinds × 11 properties. Token-fusion bug (`staticint`) found by the corpus dry
+run, fixed at gap selection (a leading gap is a property of a *pair*), lexical
+backstop kept.
+
+**M1 (corpus).** 69 repos attempted, 0 clone failures, 195k merges walked:
+29,171 conflicted .java cases (21.7% contaminated, flagged not deleted),
+**16,238 gradeable**, 5,640 clean cases, 3.3 GiB gitignored; committed:
+miner, repos.txt, docs/corpus-summary.md, 15-case licensed sample. Finding:
+GitHub's merge button refuses conflicted PRs, so conflict history lives in
+locally-merged projects (quarkus: 74 cases from 23k merges). `add_none` shape
+(3,815) is rename conflicts — bucketed, not graded; `git diff -M` follow-up
+recorded.
+
+**M6 (binding).** `sm-bind` + additive `sm-cst` extensions (field names,
+`IdentifierRole` with conservative MemberRef default, `DeclKind`).
+Differential check: flag only references that resolved in their origin branch
+and broke or got captured in the merged program. Headline scenario (rename in
+ours + new call in theirs, clean under git line merge) caught; nine negative
+classes silent. Wired as `--semantic=off|report|conflict` (default report)
+plus standalone `sm check`.
+
+**M5 (evaluation)** — docs/evaluation.md + docs/evaluation.json; README leads
+with the table. Headline (16,238 gradeable cases): resolve **52.34%** (git
+merge-file control: 0), regression vs line merge **0.00%**, divergence 0.02%
+(the one case IS git's own bytes), p50/p99 **24/304 ms**, parsable/universal
+99.99%. Incorrect-resolve (AST-notion, vs human commit) **44.77% — target
+missed on the strict metric**; taxonomy: 36% comment-only (1,280 copyright
+headers), 19% semantically-identical reordering, ~17% defensible unions the
+human resolved by dropping a side. 30-case hand audit → **~1.5% true
+wrong-merge rate** (CI 0.7–7.5%). Constant sweep (24 configs): null result,
+defaults kept — correctness lives in merge/emit, not matcher constants.
+Semantic corpus scan: fires on 8.5% of clean merges; 40-finding audit → ~15%
+precision, 29/40 FPs from the wildcard-import simplification (fix identified:
+same-package wildcard suppression). Best real hit: apache/ignite
+`2c480b4fedc4` — we predicted the exact rename break the human had to finish
+by hand.
+
+## Remaining known limitations / next steps
+
+1. Floating-comment both-sides edits are invisible (attached ones conflict);
+   fix is a trivia-model change in `sm-merge` (docs/evaluation.md §3.2).
+2. Commutative-container insertions append after the run instead of anchoring
+   (§3.3) — largest incorrect-class lever after comments.
+3. Semantic check: implement same-package wildcard-import suppression (kills
+   29/29 audited FPs, none of the TPs); precision re-audit after.
+4. Rename-shaped cases (3,815): chase counterpart paths with `git diff -M` to
+   convert them into gradeable three-way cases.
+5. TS is test-suite-proven, not corpus-evaluated; mining TS repos is open.
+6. Per-subtree line-merge fallback (Mergiraf's `LineBasedMerge` node) and the
+   signature-keyed duplicate post-pass remain unimplemented (prior-art §2).
+
+All 689 workspace tests green; release binary 5.8 MB; every wave committed and
+pushed on `claude/semantic-merge-spec-8d684v`.

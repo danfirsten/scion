@@ -118,10 +118,12 @@
 //! 7. **An output self-check fails** → line merge. For a clean merge: zero
 //!    conflict markers, no synthesized bytes other than token separators (see
 //!    below), output reparses without errors, and **every token in the output
-//!    is a token of one of the inputs**. For a conflicted merge: at least one
-//!    marker. The token check is the one that earns its keep — see
-//!    [`fabricated_token`], which explains the real bug it catches and why
-//!    reparsing alone does not.
+//!    is a token of one of the inputs**, and **no declaration is duplicated
+//!    that no input duplicated**. For a conflicted merge: at least one marker.
+//!    The last two are the ones that earn their keep, because both catch
+//!    output that parses and reads as ordinary code — see [`fabricated_token`]
+//!    for the token-fusion bug and the [`dedup`] module for the duplicate
+//!    declaration one, which M5's corpus replay found in 183 real merges.
 //! 8. **The line merge itself failed** → exit 2, `%A` untouched.
 //!
 //! # 5. Panic safety
@@ -186,6 +188,7 @@
 //! - **No `mergiraf solve` equivalent.** Different feature, different milestone.
 
 pub mod atomic;
+pub mod dedup;
 pub mod linemerge;
 pub mod record;
 pub mod semantic;
@@ -283,6 +286,19 @@ pub struct MergeArgs {
     /// corpus replay runs.
     #[arg(long, short = 'o', value_name = "PATH")]
     output: Option<PathBuf>,
+
+    /// Read [`sm_merge::MergeConfig`] from a JSON file instead of using the
+    /// shipped defaults.
+    ///
+    /// Any subset of the fields may be given; the rest keep their defaults, and
+    /// an unknown field is an error rather than a silent no-op — a typo in a
+    /// swept configuration would otherwise show up as "the sweep found nothing".
+    /// This exists for M5's constant sweep (SPEC.md §4.3: the matcher constants
+    /// "must be tunable via config, because M5 will sweep them against the
+    /// corpus") and for reproducing a report's numbers from its own record of
+    /// how it was run.
+    #[arg(long, value_name = "FILE")]
+    merge_config: Option<PathBuf>,
 
     /// Never take the fast path: always run the semantic merge.
     ///
@@ -497,7 +513,33 @@ fn drive(args: &MergeArgs, rec: &mut Record) -> u8 {
     }
     .with_labels(&labels.ours, &labels.theirs, &labels.base);
 
-    match run_semantic(inputs, lang, opts, args.timeout_ms, args.semantic_check) {
+    let merge_config = match load_merge_config(args.merge_config.as_deref(), lang) {
+        Ok(cfg) => cfg,
+        Err(err) => {
+            // A configuration we cannot read is a usage error, not something to
+            // paper over with defaults: a sweep that silently measured the
+            // defaults would be worse than no sweep. The line merge still runs,
+            // so `%A` is left in a state git can use.
+            eprintln!("sm merge: {err}");
+            rec.warn(format!("--merge-config ignored: {err}"));
+            return finish_fallback(
+                args,
+                rec,
+                destination,
+                line_merge,
+                FallbackReason::InvariantFailed,
+            );
+        }
+    };
+
+    match run_semantic(
+        inputs,
+        lang,
+        opts,
+        merge_config,
+        args.timeout_ms,
+        args.semantic_check,
+    ) {
         Ok(done) => {
             rec.inputs.base.parse_errors = Some(done.parse_errors[0]);
             rec.inputs.ours.parse_errors = Some(done.parse_errors[1]);
@@ -852,16 +894,29 @@ enum RecvEnd {
     Disconnected,
 }
 
+/// `--merge-config`, or the language's defaults.
+fn load_merge_config(path: Option<&Path>, lang: &dyn Language) -> Result<MergeConfig, String> {
+    let Some(path) = path else {
+        return Ok(MergeConfig::for_language(lang));
+    };
+    let text = std::fs::read_to_string(path).map_err(|e| format!("{}: {e}", path.display()))?;
+    serde_json::from_str(&text).map_err(|e| format!("{}: {e}", path.display()))
+}
+
 fn run_semantic(
     inputs: Inputs,
     lang: &'static dyn Language,
     opts: EmitOptions,
+    config: MergeConfig,
     timeout_ms: u64,
     mode: SemanticMode,
 ) -> Result<Done, Failure> {
     // The worker takes ownership of the three input buffers, so nothing it
     // touches is visible here except through the channel (module docs §6).
-    let outcome = in_worker(move || semantic(&inputs, lang, &opts, mode), timeout_ms);
+    let outcome = in_worker(
+        move || semantic(&inputs, lang, &opts, &config, mode),
+        timeout_ms,
+    );
     match outcome {
         Ok(Outcome::Done(done)) => Ok(*done),
         Ok(Outcome::Failed(failure)) => Err(failure),
@@ -893,6 +948,7 @@ fn semantic(
     inputs: &Inputs,
     lang: &'static dyn Language,
     opts: &EmitOptions,
+    config: &MergeConfig,
     mode: SemanticMode,
 ) -> Outcome {
     let t = Instant::now();
@@ -940,8 +996,7 @@ fn semantic(
     let (base, ours, theirs) = (&parsed[0], &parsed[1], &parsed[2]);
 
     let t = Instant::now();
-    let outcome: MergeOutcome =
-        sm_merge::merge(base, ours, theirs, lang, &MergeConfig::for_language(lang));
+    let outcome: MergeOutcome = sm_merge::merge(base, ours, theirs, lang, config);
     let merge_ms = ms(t.elapsed());
 
     let t = Instant::now();
@@ -1038,6 +1093,11 @@ fn self_check(
             return Err(format!(
                 "a clean merge produced the token {token:?}, which is in none of the three inputs"
             ));
+        }
+        // Rung 7b: a duplicate declaration the merge invented. Parses, and
+        // every token is authentic, so nothing above sees it. See `dedup`.
+        if let Some(note) = dedup::introduced_duplicate(&reparsed, inputs, lang) {
+            return Err(note);
         }
     } else if result.conflict_count == 0 {
         return Err(format!(

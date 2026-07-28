@@ -15,6 +15,13 @@ anyhow.workspace = true
 clap.workspace = true
 serde.workspace = true
 serde_json.workspace = true
+# The replay harness grades its own output: it parses the merged file and the
+# human resolution and compares the trees (SPEC.md §6.2's second equality
+# notion). That is `sm-cst` plus `sm-match`'s structural equality, reused rather
+# than reimplemented — a second definition of "the same AST" is a second thing
+# to be wrong.
+sm-cst.workspace = true
+sm-match.workspace = true
 
 [dev-dependencies]
 tempfile = "3.24.0"

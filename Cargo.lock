@@ -574,6 +574,8 @@ dependencies = [
  "clap",
  "serde",
  "serde_json",
+ "sm-cst",
+ "sm-match",
  "tempfile",
 ]
 
