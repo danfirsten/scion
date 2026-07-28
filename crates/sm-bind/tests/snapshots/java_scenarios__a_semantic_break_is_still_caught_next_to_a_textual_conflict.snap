@@ -1,0 +1,12 @@
+---
+source: crates/sm-bind/tests/java_scenarios.rs
+expression: s.render()
+---
+tree merge: conflicted
+references: 3 (resolved in origin 2, unresolved in origin 1), skipped conflict regions: 1
+semantic conflicts: 1
+
+  [broken_reference] `helper`
+  reference: theirs "helper"
+  was: method `helper` in theirs scope `class_declaration`
+  `ours` renamed method `helper` to `renamedHelper`; the reference to `helper` from `theirs` still says `helper`, which no longer resolves in the merged result.

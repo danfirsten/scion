@@ -1,0 +1,12 @@
+---
+source: crates/sm-bind/tests/java_scenarios.rs
+expression: s.render()
+---
+tree merge: clean
+references: 11 (resolved in origin 5, unresolved in origin 6), skipped conflict regions: 0
+semantic conflicts: 1
+
+  [broken_reference] `getUser`
+  reference: theirs "getUser"
+  was: method `getUser` in theirs scope `class_declaration`
+  `ours` renamed method `getUser` to `fetchUser`; the reference to `getUser` from `theirs` still says `getUser`, which no longer resolves in the merged result.

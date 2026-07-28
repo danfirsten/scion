@@ -1,0 +1,12 @@
+---
+source: crates/sm-bind/tests/typescript_scenarios.rs
+expression: s.render()
+---
+tree merge: clean
+references: 2 (resolved in origin 2, unresolved in origin 0), skipped conflict regions: 0
+semantic conflicts: 1
+
+  [broken_reference] `Options`
+  reference: theirs "Options"
+  was: interface `Options` in theirs scope `program`
+  `ours` renamed interface `Options` to `Settings`; the reference to `Options` from `theirs` still says `Options`, which no longer resolves in the merged result.

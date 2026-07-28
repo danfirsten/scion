@@ -1,0 +1,13 @@
+---
+source: crates/sm-bind/tests/java_scenarios.rs
+expression: s.render()
+---
+tree merge: clean
+references: 9 (resolved in origin 5, unresolved in origin 4), skipped conflict regions: 0
+semantic conflicts: 1
+
+  [captured_reference] `log`
+  reference: ours "log"
+  was: field `log` in ours scope `class_declaration`
+  now: local variable `log` in theirs scope `block`
+  the reference to `log` from `ours` bound to the field `log` declared in `class_declaration` there; in the merged result it binds instead to the local variable `log` that `theirs` declared in `block` — a silent capture that both the line merge and the tree merge accept.

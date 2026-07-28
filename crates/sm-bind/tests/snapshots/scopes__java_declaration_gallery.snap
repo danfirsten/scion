@@ -1,0 +1,28 @@
+---
+source: crates/sm-bind/tests/scopes.rs
+expression: "decls_dump(java(), src)"
+---
+line   3  import           List                 in program
+line   4  import           requireNonNull       in program
+line   7  class            Repo                 in program
+line   7  type parameter   T                    in class_declaration
+line   8  field            field                in class_declaration
+line  10  constructor      Repo                 in class_declaration
+line  10  parameter        p                    in constructor_declaration
+line  11  local variable   local                in constructor_declaration
+line  14  method           method               in class_declaration
+line  14  type parameter   R                    in method_declaration
+line  14  parameter        r                    in method_declaration
+line  14  parameter        rest                 in method_declaration
+line  15  local variable   c                    in try_with_resources_statement
+line  16  parameter        e                    in catch_clause
+line  21  enum             Color                in class_declaration
+line  21  enum member      RED                  in enum_declaration
+line  21  enum member      GREEN                in enum_declaration
+line  23  record           Pt                   in class_declaration
+line  23  parameter        x                    in record_declaration
+line  23  parameter        y                    in record_declaration
+line  25  interface        I                    in class_declaration
+line  25  method           h                    in interface_declaration
+line  27  annotation type  A                    in class_declaration
+line  27  method           value                in annotation_type_declaration

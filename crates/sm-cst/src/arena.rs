@@ -172,16 +172,33 @@ impl Node {
 pub struct SourceTree {
     source: Vec<u8>,
     nodes: Vec<Node>,
+    /// Parallel to `nodes`: the tree-sitter **field name** each node occupies in
+    /// its parent, e.g. `Some("name")` for the `identifier` under
+    /// `method_declaration`. `None` for the root and for children the grammar
+    /// gives no field.
+    ///
+    /// A side table rather than a field on [`Node`] so that the arena's shape —
+    /// which the JSON schema, the matcher and the emitter all depend on — is
+    /// unchanged. Populated in [`crate::parse`]; see
+    /// [`SourceTree::field_name`].
+    field_names: Vec<Option<&'static str>>,
     language_name: &'static str,
     has_errors: bool,
 }
 
 impl SourceTree {
-    pub(crate) fn new(source: Vec<u8>, nodes: Vec<Node>, language_name: &'static str) -> Self {
+    pub(crate) fn new(
+        source: Vec<u8>,
+        nodes: Vec<Node>,
+        field_names: Vec<Option<&'static str>>,
+        language_name: &'static str,
+    ) -> Self {
+        debug_assert_eq!(nodes.len(), field_names.len());
         let has_errors = nodes.first().is_some_and(|root| root.has_error);
         Self {
             source,
             nodes,
+            field_names,
             language_name,
             has_errors,
         }
@@ -357,6 +374,38 @@ impl SourceTree {
         std::iter::once(self.root_id())
             .chain(self.descendants(self.root_id()))
             .filter(move |&id| self.node(id).is_leaf())
+    }
+
+    /// The tree-sitter **field name** this node occupies in its parent.
+    ///
+    /// `Some("name")` for the `identifier` under a `method_declaration`,
+    /// `Some("object")` for the receiver of a `method_invocation`, `None` for
+    /// the root and for any child the grammar does not name.
+    ///
+    /// This is the piece of grammar information that makes it possible to tell
+    /// a *declaration* from a *reference* without hard-coding child positions:
+    /// the same `identifier` kind appears as `method_declaration.name`, as
+    /// `method_invocation.object` and as `method_invocation.name`, and those
+    /// three mean entirely different things. See [`crate::IdentifierRole`].
+    ///
+    /// Recorded at parse time from `tree_sitter::Node::field_name_for_child`,
+    /// so it costs one `Option<&'static str>` per node and no re-walk of the
+    /// tree-sitter tree.
+    #[must_use]
+    pub fn field_name(&self, id: NodeId) -> Option<&'static str> {
+        self.field_names[id.index()]
+    }
+
+    /// The first child of `id` occupying the field `name`, if any.
+    ///
+    /// The arena equivalent of tree-sitter's `Node::child_by_field_name`.
+    #[must_use]
+    pub fn child_by_field_name(&self, id: NodeId, name: &str) -> Option<NodeId> {
+        self.node(id)
+            .children
+            .iter()
+            .copied()
+            .find(|&c| self.field_names[c.index()] == Some(name))
     }
 
     /// Walk from `id` to the root, `id` excluded.

@@ -1,0 +1,20 @@
+---
+source: crates/sm-bind/tests/scopes.rs
+expression: "bindings_dump(typescript(), src)"
+---
+line   7  type     Id               -> type alias `Id` @ line 4
+line  10  type     Id               -> type alias `Id` @ line 4
+line  10  type     Row              -> interface `Row` @ line 6
+line  11  value    Db               -> import `Db` @ line 1
+line  11  value    id               -> parameter `id` @ line 10
+line  12  value    console          -> unresolved
+line  12  value    row              -> local variable `row` @ line 11
+line  12  value    LIMIT            -> local variable `LIMIT` @ line 3
+line  13  value    row              -> local variable `row` @ line 11
+line  17  value    Map              -> unresolved
+line  17  type     Row              -> interface `Row` @ line 6
+line  19  type     Id               -> type alias `Id` @ line 4
+line  19  type     Row              -> interface `Row` @ line 6
+line  20  value    id               -> parameter `id` @ line 19
+line  20  value    load             -> function `load` @ line 10
+line  20  value    id               -> parameter `id` @ line 19

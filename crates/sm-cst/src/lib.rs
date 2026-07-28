@@ -24,6 +24,15 @@
 //!   arrives attached. The comment nodes stay where they are in the tree —
 //!   attachment annotates, it never restructures.
 //!
+//! - **Name roles (M6).** [`Language::identifier_role`],
+//!   [`Language::declaration_kind`] and [`Language::declared_name`] classify a
+//!   name node as a declaration, a lexically-resolved reference or a
+//!   *receiver-typed* member reference, using the tree-sitter **field name** the
+//!   node occupies in its parent ([`SourceTree::field_name`], captured at parse
+//!   time). `sm-bind` builds scopes and resolves names on top of them. Every one
+//!   of these has a conservative default, so a language that does not implement
+//!   them contributes no name analysis rather than a wrong one.
+//!
 //! # Milestone status
 //!
 //! M0 is complete: parsing, the arena, the invariant checks, the `Language`
@@ -48,7 +57,7 @@ mod trivia;
 
 pub use arena::{Attachment, Node, NodeId, SourceTree};
 pub use json::JsonTree;
-pub use language::{ChildListKind, Language};
+pub use language::{ChildListKind, DeclKind, IdentifierRole, Language, MemberVisibility};
 pub use parse::{MAX_SOURCE_LEN, ParseError, parse, parse_with_trivia_config};
 pub use render::{ERROR_WARNING, HeaderInfo, RenderOptions, render_parse};
 pub use trivia::{TriviaConfig, attach_trivia};

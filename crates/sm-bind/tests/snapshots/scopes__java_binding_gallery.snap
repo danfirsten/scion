@@ -1,0 +1,29 @@
+---
+source: crates/sm-bind/tests/scopes.rs
+expression: "bindings_dump(java(), src)"
+---
+line   7  type     Store            -> unresolved
+line  10  type     Store            -> unresolved
+line  11  value    store            -> parameter `store` @ line 10
+line  14  type     User             -> unresolved
+line  14  type     String           -> unresolved
+line  15  type     User             -> unresolved
+line  15  value    store            -> field `store` @ line 7
+line  15  value    id               -> parameter `id` @ line 14
+line  16  value    u                -> local variable `u` @ line 15
+line  17  value    u                -> local variable `u` @ line 15
+line  17  callable fallback         -> method `fallback` @ line 23
+line  17  value    id               -> parameter `id` @ line 14
+line  18  value    System           -> unresolved
+line  18  value    id               -> parameter `id` @ line 14
+line  20  value    u                -> local variable `u` @ line 15
+line  23  type     User             -> unresolved
+line  23  type     String           -> unresolved
+line  24  value    LIMIT            -> field `LIMIT` @ line 8
+line  25  value    i                -> local variable `i` @ line 25
+line  25  value    tries            -> local variable `tries` @ line 24
+line  25  value    i                -> local variable `i` @ line 25
+line  26  callable log              -> method `log` @ line 35
+line  26  value    i                -> local variable `i` @ line 25
+line  41  callable log              -> method `log` @ line 35
+line  41  value    LIMIT            -> field `LIMIT` @ line 8

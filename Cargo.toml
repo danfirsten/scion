@@ -32,6 +32,13 @@ serde_json = "1.0.151"
 
 # Testing.
 insta = "1.48.0"
+# `proptest`'s default feature set pulls in `rusty-fork`/`tempfile` to run each
+# case in a forked child. We do not want that: our properties are pure, forking
+# would multiply the cost of a few thousand merges by a process spawn each, and
+# the panic-safety story the driver needs is tested against the real binary
+# instead (crates/sm-cli/tests/cli_merge.rs).
+proptest = { version = "1.9.0", default-features = false, features = ["std", "bit-set"] }
+tempfile = "3.27.0"
 
 # Internal crates.
 sm-bind = { path = "crates/sm-bind", version = "0.0.0" }

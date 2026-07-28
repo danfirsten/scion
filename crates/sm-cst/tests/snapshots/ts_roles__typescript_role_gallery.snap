@@ -1,0 +1,62 @@
+---
+source: crates/sm-cst/tests/ts_roles.rs
+expression: role_gallery(src)
+---
+`Db`                   declaration(import)          import_specifier             name
+`Cfg`                  declaration(import)          import_specifier             name
+`LIMIT`                declaration(local variable)  variable_declarator          name
+`Id`                   declaration(type alias)      type_alias_declaration       name
+`Row`                  declaration(interface)       interface_declaration        name
+`id`                   declaration(property)        property_signature           name
+`Id`                   type_ref                     type_annotation              -
+`load`                 declaration(method)          method_signature             name
+`Color`                declaration(enum)            enum_declaration             name
+`RED`                  declaration(enum member)     enum_assignment              name
+`GREEN`                member_ref                   enum_body                    name
+`load`                 declaration(function)        function_declaration         name
+`id`                   declaration(parameter)       required_parameter           pattern
+`Id`                   type_ref                     type_annotation              -
+`trace`                declaration(local variable)  object_pattern               -
+`Cfg`                  type_ref                     type_annotation              -
+`Row`                  type_ref                     type_annotation              -
+`row`                  declaration(local variable)  variable_declarator          name
+`Db`                   lexical_ref                  member_expression            object
+`find`                 member_ref                   member_expression            property
+`id`                   lexical_ref                  arguments                    -
+`key`                  declaration(local variable)  for_in_statement             left
+`Object`               lexical_ref                  member_expression            object
+`keys`                 member_ref                   member_expression            property
+`row`                  lexical_ref                  arguments                    -
+`console`              lexical_ref                  member_expression            object
+`log`                  member_ref                   member_expression            property
+`key`                  lexical_ref                  arguments                    -
+`LIMIT`                lexical_ref                  arguments                    -
+`row`                  lexical_ref                  member_expression            object
+`load`                 member_ref                   member_expression            property
+`err`                  declaration(parameter)       catch_clause                 parameter
+`console`              lexical_ref                  member_expression            object
+`error`                member_ref                   member_expression            property
+`err`                  lexical_ref                  arguments                    -
+`row`                  lexical_ref                  return_statement             -
+`Repo`                 declaration(class)           class_declaration            name
+`Base`                 lexical_ref                  extends_clause               value
+`cache`                declaration(field)           public_field_definition      name
+`Map`                  lexical_ref                  new_expression               constructor
+`Row`                  type_ref                     type_arguments               -
+`#hidden`              declaration(field)           public_field_definition      name
+`constructor`          declaration(method)          method_definition            name
+`cfg`                  declaration(parameter)       required_parameter           pattern
+`Cfg`                  type_ref                     type_annotation              -
+`get`                  declaration(method)          method_definition            name
+`T`                    declaration(type parameter)  type_parameter               name
+`id`                   declaration(parameter)       required_parameter           pattern
+`Id`                   type_ref                     type_annotation              -
+`Row`                  type_ref                     union_type                   -
+`cache`                member_ref                   member_expression            property
+`get`                  member_ref                   member_expression            property
+`id`                   lexical_ref                  arguments                    -
+`load`                 lexical_ref                  call_expression              function
+`id`                   lexical_ref                  arguments                    -
+`cfg`                  member_ref                   member_expression            property
+`NS`                   declaration(namespace)       internal_module              name
+`inner`                declaration(local variable)  variable_declarator          name

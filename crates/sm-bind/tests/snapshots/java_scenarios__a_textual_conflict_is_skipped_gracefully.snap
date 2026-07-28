@@ -1,0 +1,7 @@
+---
+source: crates/sm-bind/tests/java_scenarios.rs
+expression: s.render()
+---
+tree merge: conflicted
+references: 0 (resolved in origin 0, unresolved in origin 0), skipped conflict regions: 1
+semantic conflicts: 0

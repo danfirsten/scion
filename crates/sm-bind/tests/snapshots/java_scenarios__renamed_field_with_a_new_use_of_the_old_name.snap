@@ -1,0 +1,12 @@
+---
+source: crates/sm-bind/tests/java_scenarios.rs
+expression: s.render()
+---
+tree merge: clean
+references: 3 (resolved in origin 3, unresolved in origin 0), skipped conflict regions: 0
+semantic conflicts: 1
+
+  [broken_reference] `count`
+  reference: theirs "count"
+  was: field `count` in theirs scope `class_declaration`
+  `ours` renamed field `count` to `total`; the reference to `count` from `theirs` still says `count`, which no longer resolves in the merged result.

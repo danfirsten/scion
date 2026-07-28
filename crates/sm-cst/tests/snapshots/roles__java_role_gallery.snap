@@ -1,0 +1,64 @@
+---
+source: crates/sm-cst/tests/roles.rs
+expression: role_gallery(src)
+---
+`com`                    member_ref           scoped_identifier            scope
+`example`                member_ref           scoped_identifier            name
+`java`                   member_ref           scoped_identifier            scope
+`util`                   member_ref           scoped_identifier            name
+`List`                   declaration(import)  scoped_identifier            name
+`java`                   member_ref           scoped_identifier            scope
+`util`                   member_ref           scoped_identifier            name
+`Objects`                member_ref           scoped_identifier            name
+`requireNonNull`         declaration(import)  scoped_identifier            name
+`Deprecated`             type_ref             marker_annotation            name
+`Repo`                   declaration(class)   class_declaration            name
+`T`                      declaration(type parameter) type_parameter               -
+`Number`                 type_ref             type_bound                   -
+`Iface`                  type_ref             type_list                    -
+`Store`                  type_ref             field_declaration            type
+`store`                  declaration(field)   variable_declarator          name
+`LIMIT`                  declaration(field)   variable_declarator          name
+`Repo`                   declaration(constructor) constructor_declaration      name
+`Store`                  type_ref             formal_parameter             type
+`store`                  declaration(parameter) formal_parameter             name
+`store`                  member_ref           field_access                 field
+`store`                  lexical_ref          assignment_expression        right
+`R`                      declaration(type parameter) type_parameter               -
+`R`                      type_ref             method_declaration           type
+`pick`                   declaration(method)  method_declaration           name
+`R`                      type_ref             formal_parameter             type
+`a`                      declaration(parameter) formal_parameter             name
+`String`                 type_ref             formal_parameter             type
+`id`                     declaration(parameter) formal_parameter             name
+`IOException`            type_ref             throws                       -
+`User`                   type_ref             local_variable_declaration   type
+`u`                      declaration(local variable) variable_declarator          name
+`store`                  lexical_ref          method_invocation            object
+`find`                   member_ref           method_invocation            name
+`id`                     lexical_ref          argument_list                -
+`n`                      declaration(local variable) variable_declarator          name
+`LIMIT`                  lexical_ref          variable_declarator          value
+`i`                      declaration(local variable) variable_declarator          name
+`i`                      lexical_ref          binary_expression            left
+`n`                      lexical_ref          binary_expression            right
+`i`                      lexical_ref          update_expression            -
+`log`                    call_ref             method_invocation            name
+`i`                      lexical_ref          argument_list                -
+`AutoCloseable`          type_ref             resource                     type
+`c`                      declaration(local variable) resource                     name
+`open`                   call_ref             method_invocation            name
+`u`                      lexical_ref          method_invocation            object
+`close`                  member_ref           method_invocation            name
+`Exception`              type_ref             catch_type                   -
+`e`                      declaration(parameter) catch_formal_parameter       name
+`RuntimeException`       type_ref             object_creation_expression   type
+`e`                      lexical_ref          argument_list                -
+`outer`                  label                labeled_statement            -
+`outer`                  label                break_statement              -
+`a`                      lexical_ref          return_statement             -
+`log`                    declaration(method)  method_declaration           name
+`i`                      declaration(parameter) formal_parameter             name
+`Color`                  declaration(enum)    enum_declaration             name
+`RED`                    declaration(enum member) enum_constant                name
+`GREEN`                  declaration(enum member) enum_constant                name

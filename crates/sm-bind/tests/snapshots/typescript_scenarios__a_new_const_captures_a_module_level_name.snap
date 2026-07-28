@@ -1,0 +1,13 @@
+---
+source: crates/sm-bind/tests/typescript_scenarios.rs
+expression: s.render()
+---
+tree merge: clean
+references: 3 (resolved in origin 3, unresolved in origin 0), skipped conflict regions: 0
+semantic conflicts: 1
+
+  [captured_reference] `limit`
+  reference: ours "limit"
+  was: local variable `limit` in ours scope `program`
+  now: local variable `limit` in theirs scope `statement_block`
+  the reference to `limit` from `ours` bound to the local variable `limit` declared in `program` there; in the merged result it binds instead to the local variable `limit` that `theirs` declared in `statement_block` — a silent capture that both the line merge and the tree merge accept.

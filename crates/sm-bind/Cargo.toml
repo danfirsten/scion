@@ -1,5 +1,6 @@
 [package]
 name = "sm-bind"
+description = "Scope tree, name resolution and merge-time semantic-conflict detection for semantic-merge"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
@@ -7,3 +8,11 @@ repository.workspace = true
 rust-version.workspace = true
 
 [dependencies]
+serde = { workspace = true }
+sm-cst = { workspace = true }
+sm-merge = { workspace = true }
+
+[dev-dependencies]
+insta = { workspace = true }
+serde_json = { workspace = true }
+sm-emit = { workspace = true }

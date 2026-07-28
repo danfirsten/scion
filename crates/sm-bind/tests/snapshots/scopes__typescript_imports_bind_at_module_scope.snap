@@ -1,0 +1,9 @@
+---
+source: crates/sm-bind/tests/scopes.rs
+expression: "decls_dump(typescript(), src)"
+---
+line   1  import           def                  in program
+line   1  import           ns                   in program
+line   2  import           a                    in program
+line   2  import           renamed              in program
+line   4  local variable   x                    in program

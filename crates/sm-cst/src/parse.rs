@@ -105,27 +105,37 @@ pub fn parse_with_trivia_config(
         language: lang.name(),
     })?;
 
-    let nodes = build_arena(&tree);
-    let mut tree = SourceTree::new(source.to_vec(), nodes, lang.name());
+    let (nodes, field_names) = build_arena(&tree);
+    let mut tree = SourceTree::new(source.to_vec(), nodes, field_names, lang.name());
     attach_trivia(&mut tree, lang, trivia);
     Ok(tree)
 }
 
-/// Flatten a tree-sitter tree into a preorder arena.
+/// Flatten a tree-sitter tree into a preorder arena, plus the parallel table of
+/// per-node field names.
 ///
 /// Iterative rather than recursive on purpose: a chain of binary expressions or
 /// nested parentheses in generated Java can nest thousands deep, and a recursive
 /// walk would blow the stack on input a merge driver is expected to survive.
-fn build_arena<'t>(tree: &'t tree_sitter::Tree) -> Vec<Node> {
+///
+/// The field name of a child is read from its *parent* via
+/// `Node::field_name_for_child`, which indexes the parent's full child list —
+/// anonymous tokens and `extra`s included — exactly as this walk does. It is a
+/// table lookup in the grammar's static tables, so capturing it costs one
+/// pointer per node and no second traversal.
+fn build_arena<'t>(tree: &'t tree_sitter::Tree) -> (Vec<Node>, Vec<Option<&'static str>>) {
     let mut nodes: Vec<Node> = Vec::new();
-    // (tree-sitter node, arena id of its parent). Popped LIFO; children are
-    // pushed in reverse so they pop in source order, which makes the arena
-    // order exactly preorder.
-    let mut stack: Vec<(tree_sitter::Node<'t>, Option<NodeId>)> = vec![(tree.root_node(), None)];
-    let mut child_buf: Vec<tree_sitter::Node<'t>> = Vec::new();
+    let mut field_names: Vec<Option<&'static str>> = Vec::new();
+    // (tree-sitter node, arena id of its parent, field name in that parent).
+    // Popped LIFO; children are pushed in reverse so they pop in source order,
+    // which makes the arena order exactly preorder.
+    let mut stack: Vec<(tree_sitter::Node<'t>, Option<NodeId>, Option<&'static str>)> =
+        vec![(tree.root_node(), None, None)];
+    let mut child_buf: Vec<(tree_sitter::Node<'t>, Option<&'static str>)> = Vec::new();
 
-    while let Some((ts_node, parent)) = stack.pop() {
+    while let Some((ts_node, parent, field)) = stack.pop() {
         let id = NodeId(nodes.len() as u32);
+        field_names.push(field);
         nodes.push(Node {
             kind_id: ts_node.kind_id(),
             kind: ts_node.kind(),
@@ -148,11 +158,16 @@ fn build_arena<'t>(tree: &'t tree_sitter::Tree) -> Vec<Node> {
 
         child_buf.clear();
         let mut cursor = ts_node.walk();
-        child_buf.extend(ts_node.children(&mut cursor));
-        for child in child_buf.drain(..).rev() {
-            stack.push((child, Some(id)));
+        child_buf.extend(
+            ts_node
+                .children(&mut cursor)
+                .enumerate()
+                .map(|(i, child)| (child, ts_node.field_name_for_child(i as u32))),
+        );
+        for (child, field) in child_buf.drain(..).rev() {
+            stack.push((child, Some(id), field));
         }
     }
 
-    nodes
+    (nodes, field_names)
 }

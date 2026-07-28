@@ -28,7 +28,8 @@
 //! and a declaration file is ordinary TypeScript as far as every classification
 //! here is concerned.
 
-use crate::language::{ChildListKind, Language};
+use crate::arena::{NodeId, SourceTree};
+use crate::language::{ChildListKind, DeclKind, IdentifierRole, Language, MemberVisibility};
 
 /// Which of `tree-sitter-typescript`'s two grammars a [`TypeScriptLanguage`]
 /// parses with.
@@ -369,8 +370,12 @@ impl TypeScriptLanguage {
     /// property access in the file.
     ///
     /// `is_identifier` is a single boolean, so it cannot say "this is a name but
-    /// not a lexically-resolved one". Java never needed the distinction. See the
-    /// gap report in PROGRESS.md.
+    /// not a lexically-resolved one". **M6 closed that gap**: every name node is
+    /// now classified by [`Language::identifier_role`], which reports these
+    /// kinds as [`IdentifierRole::MemberRef`] — a name `sm-bind` never resolves
+    /// and therefore never reports — while still recognising them as
+    /// [`IdentifierRole::Declaration`] when they are a class member's own name.
+    /// This list is what `is_identifier` still answers, and it is unchanged.
     ///
     /// Note that the excluded kinds are still in [`Self::SIGNIFICANT_TEXT`]:
     /// the matcher absolutely must tell `.foo` from `.bar`.
@@ -445,6 +450,190 @@ impl TypeScriptLanguage {
     /// `jsx_text` is the literal text between JSX tags. It is not trivia and it
     /// is not whitespace-insignificant — it is rendered.
     pub const TSX_ONLY_SIGNIFICANT_TEXT: &'static [&'static str] = &["jsx_text"];
+
+    // ------------------------------------------------------------- M6: names
+
+    /// Declaration node kinds, and what each declares (M6).
+    ///
+    /// Keyed on the *declaration* node. The name is [`Language::declared_name`],
+    /// which is the grammar's `name` field for all of these except the ones
+    /// listed in [`TypeScriptLanguage::declared_name`].
+    ///
+    /// # What is deliberately absent
+    ///
+    /// - `class`, `function_expression`, `generator_function` — the *expression*
+    ///   forms. `const f = function named() { … }` binds `named` only inside the
+    ///   function's own body, and this crate's scope model puts a self-named
+    ///   declaration in the *enclosing* scope. Registering them would leak the
+    ///   name outward, which could make an unrelated later `named` resolve. Not
+    ///   registering them makes such a name unresolved, which is never reported.
+    ///   Under-approximate, on purpose.
+    /// - `variable_declarator` — its answer depends on its parent
+    ///   (`lexical_declaration` ⇒ block-scoped [`DeclKind::Local`],
+    ///   `variable_declaration` ⇒ function-hoisted [`DeclKind::Var`]), so it is
+    ///   handled in [`TypeScriptLanguage::declaration_kind`].
+    /// - Destructuring leaves (`shorthand_property_identifier_pattern`,
+    ///   `rest_pattern`, bare identifiers under `array_pattern`) declare
+    ///   themselves and are handled the same way.
+    pub const DECLARATIONS: &'static [(&'static str, DeclKind)] = &[
+        ("class_declaration", DeclKind::Class),
+        ("abstract_class_declaration", DeclKind::Class),
+        ("interface_declaration", DeclKind::Interface),
+        ("type_alias_declaration", DeclKind::TypeAlias),
+        ("enum_declaration", DeclKind::Enum),
+        ("enum_assignment", DeclKind::EnumMember),
+        ("function_declaration", DeclKind::Function),
+        ("generator_function_declaration", DeclKind::Function),
+        ("method_definition", DeclKind::Method),
+        ("method_signature", DeclKind::Method),
+        ("abstract_method_signature", DeclKind::Method),
+        ("public_field_definition", DeclKind::Field),
+        ("property_signature", DeclKind::Property),
+        ("required_parameter", DeclKind::Parameter),
+        ("optional_parameter", DeclKind::Parameter),
+        ("catch_clause", DeclKind::Parameter),
+        ("type_parameter", DeclKind::TypeParam),
+        ("import_specifier", DeclKind::Import),
+        ("namespace_import", DeclKind::Import),
+        ("internal_module", DeclKind::Namespace),
+        ("module", DeclKind::Module),
+        ("pair_pattern", DeclKind::Local),
+        ("rest_pattern", DeclKind::Local),
+        ("shorthand_property_identifier_pattern", DeclKind::Local),
+        ("for_in_statement", DeclKind::Local),
+    ];
+
+    /// `(parent kind, field name)` pairs whose identifier child is a
+    /// **member reference** — resolved against a receiver's type or a
+    /// namespace, never against the lexical scope chain.
+    ///
+    /// TypeScript needs fewer entries than Java because the grammar already
+    /// separates `property_identifier` from `identifier`; those two kinds are
+    /// handled wholesale by kind. What is left is the
+    /// qualified-name shapes:
+    ///
+    /// - `nested_type_identifier.name` — the `Type` of `ns.Type`.
+    /// - `nested_identifier.property` — the tail of a qualified value name.
+    /// - `import_specifier.name` — the *exported* name in
+    ///   `import { a as b }`, which lives in the other module, not here. (When
+    ///   there is no alias the same node **is** the local binding and is caught
+    ///   as a declaration first.)
+    pub const MEMBER_REF_CONTEXTS: &'static [(&'static str, &'static str)] = &[
+        ("nested_type_identifier", "name"),
+        ("nested_identifier", "property"),
+        ("import_specifier", "name"),
+    ];
+
+    /// Kinds that are a **function-level** scope, i.e. where a `var` lands.
+    ///
+    /// `statement_block` is emphatically not here: that is the whole point of
+    /// `var`. `program` is, so that a top-level `var` is module-wide.
+    pub const FUNCTION_SCOPES: &'static [&'static str] = &[
+        "program",
+        "function_declaration",
+        "generator_function_declaration",
+        "function_expression",
+        "generator_function",
+        "arrow_function",
+        "method_definition",
+        "class_static_block",
+        "module",
+        "internal_module",
+    ];
+
+    /// Name kinds that resolve against a **receiver's type**, never against the
+    /// lexical scope chain.
+    ///
+    /// This is the finding that motivated [`IdentifierRole`]: `o.foo`, a class
+    /// member name and an object-literal key are all `property_identifier`, and
+    /// `#x` is `private_property_identifier`. Treating them as lexical
+    /// references would report a broken reference on every property access in
+    /// the file. They are still names — when one of them is a *declaration's*
+    /// name it is reported as [`IdentifierRole::Declaration`], which is what
+    /// lets a renamed method be described in a conflict explanation.
+    pub const RECEIVER_TYPED_NAMES: &'static [&'static str] =
+        &["property_identifier", "private_property_identifier"];
+
+    /// Parent kinds under which a bare `identifier` **is itself** a
+    /// declaration, with no wrapper node and no field name to key on.
+    ///
+    /// - `array_pattern` — the `p` of `const [p, ...rest] = arr`.
+    /// - `import_clause` — the `def` of `import def from "m"`.
+    pub const SELF_DECLARING_PARENTS: &'static [(&'static str, DeclKind)] = &[
+        ("array_pattern", DeclKind::Local),
+        ("import_clause", DeclKind::Import),
+    ];
+
+    /// What a bare `identifier` declares purely by virtue of where it sits, or
+    /// `None` if it declares nothing. See
+    /// [`TypeScriptLanguage::SELF_DECLARING_PARENTS`].
+    fn self_declared(tree: &SourceTree, id: NodeId) -> Option<DeclKind> {
+        let node = tree.node(id);
+        match node.kind {
+            "shorthand_property_identifier_pattern" => Some(DeclKind::Local),
+            "identifier" => {
+                let parent_kind = tree.node(node.parent?).kind;
+                Self::SELF_DECLARING_PARENTS
+                    .iter()
+                    .find(|(k, _)| *k == parent_kind)
+                    .map(|(_, d)| *d)
+            }
+            _ => None,
+        }
+    }
+
+    /// The role of one name node. Split out of the trait impl so the reasoning
+    /// can be read top to bottom.
+    fn role(&self, tree: &SourceTree, id: NodeId) -> IdentifierRole {
+        let node = tree.node(id);
+        let kind = node.kind;
+        let is_name =
+            Self::IDENTIFIERS.contains(&kind) || Self::RECEIVER_TYPED_NAMES.contains(&kind);
+        if !is_name {
+            return IdentifierRole::NotAName;
+        }
+        let Some(parent) = node.parent else {
+            return IdentifierRole::MemberRef;
+        };
+        let parent_kind = tree.node(parent).kind;
+        let field = tree.field_name(id);
+
+        // 1. The name of a declaration — asked of the declaration itself, so
+        //    the two APIs cannot drift apart. A destructuring leaf and a
+        //    default import declare *themselves*, hence the `id` probe as well
+        //    as the `parent` one.
+        for candidate in [parent, id] {
+            if let Some(decl) = self.declaration_kind(tree, candidate)
+                && self.declared_name(tree, candidate) == Some(id)
+            {
+                return IdentifierRole::Declaration(decl);
+            }
+        }
+
+        // 2. Labels: `outer: for (…) { break outer; }`.
+        if kind == "statement_identifier" {
+            return IdentifierRole::Label;
+        }
+
+        // 3. Receiver-typed names, in bulk and by context.
+        if Self::RECEIVER_TYPED_NAMES.contains(&kind) {
+            return IdentifierRole::MemberRef;
+        }
+        if let Some(field) = field
+            && Self::MEMBER_REF_CONTEXTS.contains(&(parent_kind, field))
+        {
+            return IdentifierRole::MemberRef;
+        }
+
+        // 5. Everything else. TypeScript has a single value namespace, so a
+        //    call target is an ordinary `LexicalRef` and `CallRef` is never
+        //    produced here.
+        if kind == "type_identifier" {
+            IdentifierRole::TypeRef
+        } else {
+            IdentifierRole::LexicalRef
+        }
+    }
 }
 
 impl Language for TypeScriptLanguage {
@@ -499,5 +688,73 @@ impl Language for TypeScriptLanguage {
     fn significant_text(&self, kind: &str) -> bool {
         Self::SIGNIFICANT_TEXT.contains(&kind)
             || (self.dialect == TsDialect::Tsx && Self::TSX_ONLY_SIGNIFICANT_TEXT.contains(&kind))
+    }
+
+    fn identifier_role(&self, tree: &SourceTree, id: NodeId) -> IdentifierRole {
+        self.role(tree, id)
+    }
+
+    fn declaration_kind(&self, tree: &SourceTree, id: NodeId) -> Option<DeclKind> {
+        if let Some(kind) = Self::self_declared(tree, id) {
+            return Some(kind);
+        }
+        let kind = tree.node(id).kind;
+        match kind {
+            // `let`/`const` are block-scoped; `var` is function-hoisted.
+            "variable_declarator" => {
+                let parent_kind = tree.node(id).parent.map_or("", |p| tree.node(p).kind);
+                Some(if parent_kind == "variable_declaration" {
+                    DeclKind::Var
+                } else {
+                    DeclKind::Local
+                })
+            }
+            // `for (const x of xs)` binds; `for (x of xs)` assigns. The `kind`
+            // field is what tells them apart.
+            "for_in_statement" => tree
+                .child_by_field_name(id, "kind")
+                .map(|_| DeclKind::Local),
+            _ => Self::DECLARATIONS
+                .iter()
+                .find(|(k, _)| *k == kind)
+                .map(|(_, d)| *d),
+        }
+    }
+
+    fn declared_name(&self, tree: &SourceTree, id: NodeId) -> Option<NodeId> {
+        if Self::self_declared(tree, id).is_some() {
+            return Some(id);
+        }
+        match tree.node(id).kind {
+            // `import { a as b }` binds `b`; `import { a }` binds `a`.
+            "import_specifier" => tree
+                .child_by_field_name(id, "alias")
+                .or_else(|| tree.child_by_field_name(id, "name")),
+            // `* as ns` and `...rest` leave their binding unlabelled.
+            "namespace_import" | "rest_pattern" => tree
+                .children(id)
+                .find(|&c| tree.node(c).kind == "identifier"),
+            // `catch (e)`, `const { c: renamed } = o`, `for (const x of xs)`.
+            "catch_clause" => tree.child_by_field_name(id, "parameter"),
+            "pair_pattern" => tree.child_by_field_name(id, "value"),
+            "for_in_statement" => tree.child_by_field_name(id, "left"),
+            // A parameter's "name" is its `pattern`, which may itself be a
+            // destructuring pattern — in which case this returns a non-name
+            // node and `sm-bind` skips it, leaving the pattern's own leaves to
+            // register themselves.
+            "required_parameter" | "optional_parameter" => tree.child_by_field_name(id, "pattern"),
+            _ => tree.child_by_field_name(id, "name"),
+        }
+    }
+
+    /// A TypeScript class member is reachable only through a receiver —
+    /// `this.x`, never a bare `x`. Saying otherwise would make every method
+    /// parameter that shares a name with a field look like a capture.
+    fn member_visibility(&self) -> MemberVisibility {
+        MemberVisibility::ReceiverOnly
+    }
+
+    fn is_function_scope(&self, kind: &str) -> bool {
+        Self::FUNCTION_SCOPES.contains(&kind)
     }
 }
