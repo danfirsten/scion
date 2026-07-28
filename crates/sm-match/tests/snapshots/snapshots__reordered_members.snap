@@ -1,0 +1,77 @@
+---
+source: crates/sm-match/tests/snapshots.rs
+expression: "snapshot_body(\"reordered_members\")"
+---
+case: reordered_members
+
+--- profile base (min_height=1 min_dice=0.4 max_size=100) ---
+matchable: a=33 b=33   matched: 33   moves: 4
+0:program@0..193 <-> 0:program@0..193
+1:package_declaration@0..13 <-> 1:package_declaration@0..13
+3:identifier@8..12 <-> 3:identifier@8..12
+5:class_declaration@15..192 <-> 5:class_declaration@15..192
+6:modifiers@15..21 <-> 6:modifiers@15..21
+9:identifier@28..34 <-> 9:identifier@28..34
+10:class_body@35..192 <-> 10:class_body@35..192
+12:field_declaration@41..61 <-> 20:field_declaration@63..83
+13:modifiers@41..48 <-> 21:modifiers@63..70
+15:type_identifier@49..55 <-> 23:type_identifier@71..77
+16:variable_declarator@56..60 <-> 24:variable_declarator@78..82
+17:identifier@56..60 <-> 25:identifier@78..82
+19:field_declaration@66..83 <-> 12:field_declaration@41..58
+20:modifiers@66..73 <-> 13:modifiers@41..48
+22:integral_type@74..77 <-> 15:integral_type@49..52
+24:variable_declarator@78..82 <-> 17:variable_declarator@53..57
+25:identifier@78..82 <-> 18:identifier@53..57
+27:method_declaration@89..138 <-> 43:method_declaration@141..190
+28:modifiers@89..95 <-> 44:modifiers@141..147
+30:type_identifier@96..102 <-> 46:type_identifier@148..154
+31:identifier@103..107 <-> 47:identifier@155..159
+32:formal_parameters@107..109 <-> 48:formal_parameters@159..161
+35:block@110..138 <-> 51:block@162..190
+37:return_statement@120..132 <-> 53:return_statement@172..184
+39:identifier@127..131 <-> 55:identifier@179..183
+42:method_declaration@144..190 <-> 27:method_declaration@89..135
+43:modifiers@144..150 <-> 28:modifiers@89..95
+45:integral_type@151..154 <-> 30:integral_type@96..99
+47:identifier@155..159 <-> 32:identifier@100..104
+48:formal_parameters@159..161 <-> 33:formal_parameters@104..106
+51:block@162..190 <-> 36:block@107..135
+53:return_statement@172..184 <-> 38:return_statement@117..129
+55:identifier@179..183 <-> 40:identifier@124..128
+
+--- profile strict (min_height=2 min_dice=0.6 max_size=100) ---
+matchable: a=33 b=33   matched: 33   moves: 4
+0:program@0..193 <-> 0:program@0..193
+1:package_declaration@0..13 <-> 1:package_declaration@0..13
+3:identifier@8..12 <-> 3:identifier@8..12
+5:class_declaration@15..192 <-> 5:class_declaration@15..192
+6:modifiers@15..21 <-> 6:modifiers@15..21
+9:identifier@28..34 <-> 9:identifier@28..34
+10:class_body@35..192 <-> 10:class_body@35..192
+12:field_declaration@41..61 <-> 20:field_declaration@63..83
+13:modifiers@41..48 <-> 21:modifiers@63..70
+15:type_identifier@49..55 <-> 23:type_identifier@71..77
+16:variable_declarator@56..60 <-> 24:variable_declarator@78..82
+17:identifier@56..60 <-> 25:identifier@78..82
+19:field_declaration@66..83 <-> 12:field_declaration@41..58
+20:modifiers@66..73 <-> 13:modifiers@41..48
+22:integral_type@74..77 <-> 15:integral_type@49..52
+24:variable_declarator@78..82 <-> 17:variable_declarator@53..57
+25:identifier@78..82 <-> 18:identifier@53..57
+27:method_declaration@89..138 <-> 43:method_declaration@141..190
+28:modifiers@89..95 <-> 44:modifiers@141..147
+30:type_identifier@96..102 <-> 46:type_identifier@148..154
+31:identifier@103..107 <-> 47:identifier@155..159
+32:formal_parameters@107..109 <-> 48:formal_parameters@159..161
+35:block@110..138 <-> 51:block@162..190
+37:return_statement@120..132 <-> 53:return_statement@172..184
+39:identifier@127..131 <-> 55:identifier@179..183
+42:method_declaration@144..190 <-> 27:method_declaration@89..135
+43:modifiers@144..150 <-> 28:modifiers@89..95
+45:integral_type@151..154 <-> 30:integral_type@96..99
+47:identifier@155..159 <-> 32:identifier@100..104
+48:formal_parameters@159..161 <-> 33:formal_parameters@104..106
+51:block@162..190 <-> 36:block@107..135
+53:return_statement@172..184 <-> 38:return_statement@117..129
+55:identifier@179..183 <-> 40:identifier@124..128

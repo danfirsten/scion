@@ -1,10 +1,13 @@
 //! `sm` — the `semantic-merge` command-line front end (SPEC.md §4.7).
 //!
-//! In M0 the only subcommand is `sm parse`, which exists to make the CST layer
-//! inspectable. The merge driver (`sm merge %O %A %B %L %P`), `sm diff` and
-//! `sm match` land in M4, M3 and M2 respectively; none of them are registered
-//! here yet, because a subcommand that exists and does nothing is worse than one
-//! that does not exist.
+//! Two subcommands so far. `sm parse` makes the CST layer inspectable (M0);
+//! `sm match` makes a matching inspectable (M2), which SPEC.md §4.3 requires
+//! because "matching bugs are almost invisible in assertions and obvious
+//! visually". The merge driver (`sm merge %O %A %B %L %P`) and `sm diff` land
+//! in M4 and M3; neither is registered here yet, because a subcommand that
+//! exists and does nothing is worse than one that does not exist.
+
+mod cmd_match;
 
 use std::path::{Path, PathBuf};
 use std::process::ExitCode;
@@ -22,8 +25,8 @@ const EXIT_USAGE: u8 = 2;
     about = "semantic-merge: an AST-aware three-way merge driver for git",
     long_about = "semantic-merge parses source with tree-sitter and merges on the tree \
                   rather than on lines.\n\n\
-                  Status: M0 — scaffold and CST layer. Only `sm parse` is implemented; \
-                  the merge driver lands in M4."
+                  Status: M2 — CST layer and structural matching. `sm parse` and \
+                  `sm match` are implemented; the merge driver lands in M4."
 )]
 struct Cli {
     #[command(subcommand)]
@@ -34,6 +37,8 @@ struct Cli {
 enum Command {
     /// Parse a file and print its concrete syntax tree.
     Parse(ParseArgs),
+    /// Match two files structurally and show the result side by side.
+    Match(cmd_match::MatchArgs),
 }
 
 #[derive(clap::Args, Debug)]
@@ -60,12 +65,18 @@ fn main() -> ExitCode {
     let cli = Cli::parse();
     match cli.command {
         Command::Parse(args) => run_parse(&args),
+        Command::Match(args) => cmd_match::run(&args),
     }
 }
 
-fn run_parse(args: &ParseArgs) -> ExitCode {
-    let path: &Path = &args.file;
-
+/// Detect the language for `path`, read it and parse it.
+///
+/// Returns `None` after printing the reason; every caller turns that into
+/// [`EXIT_USAGE`]. A file that *parses* but contains `ERROR` nodes is a
+/// success here — the tree is still a faithful description of the bytes
+/// (PROGRESS.md decision 8) — so callers that care must ask
+/// [`sm_cst::SourceTree::has_errors`].
+fn load(path: &Path) -> Option<Loaded> {
     let Some(lang) = sm_cst::languages::detect(path) else {
         let known: Vec<&str> = sm_cst::languages::all()
             .iter()
@@ -76,26 +87,50 @@ fn run_parse(args: &ParseArgs) -> ExitCode {
             path.display(),
             known.join(", ")
         );
-        return ExitCode::from(EXIT_USAGE);
+        return None;
     };
 
     let source = match std::fs::read(path) {
         Ok(bytes) => bytes,
         Err(err) => {
             eprintln!("sm: {}: {err}", path.display());
-            return ExitCode::from(EXIT_USAGE);
+            return None;
         }
     };
 
     let started = Instant::now();
-    let tree = match sm_cst::parse(&source, lang) {
-        Ok(tree) => tree,
+    match sm_cst::parse(&source, lang) {
+        Ok(tree) => Some(Loaded {
+            lang,
+            tree,
+            parse_time: started.elapsed(),
+        }),
         Err(err) => {
             eprintln!("sm: {}: {err}", path.display());
-            return ExitCode::from(EXIT_USAGE);
+            None
         }
+    }
+}
+
+/// A successfully parsed file. `parse_time` measures the parse alone, not the
+/// read, because that is what the `sm parse` header claims to report.
+struct Loaded {
+    lang: &'static dyn sm_cst::Language,
+    tree: sm_cst::SourceTree,
+    parse_time: std::time::Duration,
+}
+
+fn run_parse(args: &ParseArgs) -> ExitCode {
+    let path: &Path = &args.file;
+
+    let Some(Loaded {
+        lang,
+        tree,
+        parse_time,
+    }) = load(path)
+    else {
+        return ExitCode::from(EXIT_USAGE);
     };
-    let elapsed = started.elapsed();
 
     let display_path = path.display().to_string();
     let stdout = std::io::stdout();
@@ -125,7 +160,7 @@ fn run_parse(args: &ParseArgs) -> ExitCode {
                 max_text_len: args.max_text,
                 header: Some(sm_cst::HeaderInfo {
                     path: &display_path,
-                    parse_time: Some(elapsed),
+                    parse_time: Some(parse_time),
                 }),
             },
         )

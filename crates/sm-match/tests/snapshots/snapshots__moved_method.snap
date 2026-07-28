@@ -1,0 +1,115 @@
+---
+source: crates/sm-match/tests/snapshots.rs
+expression: "snapshot_body(\"moved_method\")"
+---
+case: moved_method
+
+--- profile base (min_height=1 min_dice=0.4 max_size=100) ---
+matchable: a=52 b=52   matched: 52   moves: 3
+0:program@0..247 <-> 0:program@0..247
+1:package_declaration@0..13 <-> 1:package_declaration@0..13
+3:identifier@8..12 <-> 3:identifier@8..12
+5:class_declaration@15..246 <-> 5:class_declaration@15..246
+6:modifiers@15..21 <-> 6:modifiers@15..21
+9:identifier@28..35 <-> 9:identifier@28..35
+10:class_body@36..246 <-> 10:class_body@36..246
+12:method_declaration@42..106 <-> 39:method_declaration@112..176
+13:modifiers@42..48 <-> 40:modifiers@112..118
+15:void_type@49..53 <-> 42:void_type@119..123
+16:identifier@54..59 <-> 43:identifier@124..129
+17:formal_parameters@59..61 <-> 44:formal_parameters@129..131
+20:block@62..106 <-> 47:block@132..176
+22:expression_statement@72..100 <-> 49:expression_statement@142..170
+23:method_invocation@72..99 <-> 50:method_invocation@142..169
+24:field_access@72..82 <-> 51:field_access@142..152
+25:identifier@72..78 <-> 52:identifier@142..148
+27:identifier@79..82 <-> 54:identifier@149..152
+29:identifier@83..90 <-> 56:identifier@153..160
+30:argument_list@90..99 <-> 57:argument_list@160..169
+32:string_literal@91..98 <-> 59:string_literal@161..168
+34:string_fragment@92..97 <-> 61:string_fragment@162..167
+39:method_declaration@112..174 <-> 66:method_declaration@182..244
+40:modifiers@112..118 <-> 67:modifiers@182..188
+42:void_type@119..123 <-> 69:void_type@189..193
+43:identifier@124..128 <-> 70:identifier@194..198
+44:formal_parameters@128..130 <-> 71:formal_parameters@198..200
+47:block@131..174 <-> 74:block@201..244
+49:expression_statement@141..168 <-> 76:expression_statement@211..238
+50:method_invocation@141..167 <-> 77:method_invocation@211..237
+51:field_access@141..151 <-> 78:field_access@211..221
+52:identifier@141..147 <-> 79:identifier@211..217
+54:identifier@148..151 <-> 81:identifier@218..221
+56:identifier@152..159 <-> 83:identifier@222..229
+57:argument_list@159..167 <-> 84:argument_list@229..237
+59:string_literal@160..166 <-> 86:string_literal@230..236
+61:string_fragment@161..165 <-> 88:string_fragment@231..235
+66:method_declaration@180..244 <-> 12:method_declaration@42..106
+67:modifiers@180..186 <-> 13:modifiers@42..48
+69:void_type@187..191 <-> 15:void_type@49..53
+70:identifier@192..197 <-> 16:identifier@54..59
+71:formal_parameters@197..199 <-> 17:formal_parameters@59..61
+74:block@200..244 <-> 20:block@62..106
+76:expression_statement@210..238 <-> 22:expression_statement@72..100
+77:method_invocation@210..237 <-> 23:method_invocation@72..99
+78:field_access@210..220 <-> 24:field_access@72..82
+79:identifier@210..216 <-> 25:identifier@72..78
+81:identifier@217..220 <-> 27:identifier@79..82
+83:identifier@221..228 <-> 29:identifier@83..90
+84:argument_list@228..237 <-> 30:argument_list@90..99
+86:string_literal@229..236 <-> 32:string_literal@91..98
+88:string_fragment@230..235 <-> 34:string_fragment@92..97
+
+--- profile strict (min_height=2 min_dice=0.6 max_size=100) ---
+matchable: a=52 b=52   matched: 52   moves: 3
+0:program@0..247 <-> 0:program@0..247
+1:package_declaration@0..13 <-> 1:package_declaration@0..13
+3:identifier@8..12 <-> 3:identifier@8..12
+5:class_declaration@15..246 <-> 5:class_declaration@15..246
+6:modifiers@15..21 <-> 6:modifiers@15..21
+9:identifier@28..35 <-> 9:identifier@28..35
+10:class_body@36..246 <-> 10:class_body@36..246
+12:method_declaration@42..106 <-> 39:method_declaration@112..176
+13:modifiers@42..48 <-> 40:modifiers@112..118
+15:void_type@49..53 <-> 42:void_type@119..123
+16:identifier@54..59 <-> 43:identifier@124..129
+17:formal_parameters@59..61 <-> 44:formal_parameters@129..131
+20:block@62..106 <-> 47:block@132..176
+22:expression_statement@72..100 <-> 49:expression_statement@142..170
+23:method_invocation@72..99 <-> 50:method_invocation@142..169
+24:field_access@72..82 <-> 51:field_access@142..152
+25:identifier@72..78 <-> 52:identifier@142..148
+27:identifier@79..82 <-> 54:identifier@149..152
+29:identifier@83..90 <-> 56:identifier@153..160
+30:argument_list@90..99 <-> 57:argument_list@160..169
+32:string_literal@91..98 <-> 59:string_literal@161..168
+34:string_fragment@92..97 <-> 61:string_fragment@162..167
+39:method_declaration@112..174 <-> 66:method_declaration@182..244
+40:modifiers@112..118 <-> 67:modifiers@182..188
+42:void_type@119..123 <-> 69:void_type@189..193
+43:identifier@124..128 <-> 70:identifier@194..198
+44:formal_parameters@128..130 <-> 71:formal_parameters@198..200
+47:block@131..174 <-> 74:block@201..244
+49:expression_statement@141..168 <-> 76:expression_statement@211..238
+50:method_invocation@141..167 <-> 77:method_invocation@211..237
+51:field_access@141..151 <-> 78:field_access@211..221
+52:identifier@141..147 <-> 79:identifier@211..217
+54:identifier@148..151 <-> 81:identifier@218..221
+56:identifier@152..159 <-> 83:identifier@222..229
+57:argument_list@159..167 <-> 84:argument_list@229..237
+59:string_literal@160..166 <-> 86:string_literal@230..236
+61:string_fragment@161..165 <-> 88:string_fragment@231..235
+66:method_declaration@180..244 <-> 12:method_declaration@42..106
+67:modifiers@180..186 <-> 13:modifiers@42..48
+69:void_type@187..191 <-> 15:void_type@49..53
+70:identifier@192..197 <-> 16:identifier@54..59
+71:formal_parameters@197..199 <-> 17:formal_parameters@59..61
+74:block@200..244 <-> 20:block@62..106
+76:expression_statement@210..238 <-> 22:expression_statement@72..100
+77:method_invocation@210..237 <-> 23:method_invocation@72..99
+78:field_access@210..220 <-> 24:field_access@72..82
+79:identifier@210..216 <-> 25:identifier@72..78
+81:identifier@217..220 <-> 27:identifier@79..82
+83:identifier@221..228 <-> 29:identifier@83..90
+84:argument_list@228..237 <-> 30:argument_list@90..99
+86:string_literal@229..236 <-> 32:string_literal@91..98
+88:string_fragment@230..235 <-> 34:string_fragment@92..97

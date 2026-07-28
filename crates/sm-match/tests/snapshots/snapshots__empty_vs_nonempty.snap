@@ -1,0 +1,13 @@
+---
+source: crates/sm-match/tests/snapshots.rs
+expression: "snapshot_body(\"empty_vs_nonempty\")"
+---
+case: empty_vs_nonempty
+
+--- profile base (min_height=1 min_dice=0.4 max_size=100) ---
+matchable: a=1 b=27   matched: 1   moves: 0
+0:program@0..0 <-> 0:program@0..123
+
+--- profile strict (min_height=2 min_dice=0.6 max_size=100) ---
+matchable: a=1 b=27   matched: 1   moves: 0
+0:program@0..0 <-> 0:program@0..123

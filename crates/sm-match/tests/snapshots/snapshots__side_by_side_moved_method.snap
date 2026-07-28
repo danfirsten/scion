@@ -1,0 +1,79 @@
+---
+source: crates/sm-match/tests/snapshots.rs
+expression: rendered
+---
+moved_method/a.java                                        | moved_method/b.java
+-----------------------------------------------------------------------------------------------------------------------
+    1 program                                              |     1 program
+    2   package_declaration                                |     2   package_declaration
+    3     identifier "demo"                                |     3     identifier "demo"
+    4   class_declaration                                  |     4   class_declaration
+    5     modifiers                                        |     5     modifiers
+    6     identifier "Service"                             |     6     identifier "Service"
+    7     class_body                                       |     7     class_body
+                                                           |    38       method_declaration M
+                                                           |    39         modifiers
+                                                           |    40         void_type
+                                                           |    41         identifier "gamma"
+                                                           |    42         formal_parameters
+                                                           |    43         block
+                                                           |    44           expression_statement
+                                                           |    45             method_invocation
+                                                           |    46               field_access
+                                                           |    47                 identifier "System"
+                                                           |    48                 identifier "out"
+                                                           |    49               identifier "println"
+                                                           |    50               argument_list
+                                                           |    51                 string_literal "\"gamma\""
+                                                           |    52                   string_fragment "gamma"
+    8       method_declaration M                           |     8       method_declaration M
+    9         modifiers                                    |     9         modifiers
+   10         void_type                                    |    10         void_type
+   11         identifier "alpha"                           |    11         identifier "alpha"
+   12         formal_parameters                            |    12         formal_parameters
+   13         block                                        |    13         block
+   14           expression_statement                       |    14           expression_statement
+   15             method_invocation                        |    15             method_invocation
+   16               field_access                           |    16               field_access
+   17                 identifier "System"                  |    17                 identifier "System"
+   18                 identifier "out"                     |    18                 identifier "out"
+   19               identifier "println"                   |    19               identifier "println"
+   20               argument_list                          |    20               argument_list
+   21                 string_literal "\"alpha\""           |    21                 string_literal "\"alpha\""
+   22                   string_fragment "alpha"            |    22                   string_fragment "alpha"
+   23       method_declaration M                           |    23       method_declaration M
+   24         modifiers                                    |    24         modifiers
+   25         void_type                                    |    25         void_type
+   26         identifier "beta"                            |    26         identifier "beta"
+   27         formal_parameters                            |    27         formal_parameters
+   28         block                                        |    28         block
+   29           expression_statement                       |    29           expression_statement
+   30             method_invocation                        |    30             method_invocation
+   31               field_access                           |    31               field_access
+   32                 identifier "System"                  |    32                 identifier "System"
+   33                 identifier "out"                     |    33                 identifier "out"
+   34               identifier "println"                   |    34               identifier "println"
+   35               argument_list                          |    35               argument_list
+   36                 string_literal "\"beta\""            |    36                 string_literal "\"beta\""
+   37                   string_fragment "beta"             |    37                   string_fragment "beta"
+   38       method_declaration M                           |
+   39         modifiers                                    |
+   40         void_type                                    |
+   41         identifier "gamma"                           |
+   42         formal_parameters                            |
+   43         block                                        |
+   44           expression_statement                       |
+   45             method_invocation                        |
+   46               field_access                           |
+   47                 identifier "System"                  |
+   48                 identifier "out"                     |
+   49               identifier "println"                   |
+   50               argument_list                          |
+   51                 string_literal "\"gamma\""           |
+   52                   string_fragment "gamma"            |
+
+profile: min_height=1 min_dice=0.4 max_size=100
+a: 94 nodes (52 matchable)   b: 94 nodes (52 matchable)
+matched: 52 pairs — 100.0% of a, 100.0% of b   moves: 3
+unmatched in a: none
+unmatched in b: none

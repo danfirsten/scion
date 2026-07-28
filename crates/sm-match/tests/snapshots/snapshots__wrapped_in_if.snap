@@ -1,0 +1,73 @@
+---
+source: crates/sm-match/tests/snapshots.rs
+expression: "snapshot_body(\"wrapped_in_if\")"
+---
+case: wrapped_in_if
+
+--- profile base (min_height=1 min_dice=0.4 max_size=100) ---
+matchable: a=31 b=38   matched: 31   moves: 1
+0:program@0..143 <-> 0:program@0..194
+1:package_declaration@0..13 <-> 1:package_declaration@0..13
+3:identifier@8..12 <-> 3:identifier@8..12
+5:class_declaration@15..142 <-> 5:class_declaration@15..193
+6:modifiers@15..21 <-> 6:modifiers@15..21
+9:identifier@28..33 <-> 9:identifier@28..33
+10:class_body@34..142 <-> 10:class_body@34..193
+12:method_declaration@40..140 <-> 12:method_declaration@40..191
+13:modifiers@40..46 <-> 13:modifiers@40..46
+15:void_type@47..51 <-> 15:void_type@47..51
+16:identifier@52..55 <-> 16:identifier@52..55
+17:formal_parameters@55..64 <-> 17:formal_parameters@55..64
+19:formal_parameter@56..63 <-> 19:formal_parameter@56..63
+20:type_identifier@56..59 <-> 20:type_identifier@56..59
+21:identifier@60..63 <-> 21:identifier@60..63
+23:block@65..140 <-> 37:block@94..185
+25:expression_statement@75..89 <-> 39:expression_statement@108..122
+26:method_invocation@75..88 <-> 40:method_invocation@108..121
+27:identifier@75..78 <-> 41:identifier@108..111
+29:identifier@79..86 <-> 43:identifier@112..119
+30:argument_list@86..88 <-> 44:argument_list@119..121
+34:expression_statement@98..112 <-> 48:expression_statement@135..149
+35:method_invocation@98..111 <-> 49:method_invocation@135..148
+36:identifier@98..101 <-> 50:identifier@135..138
+38:identifier@102..109 <-> 52:identifier@139..146
+39:argument_list@109..111 <-> 53:argument_list@146..148
+43:expression_statement@121..134 <-> 57:expression_statement@162..175
+44:method_invocation@121..133 <-> 58:method_invocation@162..174
+45:identifier@121..124 <-> 59:identifier@162..165
+47:identifier@125..131 <-> 61:identifier@166..172
+48:argument_list@131..133 <-> 62:argument_list@172..174
+
+--- profile strict (min_height=2 min_dice=0.6 max_size=100) ---
+matchable: a=31 b=38   matched: 31   moves: 1
+0:program@0..143 <-> 0:program@0..194
+1:package_declaration@0..13 <-> 1:package_declaration@0..13
+3:identifier@8..12 <-> 3:identifier@8..12
+5:class_declaration@15..142 <-> 5:class_declaration@15..193
+6:modifiers@15..21 <-> 6:modifiers@15..21
+9:identifier@28..33 <-> 9:identifier@28..33
+10:class_body@34..142 <-> 10:class_body@34..193
+12:method_declaration@40..140 <-> 12:method_declaration@40..191
+13:modifiers@40..46 <-> 13:modifiers@40..46
+15:void_type@47..51 <-> 15:void_type@47..51
+16:identifier@52..55 <-> 16:identifier@52..55
+17:formal_parameters@55..64 <-> 17:formal_parameters@55..64
+19:formal_parameter@56..63 <-> 19:formal_parameter@56..63
+20:type_identifier@56..59 <-> 20:type_identifier@56..59
+21:identifier@60..63 <-> 21:identifier@60..63
+23:block@65..140 <-> 37:block@94..185
+25:expression_statement@75..89 <-> 39:expression_statement@108..122
+26:method_invocation@75..88 <-> 40:method_invocation@108..121
+27:identifier@75..78 <-> 41:identifier@108..111
+29:identifier@79..86 <-> 43:identifier@112..119
+30:argument_list@86..88 <-> 44:argument_list@119..121
+34:expression_statement@98..112 <-> 48:expression_statement@135..149
+35:method_invocation@98..111 <-> 49:method_invocation@135..148
+36:identifier@98..101 <-> 50:identifier@135..138
+38:identifier@102..109 <-> 52:identifier@139..146
+39:argument_list@109..111 <-> 53:argument_list@146..148
+43:expression_statement@121..134 <-> 57:expression_statement@162..175
+44:method_invocation@121..133 <-> 58:method_invocation@162..174
+45:identifier@121..124 <-> 59:identifier@162..165
+47:identifier@125..131 <-> 61:identifier@166..172
+48:argument_list@131..133 <-> 62:argument_list@172..174

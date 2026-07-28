@@ -1,0 +1,87 @@
+---
+source: crates/sm-match/tests/snapshots.rs
+expression: "snapshot_body(\"import_churn\")"
+---
+case: import_churn
+
+--- profile base (min_height=1 min_dice=0.4 max_size=100) ---
+matchable: a=38 b=38   matched: 38   moves: 2
+0:program@0..177 <-> 0:program@0..178
+1:package_declaration@0..13 <-> 1:package_declaration@0..13
+3:identifier@8..12 <-> 3:identifier@8..12
+5:import_declaration@15..42 <-> 5:import_declaration@15..42
+7:scoped_identifier@22..41 <-> 7:scoped_identifier@22..41
+8:scoped_identifier@22..31 <-> 8:scoped_identifier@22..31
+9:identifier@22..26 <-> 9:identifier@22..26
+11:identifier@27..31 <-> 11:identifier@27..31
+13:identifier@32..41 <-> 13:identifier@32..41
+15:import_declaration@43..68 <-> 25:import_declaration@66..92
+17:scoped_identifier@50..67 <-> 27:scoped_identifier@73..91
+18:scoped_identifier@50..59 <-> 28:scoped_identifier@73..82
+19:identifier@50..54 <-> 29:identifier@73..77
+21:identifier@55..59 <-> 31:identifier@78..82
+23:identifier@60..67 <-> 33:identifier@83..91
+25:import_declaration@69..91 <-> 15:import_declaration@43..65
+27:scoped_identifier@76..90 <-> 17:scoped_identifier@50..64
+28:scoped_identifier@76..85 <-> 18:scoped_identifier@50..59
+29:identifier@76..80 <-> 19:identifier@50..54
+31:identifier@81..85 <-> 21:identifier@55..59
+33:identifier@86..90 <-> 23:identifier@60..64
+35:class_declaration@93..176 <-> 35:class_declaration@94..177
+36:modifiers@93..99 <-> 36:modifiers@94..100
+39:identifier@106..114 <-> 39:identifier@107..115
+40:class_body@115..176 <-> 40:class_body@116..177
+42:field_declaration@121..174 <-> 42:field_declaration@122..175
+43:modifiers@121..134 <-> 43:modifiers@122..135
+46:generic_type@135..147 <-> 46:generic_type@136..148
+47:type_identifier@135..139 <-> 47:type_identifier@136..140
+48:type_arguments@139..147 <-> 48:type_arguments@140..148
+50:type_identifier@140..146 <-> 50:type_identifier@141..147
+52:variable_declarator@148..173 <-> 52:variable_declarator@149..174
+53:identifier@148..153 <-> 53:identifier@149..154
+55:object_creation_expression@156..173 <-> 55:object_creation_expression@157..174
+57:generic_type@160..171 <-> 57:generic_type@161..172
+58:type_identifier@160..169 <-> 58:type_identifier@161..170
+59:type_arguments@169..171 <-> 59:type_arguments@170..172
+62:argument_list@171..173 <-> 62:argument_list@172..174
+
+--- profile strict (min_height=2 min_dice=0.6 max_size=100) ---
+matchable: a=38 b=38   matched: 38   moves: 2
+0:program@0..177 <-> 0:program@0..178
+1:package_declaration@0..13 <-> 1:package_declaration@0..13
+3:identifier@8..12 <-> 3:identifier@8..12
+5:import_declaration@15..42 <-> 5:import_declaration@15..42
+7:scoped_identifier@22..41 <-> 7:scoped_identifier@22..41
+8:scoped_identifier@22..31 <-> 8:scoped_identifier@22..31
+9:identifier@22..26 <-> 9:identifier@22..26
+11:identifier@27..31 <-> 11:identifier@27..31
+13:identifier@32..41 <-> 13:identifier@32..41
+15:import_declaration@43..68 <-> 25:import_declaration@66..92
+17:scoped_identifier@50..67 <-> 27:scoped_identifier@73..91
+18:scoped_identifier@50..59 <-> 28:scoped_identifier@73..82
+19:identifier@50..54 <-> 29:identifier@73..77
+21:identifier@55..59 <-> 31:identifier@78..82
+23:identifier@60..67 <-> 33:identifier@83..91
+25:import_declaration@69..91 <-> 15:import_declaration@43..65
+27:scoped_identifier@76..90 <-> 17:scoped_identifier@50..64
+28:scoped_identifier@76..85 <-> 18:scoped_identifier@50..59
+29:identifier@76..80 <-> 19:identifier@50..54
+31:identifier@81..85 <-> 21:identifier@55..59
+33:identifier@86..90 <-> 23:identifier@60..64
+35:class_declaration@93..176 <-> 35:class_declaration@94..177
+36:modifiers@93..99 <-> 36:modifiers@94..100
+39:identifier@106..114 <-> 39:identifier@107..115
+40:class_body@115..176 <-> 40:class_body@116..177
+42:field_declaration@121..174 <-> 42:field_declaration@122..175
+43:modifiers@121..134 <-> 43:modifiers@122..135
+46:generic_type@135..147 <-> 46:generic_type@136..148
+47:type_identifier@135..139 <-> 47:type_identifier@136..140
+48:type_arguments@139..147 <-> 48:type_arguments@140..148
+50:type_identifier@140..146 <-> 50:type_identifier@141..147
+52:variable_declarator@148..173 <-> 52:variable_declarator@149..174
+53:identifier@148..153 <-> 53:identifier@149..154
+55:object_creation_expression@156..173 <-> 55:object_creation_expression@157..174
+57:generic_type@160..171 <-> 57:generic_type@161..172
+58:type_identifier@160..169 <-> 58:type_identifier@161..170
+59:type_arguments@169..171 <-> 59:type_arguments@170..172
+62:argument_list@171..173 <-> 62:argument_list@172..174

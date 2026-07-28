@@ -1,0 +1,70 @@
+---
+source: crates/sm-match/tests/snapshots.rs
+expression: "serde_json::to_string_pretty(&trimmed).expect(\"re-serialize\")"
+---
+{
+  "config": {
+    "max_size": 100,
+    "min_dice": 0.4,
+    "min_height": 1
+  },
+  "dst": {
+    "has_errors": false,
+    "language": "java",
+    "matchable": 33,
+    "nodes": 57,
+    "path": "b.java"
+  },
+  "pairs": [
+    {
+      "dst_end": 141,
+      "dst_id": 0,
+      "dst_start": 0,
+      "kind": "program",
+      "moved": false,
+      "src_end": 143,
+      "src_id": 0,
+      "src_start": 0
+    },
+    {
+      "dst_end": 13,
+      "dst_id": 1,
+      "dst_start": 0,
+      "kind": "package_declaration",
+      "moved": false,
+      "src_end": 13,
+      "src_id": 1,
+      "src_start": 0
+    },
+    {
+      "dst_end": 12,
+      "dst_id": 3,
+      "dst_start": 8,
+      "kind": "identifier",
+      "moved": false,
+      "src_end": 12,
+      "src_id": 3,
+      "src_start": 8
+    }
+  ],
+  "schema_version": 1,
+  "src": {
+    "has_errors": false,
+    "language": "java",
+    "matchable": 33,
+    "nodes": 57,
+    "path": "a.java"
+  },
+  "summary": {
+    "dst_matchable": 33,
+    "dst_matched_pct": 100.0,
+    "dst_nodes": 57,
+    "matched": 33,
+    "moved": 0,
+    "src_matchable": 33,
+    "src_matched_pct": 100.0,
+    "src_nodes": 57,
+    "unmatched_dst_by_kind": [],
+    "unmatched_src_by_kind": []
+  }
+}

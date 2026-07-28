@@ -1,0 +1,73 @@
+---
+source: crates/sm-match/tests/snapshots.rs
+expression: "snapshot_body(\"extracted_variable\")"
+---
+case: extracted_variable
+
+--- profile base (min_height=1 min_dice=0.4 max_size=100) ---
+matchable: a=31 b=36   matched: 31   moves: 2
+0:program@0..149 <-> 0:program@0..176
+1:package_declaration@0..13 <-> 1:package_declaration@0..13
+3:identifier@8..12 <-> 3:identifier@8..12
+5:class_declaration@15..148 <-> 5:class_declaration@15..175
+6:modifiers@15..21 <-> 6:modifiers@15..21
+9:identifier@28..33 <-> 9:identifier@28..33
+10:class_body@34..148 <-> 10:class_body@34..175
+12:method_declaration@40..146 <-> 12:method_declaration@40..173
+13:modifiers@40..46 <-> 13:modifiers@40..46
+15:integral_type@47..50 <-> 15:integral_type@47..50
+17:identifier@51..56 <-> 17:identifier@51..56
+18:formal_parameters@56..69 <-> 18:formal_parameters@56..69
+20:formal_parameter@57..68 <-> 20:formal_parameter@57..68
+21:type_identifier@57..62 <-> 21:type_identifier@57..62
+22:identifier@63..68 <-> 22:identifier@63..68
+24:block@70..146 <-> 24:block@70..173
+26:return_statement@80..140 <-> 49:return_statement@135..167
+28:binary_expression@87..139 <-> 51:binary_expression@142..166
+29:binary_expression@87..120 <-> 32:binary_expression@92..125
+30:method_invocation@87..100 <-> 33:method_invocation@92..105
+31:identifier@87..92 <-> 34:identifier@92..97
+33:identifier@93..98 <-> 36:identifier@98..103
+34:argument_list@98..100 <-> 37:argument_list@103..105
+38:method_invocation@103..120 <-> 41:method_invocation@108..125
+39:identifier@103..108 <-> 42:identifier@108..113
+41:identifier@109..118 <-> 44:identifier@114..123
+42:argument_list@118..120 <-> 45:argument_list@123..125
+46:method_invocation@123..139 <-> 54:method_invocation@150..166
+47:identifier@123..128 <-> 55:identifier@150..155
+49:identifier@129..137 <-> 57:identifier@156..164
+50:argument_list@137..139 <-> 58:argument_list@164..166
+
+--- profile strict (min_height=2 min_dice=0.6 max_size=100) ---
+matchable: a=31 b=36   matched: 31   moves: 2
+0:program@0..149 <-> 0:program@0..176
+1:package_declaration@0..13 <-> 1:package_declaration@0..13
+3:identifier@8..12 <-> 3:identifier@8..12
+5:class_declaration@15..148 <-> 5:class_declaration@15..175
+6:modifiers@15..21 <-> 6:modifiers@15..21
+9:identifier@28..33 <-> 9:identifier@28..33
+10:class_body@34..148 <-> 10:class_body@34..175
+12:method_declaration@40..146 <-> 12:method_declaration@40..173
+13:modifiers@40..46 <-> 13:modifiers@40..46
+15:integral_type@47..50 <-> 15:integral_type@47..50
+17:identifier@51..56 <-> 17:identifier@51..56
+18:formal_parameters@56..69 <-> 18:formal_parameters@56..69
+20:formal_parameter@57..68 <-> 20:formal_parameter@57..68
+21:type_identifier@57..62 <-> 21:type_identifier@57..62
+22:identifier@63..68 <-> 22:identifier@63..68
+24:block@70..146 <-> 24:block@70..173
+26:return_statement@80..140 <-> 49:return_statement@135..167
+28:binary_expression@87..139 <-> 51:binary_expression@142..166
+29:binary_expression@87..120 <-> 32:binary_expression@92..125
+30:method_invocation@87..100 <-> 33:method_invocation@92..105
+31:identifier@87..92 <-> 34:identifier@92..97
+33:identifier@93..98 <-> 36:identifier@98..103
+34:argument_list@98..100 <-> 37:argument_list@103..105
+38:method_invocation@103..120 <-> 41:method_invocation@108..125
+39:identifier@103..108 <-> 42:identifier@108..113
+41:identifier@109..118 <-> 44:identifier@114..123
+42:argument_list@118..120 <-> 45:argument_list@123..125
+46:method_invocation@123..139 <-> 54:method_invocation@150..166
+47:identifier@123..128 <-> 55:identifier@150..155
+49:identifier@129..137 <-> 57:identifier@156..164
+50:argument_list@137..139 <-> 58:argument_list@164..166
