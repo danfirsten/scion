@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "case_id": "61e597159433-sopremo_sopremo-common_src_main_java_eu_stratosphere_sopremo_testing_SopremoTestPlan.java",
+  "kind": "conflicted",
+  "repo": "apache/flink",
+  "repo_url": "https://github.com/apache/flink.git",
+  "license": "Apache-2.0",
+  "merge_commit": "61e59715943361df8b1a9acfd78ce58144608b61",
+  "parents": [
+    "3beba6b77cad114768bc880a2c6da57b82204443",
+    "b06833342f8a2e3372a99721e6f69f55e820b929"
+  ],
+  "base_commit": "3dfc560b1c9b7be3e51b0a9fb4f3a99aa631b559",
+  "path": "sopremo/sopremo-common/src/main/java/eu/stratosphere/sopremo/testing/SopremoTestPlan.java",
+  "shape": "modify_modify",
+  "resolution_kind": "merged",
+  "contaminated": false,
+  "contaminating_lines": 0,
+  "base": {
+    "file": "base.java",
+    "blob": "174534698e9b56f57940b7c9475c66bff915f199",
+    "bytes": 15000,
+    "lines": 487
+  },
+  "ours": {
+    "file": "ours.java",
+    "blob": "04773bfb04f36fdc5cde771150bd42845443876c",
+    "bytes": 15285,
+    "lines": 497
+  },
+  "theirs": {
+    "file": "theirs.java",
+    "blob": "3a733bac58cd3182e70e49d530ff6d8f2afc7f65",
+    "bytes": 14158,
+    "lines": 473
+  },
+  "resolved": {
+    "file": "resolved.java",
+    "blob": "951cff7a1a3f6a9f30b4b77ee2acfaa959fe2564",
+    "bytes": 14372,
+    "lines": 483
+  },
+  "conflict_messages": [
+    "Auto-merging",
+    "CONFLICT (contents)"
+  ]
+}

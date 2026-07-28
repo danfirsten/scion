@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "case_id": "e6f229da6321-core_src_test_java_com_netflix_conductor_core_execution_TestConfiguration.java",
+  "kind": "conflicted",
+  "repo": "Netflix/conductor",
+  "repo_url": "https://github.com/Netflix/conductor.git",
+  "license": "Apache-2.0",
+  "merge_commit": "e6f229da6321e418df5a575f59d27256a251a0b9",
+  "parents": [
+    "3b9fc7dff56536e40223a1c08ea889874d930c18",
+    "8281b4525b70d0efcbf5e1d1076a1542cee3981b"
+  ],
+  "base_commit": "8ec2d22a89328bc39932a4abff70313a3f9a4697",
+  "path": "core/src/test/java/com/netflix/conductor/core/execution/TestConfiguration.java",
+  "shape": "modify_modify",
+  "resolution_kind": "merged",
+  "contaminated": false,
+  "contaminating_lines": 0,
+  "base": {
+    "file": "base.java",
+    "blob": "a3a0cc0a2978639e1bb4b814e433fe16c88d32e9",
+    "bytes": 1766,
+    "lines": 96
+  },
+  "ours": {
+    "file": "ours.java",
+    "blob": "4f4465d747657533f0f94da289563851218d940f",
+    "bytes": 1886,
+    "lines": 101
+  },
+  "theirs": {
+    "file": "theirs.java",
+    "blob": "6eb5c1a6b174dab5f908844889d06b3c96518b24",
+    "bytes": 2445,
+    "lines": 132
+  },
+  "resolved": {
+    "file": "resolved.java",
+    "blob": "503921bed115686ea80e977f9ef85532569acd0f",
+    "bytes": 2565,
+    "lines": 137
+  },
+  "conflict_messages": [
+    "Auto-merging",
+    "CONFLICT (contents)"
+  ]
+}

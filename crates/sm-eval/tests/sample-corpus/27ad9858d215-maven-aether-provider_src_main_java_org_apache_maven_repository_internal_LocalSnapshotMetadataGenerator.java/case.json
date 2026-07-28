@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "case_id": "27ad9858d215-maven-aether-provider_src_main_java_org_apache_maven_repository_internal_LocalSnapshotMetadataGenerator.java",
+  "kind": "conflicted",
+  "repo": "apache/maven",
+  "repo_url": "https://github.com/apache/maven.git",
+  "license": "Apache-2.0",
+  "merge_commit": "27ad9858d215e40ab4853428c144554ae1bbb981",
+  "parents": [
+    "39d063a4354ef28300ffa37af290824e7f656484",
+    "4fdcdbd26244ff81e242054fd38cf415d92499be"
+  ],
+  "base_commit": "c7c79e1f1a5ce5c6b213dfcca24108cf650aaedb",
+  "path": "maven-aether-provider/src/main/java/org/apache/maven/repository/internal/LocalSnapshotMetadataGenerator.java",
+  "shape": "modify_modify",
+  "resolution_kind": "took_theirs",
+  "contaminated": false,
+  "contaminating_lines": 0,
+  "base": {
+    "file": "base.java",
+    "blob": "1d318cd4ffb1136c006b64253e70614a653c7f83",
+    "bytes": 2748,
+    "lines": 82
+  },
+  "ours": {
+    "file": "ours.java",
+    "blob": "9476acc57d7ae880225fed1980f7de8c2868270c",
+    "bytes": 2736,
+    "lines": 82
+  },
+  "theirs": {
+    "file": "theirs.java",
+    "blob": "ee7c10b0c47ad574b2e21b019b3ff986908e69dc",
+    "bytes": 2730,
+    "lines": 82
+  },
+  "resolved": {
+    "file": "resolved.java",
+    "blob": "ee7c10b0c47ad574b2e21b019b3ff986908e69dc",
+    "bytes": 2730,
+    "lines": 82
+  },
+  "conflict_messages": [
+    "Auto-merging",
+    "CONFLICT (contents)"
+  ]
+}

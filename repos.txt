@@ -1,0 +1,122 @@
+# Corpus sources for `sm-eval mine` (SPEC §6.1, milestone M1).
+#
+# Format: <clone-url> <SPDX licence>   — `#` starts a comment, blank lines are
+# ignored, and the licence column is optional (it defaults to UNKNOWN).
+#
+# ## Selection
+#
+# The methodology follows the prior work we intend to be comparable with —
+# Spork's `replication/candidate_projects.txt` and jdime's ASE'15 study; see
+# docs/prior-art.md §4. Criteria:
+#
+#   * Java is the primary language, so `.java` conflicts are the norm rather
+#     than an accident of a polyglot repository.
+#   * Long-lived, so `git log --merges` has thousands of two-parent merges.
+#   * Actively maintained, so the corpus reflects how Java is written now.
+#   * Diverse in domain and house style — Apache server-side, Google and Square
+#     libraries, IDE and compiler infrastructure, test frameworks,
+#     static-analysis tools — so no single project's conventions dominate.
+#
+# ## Ordering
+#
+# Sorted by the number of two-parent merge commits reachable from the default
+# branch, measured with blobless clones before this list was written. That is
+# deliberate: the miner processes one repository at a time and writes the
+# manifest after each, so a run that is stopped early has still visited the
+# repositories that carry the corpus.
+#
+# The counts in the right-hand comment are what that survey found. They are a
+# *ceiling*, not a yield: most of these merges turn out to be fast-forwards
+# recorded with `--no-ff`, where the merge base is one of the parents and there
+# is no three-way decision to learn from. `docs/corpus-summary.md` has the real
+# numbers.
+#
+# ## Note on merge counts
+#
+# Several well-known Java projects appear here with almost no merges. That is
+# not an error and they are kept on purpose: `apache/kafka` (42),
+# `apache/hbase` (19), `apache/pulsar` (7), `apache/zookeeper` (3),
+# `google/guava` (1) and `apache/iceberg` (0) squash or rebase their pull
+# requests, so their default branches are nearly linear and carry no
+# three-way merge history at all. Their rows in the summary are a finding about
+# where mineable merge history actually lives, and dropping them would quietly
+# bias the picture.
+#
+# ## Note on licences
+#
+# The corpus is gitignored and never redistributed; the licence column exists
+# so `sm-eval sample` can restrict the small *committed* fixture set to
+# permissively licensed sources. Non-permissive entries are therefore fine to
+# mine and are simply never sampled. `elastic/elasticsearch` is the notable
+# one: it was Apache-2.0 through 7.10 and is now tri-licensed under AGPL-3.0,
+# ELv2 and SSPL.
+
+https://github.com/quarkusio/quarkus.git                  Apache-2.0                        # 25929
+https://github.com/oracle/graal.git                       GPL-2.0-with-classpath-exception  # 23890
+https://github.com/spring-projects/spring-boot.git        Apache-2.0                        # 20565
+https://github.com/apache/cassandra.git                   Apache-2.0                        # 13330
+https://github.com/apache/beam.git                        Apache-2.0                        # 12299
+https://github.com/jetty/jetty.project.git                EPL-2.0                           # 8285
+https://github.com/apache/ignite.git                      Apache-2.0                        # 6106
+https://github.com/elastic/elasticsearch.git              AGPL-3.0-OR-Elastic-2.0-OR-SSPL-1.0 # 5806
+https://github.com/jenkinsci/jenkins.git                  MIT                               # 5529
+https://github.com/pmd/pmd.git                            BSD-3-Clause                      # 5495
+https://github.com/keycloak/keycloak.git                  Apache-2.0                        # 4858
+https://github.com/apache/accumulo.git                    Apache-2.0                        # 4574
+https://github.com/FasterXML/jackson-databind.git         Apache-2.0                        # 4147
+https://github.com/spring-projects/spring-framework.git   Apache-2.0                        # 3604
+https://github.com/dbeaver/dbeaver.git                    Apache-2.0                        # 3539
+https://github.com/languagetool-org/languagetool.git      LGPL-2.1-or-later                 # 3367
+https://github.com/spring-projects/spring-security.git    Apache-2.0                        # 3186
+https://github.com/apache/shardingsphere.git              Apache-2.0                        # 2907
+https://github.com/OpenAPITools/openapi-generator.git     Apache-2.0                        # 2869
+https://github.com/testcontainers/testcontainers-java.git MIT                               # 2681
+https://github.com/micronaut-projects/micronaut-core.git  Apache-2.0                        # 2304
+https://github.com/apache/druid.git                       Apache-2.0                        # 2070
+https://github.com/redisson/redisson.git                  Apache-2.0                        # 1925
+https://github.com/square/okhttp.git                      Apache-2.0                        # 1899
+https://github.com/alibaba/druid.git                      Apache-2.0                        # 1576
+https://github.com/apache/karaf.git                       Apache-2.0                        # 1561
+https://github.com/apache/tika.git                        Apache-2.0                        # 1400
+https://github.com/ReactiveX/RxJava.git                   Apache-2.0                        # 1368
+https://github.com/apache/dolphinscheduler.git            Apache-2.0                        # 1346
+https://github.com/alibaba/nacos.git                      Apache-2.0                        # 1112
+https://github.com/apache/rocketmq.git                    Apache-2.0                        # 1030
+https://github.com/apache/skywalking.git                  Apache-2.0                        # 984
+https://github.com/square/retrofit.git                    Apache-2.0                        # 960
+https://github.com/Netflix/conductor.git                  Apache-2.0                        # 930
+https://github.com/eclipse-vertx/vert.x.git               EPL-2.0                           # 887
+https://github.com/apache/activemq.git                    Apache-2.0                        # 825
+https://github.com/apache/groovy.git                      Apache-2.0                        # 815
+https://github.com/apache/lucene.git                      Apache-2.0                        # 721
+https://github.com/apache/solr.git                        Apache-2.0                        # 703
+https://github.com/apache/flink.git                       Apache-2.0                        # 653
+https://github.com/SonarSource/sonarqube.git              LGPL-3.0-only                     # 622
+https://github.com/apache/logging-log4j2.git              Apache-2.0                        # 534
+https://github.com/google/closure-compiler.git            Apache-2.0                        # 501
+https://github.com/apache/dubbo.git                       Apache-2.0                        # 497
+https://github.com/mockito/mockito.git                    MIT                               # 485
+https://github.com/apache/curator.git                     Apache-2.0                        # 455
+https://github.com/apache/geode.git                       Apache-2.0                        # 441
+https://github.com/apache/hadoop.git                      Apache-2.0                        # 439
+https://github.com/apache/camel.git                       Apache-2.0                        # 432
+https://github.com/apache/nifi.git                        Apache-2.0                        # 397
+https://github.com/google/dagger.git                      Apache-2.0                        # 387
+https://github.com/apache/cxf.git                         Apache-2.0                        # 347
+https://github.com/apache/james-project.git               Apache-2.0                        # 336
+https://github.com/apache/hive.git                        Apache-2.0                        # 327
+https://github.com/netty/netty.git                        Apache-2.0                        # 199
+https://github.com/google/gson.git                        Apache-2.0                        # 142
+https://github.com/google/error-prone.git                 Apache-2.0                        # 129
+https://github.com/junit-team/junit-framework.git         EPL-2.0                           # 114
+https://github.com/google/guice.git                       Apache-2.0                        # 83
+https://github.com/apache/tomcat.git                      Apache-2.0                        # 77
+https://github.com/apache/maven.git                       Apache-2.0                        # 59
+https://github.com/apache/kafka.git                       Apache-2.0                        # 42
+https://github.com/apache/calcite.git                     Apache-2.0                        # 30
+https://github.com/checkstyle/checkstyle.git              LGPL-2.1-or-later                 # 19
+https://github.com/apache/hbase.git                       Apache-2.0                        # 19
+https://github.com/apache/pulsar.git                      Apache-2.0                        # 7
+https://github.com/apache/zookeeper.git                   Apache-2.0                        # 3
+https://github.com/google/guava.git                       Apache-2.0                        # 1
+https://github.com/apache/iceberg.git                     Apache-2.0                        # 0

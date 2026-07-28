@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "case_id": "a37c84b7c5d3-g-boot-tools_spring-boot-loader-tools_src_main_java_org_springframework_boot_loader_tools_Layer.java-b10116fcf54aa1d3",
+  "kind": "conflicted",
+  "repo": "spring-projects/spring-boot",
+  "repo_url": "https://github.com/spring-projects/spring-boot.git",
+  "license": "Apache-2.0",
+  "merge_commit": "a37c84b7c5d378e30225187afbc3018d25c73cc4",
+  "parents": [
+    "923f7d0ce1c10d195232fb22edd205c1c3344f71",
+    "d66b28fcba8aa61d66755adbe015cb9e5f267593"
+  ],
+  "base_commit": "72b78f7b47ed92b280d86082b1fefa5498ae14cd",
+  "path": "spring-boot-project/spring-boot-tools/spring-boot-loader-tools/src/main/java/org/springframework/boot/loader/tools/Layer.java",
+  "shape": "modify_modify",
+  "resolution_kind": "merged",
+  "contaminated": false,
+  "contaminating_lines": 0,
+  "base": {
+    "file": "base.java",
+    "blob": "544a7ec772c3a55fc392e1d9788625c712fdea28",
+    "bytes": 1881,
+    "lines": 71
+  },
+  "ours": {
+    "file": "ours.java",
+    "blob": "1141ec942a68f1bbba89cbab86b8caf48ea25b62",
+    "bytes": 1883,
+    "lines": 71
+  },
+  "theirs": {
+    "file": "theirs.java",
+    "blob": "f766c7f4cbd501e528c14092d80e289fb4e1fe6b",
+    "bytes": 1884,
+    "lines": 71
+  },
+  "resolved": {
+    "file": "resolved.java",
+    "blob": "1b016961ada92e4fea6054cd8d03b13827e2a09a",
+    "bytes": 1886,
+    "lines": 71
+  },
+  "conflict_messages": [
+    "Auto-merging",
+    "CONFLICT (contents)"
+  ]
+}

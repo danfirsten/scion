@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "case_id": "57057f47496d-pmd-core_src_main_java_net_sourceforge_pmd_PMD.java",
+  "kind": "conflicted",
+  "repo": "pmd/pmd",
+  "repo_url": "https://github.com/pmd/pmd.git",
+  "license": "BSD-3-Clause",
+  "merge_commit": "57057f47496d7fe554bd8fba7bc8574ec37e7087",
+  "parents": [
+    "0b86bf124cf05e1ce2e24ed1b889520eecd3248c",
+    "36d18aefc64b01d0ec32b892ed9b2d92c40cd9f2"
+  ],
+  "base_commit": "d4eba4f45680edc9a5aac893a016a310fe5d77bf",
+  "path": "pmd-core/src/main/java/net/sourceforge/pmd/PMD.java",
+  "shape": "modify_modify",
+  "resolution_kind": "merged",
+  "contaminated": false,
+  "contaminating_lines": 0,
+  "base": {
+    "file": "base.java",
+    "blob": "7c3ab37f96ce959e1b8d2876c6f7902f12f02662",
+    "bytes": 22628,
+    "lines": 571
+  },
+  "ours": {
+    "file": "ours.java",
+    "blob": "086f4fd019d918016dabd07a775b37ab37a8bce4",
+    "bytes": 12055,
+    "lines": 297
+  },
+  "theirs": {
+    "file": "theirs.java",
+    "blob": "632761e0029174cd7884f03ef4b0259ec9bff1ee",
+    "bytes": 22909,
+    "lines": 576
+  },
+  "resolved": {
+    "file": "resolved.java",
+    "blob": "c4848fb7d8a37e300d18fb7f2241c5e92005a934",
+    "bytes": 12336,
+    "lines": 302
+  },
+  "conflict_messages": [
+    "Auto-merging",
+    "CONFLICT (contents)"
+  ]
+}

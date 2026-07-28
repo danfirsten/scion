@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "case_id": "53d5003630ce-http-server-netty_src_main_java_io_micronaut_http_server_netty_NettyHttpServer.java",
+  "kind": "conflicted",
+  "repo": "micronaut-projects/micronaut-core",
+  "repo_url": "https://github.com/micronaut-projects/micronaut-core.git",
+  "license": "Apache-2.0",
+  "merge_commit": "53d5003630ce9a4ad7d8cc02742475d293f748f0",
+  "parents": [
+    "8f9a7cf7f8174181520b2ebb10b2a0fd6d2aea63",
+    "161bf9c7204c4376c9c943896844cdbb8778f920"
+  ],
+  "base_commit": "62af70d233ff373e95c9db57debfbd069402e8a5",
+  "path": "http-server-netty/src/main/java/io/micronaut/http/server/netty/NettyHttpServer.java",
+  "shape": "modify_modify",
+  "resolution_kind": "took_theirs",
+  "contaminated": false,
+  "contaminating_lines": 0,
+  "base": {
+    "file": "base.java",
+    "blob": "d4569812dcd555a205209302929d2a8f71c58f77",
+    "bytes": 16540,
+    "lines": 391
+  },
+  "ours": {
+    "file": "ours.java",
+    "blob": "d68c2936b7141471692b1a1a934c2fffcb71308d",
+    "bytes": 16867,
+    "lines": 410
+  },
+  "theirs": {
+    "file": "theirs.java",
+    "blob": "6f9e37a11982b81a35ffb4e45ae66a69e9acfa80",
+    "bytes": 16307,
+    "lines": 386
+  },
+  "resolved": {
+    "file": "resolved.java",
+    "blob": "6f9e37a11982b81a35ffb4e45ae66a69e9acfa80",
+    "bytes": 16307,
+    "lines": 386
+  },
+  "conflict_messages": [
+    "Auto-merging",
+    "CONFLICT (contents)"
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "case_id": "823958bcc58c-spring-web_src_test_java_org_springframework_http_converter_protobuf_ProtobufHttpMessageConverterTests.java",
+  "kind": "conflicted",
+  "repo": "spring-projects/spring-framework",
+  "repo_url": "https://github.com/spring-projects/spring-framework.git",
+  "license": "Apache-2.0",
+  "merge_commit": "823958bcc58c981097927496171324e75144e37b",
+  "parents": [
+    "6e4551131dddffecd7adc00d96e3ecddd4c4911c",
+    "c4e362500be18bd2e277535d568f45e8a059b0db"
+  ],
+  "base_commit": "8f9a1cdc0c2ab2bee112dddad00a94bb501a3181",
+  "path": "spring-web/src/test/java/org/springframework/http/converter/protobuf/ProtobufHttpMessageConverterTests.java",
+  "shape": "modify_modify",
+  "resolution_kind": "merged",
+  "contaminated": false,
+  "contaminating_lines": 0,
+  "base": {
+    "file": "base.java",
+    "blob": "26106e13d3d2028fd0094caa4f0eb1d7a221ac12",
+    "bytes": 7969,
+    "lines": 204
+  },
+  "ours": {
+    "file": "ours.java",
+    "blob": "92705a4dcb107d67cd1d53e15c0d633e729c05ab",
+    "bytes": 7130,
+    "lines": 182
+  },
+  "theirs": {
+    "file": "theirs.java",
+    "blob": "01dc97d84f94a1a4664dbd901db8f2bbdb031e18",
+    "bytes": 8281,
+    "lines": 212
+  },
+  "resolved": {
+    "file": "resolved.java",
+    "blob": "7e03d05da84e132044a0ed5dc3f2bc8083352368",
+    "bytes": 7117,
+    "lines": 182
+  },
+  "conflict_messages": [
+    "Auto-merging",
+    "CONFLICT (contents)"
+  ]
+}

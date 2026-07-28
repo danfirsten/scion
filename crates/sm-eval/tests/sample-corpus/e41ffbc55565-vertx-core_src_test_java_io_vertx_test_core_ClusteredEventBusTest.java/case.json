@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "case_id": "e41ffbc55565-vertx-core_src_test_java_io_vertx_test_core_ClusteredEventBusTest.java",
+  "kind": "conflicted",
+  "repo": "eclipse-vertx/vert.x",
+  "repo_url": "https://github.com/eclipse-vertx/vert.x.git",
+  "license": "EPL-2.0",
+  "merge_commit": "e41ffbc555658819bc40c0abadf90081a8c0a71b",
+  "parents": [
+    "12bde32dcc392453be5769125a6160f320582c97",
+    "11d3eee08075803808f065c6966f8fadddb8299d"
+  ],
+  "base_commit": "30365ab386aae80257be273648e2e69b288263da",
+  "path": "vertx-core/src/test/java/io/vertx/test/core/ClusteredEventBusTest.java",
+  "shape": "modify_modify",
+  "resolution_kind": "merged",
+  "contaminated": false,
+  "contaminating_lines": 0,
+  "base": {
+    "file": "base.java",
+    "blob": "7e8380bd970cc0b9448c9a84ac8e92f66a97a524",
+    "bytes": 8181,
+    "lines": 290
+  },
+  "ours": {
+    "file": "ours.java",
+    "blob": "1cd6bd5b310946e7ebda3c653041c1802d63f74e",
+    "bytes": 8116,
+    "lines": 289
+  },
+  "theirs": {
+    "file": "theirs.java",
+    "blob": "8685c20df53ea20284c163101497fc8e0996dbe4",
+    "bytes": 6859,
+    "lines": 246
+  },
+  "resolved": {
+    "file": "resolved.java",
+    "blob": "70734d597630acd71a268d8f1ada42cbb5cbb24e",
+    "bytes": 6856,
+    "lines": 246
+  },
+  "conflict_messages": [
+    "Auto-merging",
+    "CONFLICT (contents)"
+  ]
+}

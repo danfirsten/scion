@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "case_id": "a37c84b7c5d3-_java_org_springframework_boot_test_autoconfigure_web_servlet_MockMvcWebDriverAutoConfiguration.java-c4343ca6037c5deb",
+  "kind": "conflicted",
+  "repo": "spring-projects/spring-boot",
+  "repo_url": "https://github.com/spring-projects/spring-boot.git",
+  "license": "Apache-2.0",
+  "merge_commit": "a37c84b7c5d378e30225187afbc3018d25c73cc4",
+  "parents": [
+    "923f7d0ce1c10d195232fb22edd205c1c3344f71",
+    "d66b28fcba8aa61d66755adbe015cb9e5f267593"
+  ],
+  "base_commit": "72b78f7b47ed92b280d86082b1fefa5498ae14cd",
+  "path": "spring-boot-project/spring-boot-test-autoconfigure/src/main/java/org/springframework/boot/test/autoconfigure/web/servlet/MockMvcWebDriverAutoConfiguration.java",
+  "shape": "modify_modify",
+  "resolution_kind": "merged",
+  "contaminated": false,
+  "contaminating_lines": 0,
+  "base": {
+    "file": "base.java",
+    "blob": "6a45c59c7b21ee0008b58bb707e0f09a8e389af0",
+    "bytes": 3058,
+    "lines": 70
+  },
+  "ours": {
+    "file": "ours.java",
+    "blob": "92c3bb46f0c810c444aea3ca39bc65bb24e47222",
+    "bytes": 3060,
+    "lines": 70
+  },
+  "theirs": {
+    "file": "theirs.java",
+    "blob": "64a37e80201128bafcfe27471b7cc1ffd5d97763",
+    "bytes": 3061,
+    "lines": 70
+  },
+  "resolved": {
+    "file": "resolved.java",
+    "blob": "06a9a6d246858dc8b1c002997c604f71a4eb4eec",
+    "bytes": 3063,
+    "lines": 70
+  },
+  "conflict_messages": [
+    "Auto-merging",
+    "CONFLICT (contents)"
+  ]
+}

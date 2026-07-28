@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "case_id": "9f110e9099c0-pmd-java_src_main_java_net_sourceforge_pmd_lang_java_rule_design_LoosePackageCouplingRule.java",
+  "kind": "conflicted",
+  "repo": "pmd/pmd",
+  "repo_url": "https://github.com/pmd/pmd.git",
+  "license": "BSD-3-Clause",
+  "merge_commit": "9f110e9099c0f0eb16770dee8b67d7ff05e7ef48",
+  "parents": [
+    "356c6e0d64e2378edbb0bf1f03b45924268b64c8",
+    "48f4517a6e49b350ca4665185709070430dc99de"
+  ],
+  "base_commit": "7384fd6fb2642f19c66bcfc109589215da0dfb50",
+  "path": "pmd-java/src/main/java/net/sourceforge/pmd/lang/java/rule/design/LoosePackageCouplingRule.java",
+  "shape": "modify_modify",
+  "resolution_kind": "took_theirs",
+  "contaminated": false,
+  "contaminating_lines": 0,
+  "base": {
+    "file": "base.java",
+    "blob": "6697414b0bd59d0cd6e9c8de8c2fbddd6c6dfcc2",
+    "bytes": 5047,
+    "lines": 136
+  },
+  "ours": {
+    "file": "ours.java",
+    "blob": "9b142b3fd5d1756e2184d5fc8919bd067593db9b",
+    "bytes": 5025,
+    "lines": 136
+  },
+  "theirs": {
+    "file": "theirs.java",
+    "blob": "4a168d4ea4b058e0182adf67a19e91b00cfbea91",
+    "bytes": 5051,
+    "lines": 136
+  },
+  "resolved": {
+    "file": "resolved.java",
+    "blob": "4a168d4ea4b058e0182adf67a19e91b00cfbea91",
+    "bytes": 5051,
+    "lines": 136
+  },
+  "conflict_messages": [
+    "Auto-merging",
+    "CONFLICT (contents)"
+  ]
+}

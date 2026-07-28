@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "case_id": "2947d147b47e-samples_server_petstore_springboot-spring-pageable-without-j8_src_main_java_org_openapitools_api_PetApi.java",
+  "kind": "conflicted",
+  "repo": "OpenAPITools/openapi-generator",
+  "repo_url": "https://github.com/OpenAPITools/openapi-generator.git",
+  "license": "Apache-2.0",
+  "merge_commit": "2947d147b47e165c1bee23503e8ff8bd02515146",
+  "parents": [
+    "3bd2a611bf39146fc5395080509f470423b8f82c",
+    "b0ce532bdc7436bf1ba377af5a72e5681565f2df"
+  ],
+  "base_commit": "e02ebd822abbf07c8fe9ad444e8f3d71e9df2799",
+  "path": "samples/server/petstore/springboot-spring-pageable-without-j8/src/main/java/org/openapitools/api/PetApi.java",
+  "shape": "modify_modify",
+  "resolution_kind": "merged",
+  "contaminated": false,
+  "contaminating_lines": 0,
+  "base": {
+    "file": "base.java",
+    "blob": "af451cf8321aca96b40921c2e2e4231eda061b2a",
+    "bytes": 16954,
+    "lines": 398
+  },
+  "ours": {
+    "file": "ours.java",
+    "blob": "76518260a295b07653c06c3b5dafaa849823b007",
+    "bytes": 16954,
+    "lines": 398
+  },
+  "theirs": {
+    "file": "theirs.java",
+    "blob": "f743d8db75c5244b39f7b6e978b91be825c13d71",
+    "bytes": 16885,
+    "lines": 397
+  },
+  "resolved": {
+    "file": "resolved.java",
+    "blob": "f6c886ac94c89f09bfb3cbcd9b65de2e5a79550f",
+    "bytes": 16894,
+    "lines": 397
+  },
+  "conflict_messages": [
+    "Auto-merging",
+    "CONFLICT (contents)"
+  ]
+}

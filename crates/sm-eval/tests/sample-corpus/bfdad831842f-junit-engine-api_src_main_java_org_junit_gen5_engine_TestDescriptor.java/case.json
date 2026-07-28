@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "case_id": "bfdad831842f-junit-engine-api_src_main_java_org_junit_gen5_engine_TestDescriptor.java",
+  "kind": "conflicted",
+  "repo": "junit-team/junit-framework",
+  "repo_url": "https://github.com/junit-team/junit-framework.git",
+  "license": "EPL-2.0",
+  "merge_commit": "bfdad831842f3e839ee64e3103434b87316cbd2c",
+  "parents": [
+    "5b3b3645881550714eeba06a2c8d9739d3f350c7",
+    "5f85ec2ccecfb96df99da4fb99ae1b1b6b8c2f3b"
+  ],
+  "base_commit": "6a71651e421798be4667973bb71f6bd13b9a8ecf",
+  "path": "junit-engine-api/src/main/java/org/junit/gen5/engine/TestDescriptor.java",
+  "shape": "modify_modify",
+  "resolution_kind": "merged",
+  "contaminated": false,
+  "contaminating_lines": 0,
+  "base": {
+    "file": "base.java",
+    "blob": "0cd3efbd6ca3dc6a9af833ed9adda2f48fd497e0",
+    "bytes": 774,
+    "lines": 36
+  },
+  "ours": {
+    "file": "ours.java",
+    "blob": "3a0a90140585b8a8c42ebdc076e861b73a88357f",
+    "bytes": 1612,
+    "lines": 69
+  },
+  "theirs": {
+    "file": "theirs.java",
+    "blob": "c7b91d8a01a63b6b2fc7ed5a2d73a78c41c51389",
+    "bytes": 837,
+    "lines": 39
+  },
+  "resolved": {
+    "file": "resolved.java",
+    "blob": "65fc16eb1e55549e2a0f9d3107a99efebaae5616",
+    "bytes": 1648,
+    "lines": 71
+  },
+  "conflict_messages": [
+    "Auto-merging",
+    "CONFLICT (contents)"
+  ]
+}

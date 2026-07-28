@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "case_id": "6bfef6c19165-samples_server_petstore_springboot-beanvalidation-no-nullable_src_main_java_org_openapitools_api_AnotherFakeApi.java",
+  "kind": "conflicted",
+  "repo": "OpenAPITools/openapi-generator",
+  "repo_url": "https://github.com/OpenAPITools/openapi-generator.git",
+  "license": "Apache-2.0",
+  "merge_commit": "6bfef6c191659e2233ed1b880af84241e262dc33",
+  "parents": [
+    "c54b0623b8ccfb19d910802854bc67ff7894acdf",
+    "b88666b87acab1d59f5a1502c2445bf390ae8dfe"
+  ],
+  "base_commit": "8f3b63095cb1475cbb79e56ff309db06e61cf52e",
+  "path": "samples/server/petstore/springboot-beanvalidation-no-nullable/src/main/java/org/openapitools/api/AnotherFakeApi.java",
+  "shape": "modify_modify",
+  "resolution_kind": "took_ours",
+  "contaminated": false,
+  "contaminating_lines": 0,
+  "base": {
+    "file": "base.java",
+    "blob": "08c9361f61ad02889a26ba1d9ea76fd734020bb8",
+    "bytes": 2618,
+    "lines": 73
+  },
+  "ours": {
+    "file": "ours.java",
+    "blob": "98da5a29716bfb9cd3af771f33ac6a2fdbb9ebae",
+    "bytes": 2618,
+    "lines": 73
+  },
+  "theirs": {
+    "file": "theirs.java",
+    "blob": "df108e1fc7c6b84551d2009e2fba37537b9c2078",
+    "bytes": 2618,
+    "lines": 73
+  },
+  "resolved": {
+    "file": "resolved.java",
+    "blob": "98da5a29716bfb9cd3af771f33ac6a2fdbb9ebae",
+    "bytes": 2618,
+    "lines": 73
+  },
+  "conflict_messages": [
+    "Auto-merging",
+    "CONFLICT (contents)"
+  ]
+}

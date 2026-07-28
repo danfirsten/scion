@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "case_id": "2f113ca1024b-rocketmq-tools_src_main_java_com_alibaba_rocketmq_tools_admin_MQAdminExt.java",
+  "kind": "conflicted",
+  "repo": "apache/rocketmq",
+  "repo_url": "https://github.com/apache/rocketmq.git",
+  "license": "Apache-2.0",
+  "merge_commit": "2f113ca1024bddd4e373268de3efab57c39cba29",
+  "parents": [
+    "60b3865056bfb5bd0ecd79617097d22171b40979",
+    "7abe00f67244b12d7ca7b719b77bb7eaeb149cf9"
+  ],
+  "base_commit": "2524ca9046eab15f2ca2c28ec768d4c2dbb2b0c5",
+  "path": "rocketmq-tools/src/main/java/com/alibaba/rocketmq/tools/admin/MQAdminExt.java",
+  "shape": "modify_modify",
+  "resolution_kind": "merged",
+  "contaminated": false,
+  "contaminating_lines": 0,
+  "base": {
+    "file": "base.java",
+    "blob": "3b4635e5e935f48449dc1e6c410273d45efe94c5",
+    "bytes": 19549,
+    "lines": 611
+  },
+  "ours": {
+    "file": "ours.java",
+    "blob": "501ab04761492df5070594a2203866522f3858e0",
+    "bytes": 18890,
+    "lines": 603
+  },
+  "theirs": {
+    "file": "theirs.java",
+    "blob": "db26eb4596cab32b055f6b0fb867a8b63a43fd5a",
+    "bytes": 20192,
+    "lines": 628
+  },
+  "resolved": {
+    "file": "resolved.java",
+    "blob": "a2e1f91b792283fbcd983953e0945fcb61e615f0",
+    "bytes": 19467,
+    "lines": 619
+  },
+  "conflict_messages": [
+    "Auto-merging",
+    "CONFLICT (contents)"
+  ]
+}

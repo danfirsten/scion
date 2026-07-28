@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "case_id": "0872090fa4fb-dubbo-rpc_dubbo-rpc-api_src_main_java_org_apache_dubbo_rpc_model_ApplicationModel.java",
+  "kind": "conflicted",
+  "repo": "apache/dubbo",
+  "repo_url": "https://github.com/apache/dubbo.git",
+  "license": "Apache-2.0",
+  "merge_commit": "0872090fa4fbd70ba302978ce3575f4cdafb7f1e",
+  "parents": [
+    "e261acc98ac0d46ed3239101f1871f9b08e4f136",
+    "13c01efd12340f1bf065c6b1ca329c63e384bf65"
+  ],
+  "base_commit": "346630e4132c9e45c547d9a2554c2b7702dabfad",
+  "path": "dubbo-rpc/dubbo-rpc-api/src/main/java/org/apache/dubbo/rpc/model/ApplicationModel.java",
+  "shape": "modify_modify",
+  "resolution_kind": "merged",
+  "contaminated": false,
+  "contaminating_lines": 0,
+  "base": {
+    "file": "base.java",
+    "blob": "33dcc908e1b1c7c183cb11ccc8e58031ef0297d9",
+    "bytes": 3318,
+    "lines": 93
+  },
+  "ours": {
+    "file": "ours.java",
+    "blob": "59c2374f7770952e613f098f44fd5bef37efa6fd",
+    "bytes": 3986,
+    "lines": 108
+  },
+  "theirs": {
+    "file": "theirs.java",
+    "blob": "7a7a4bef41faa709b40a94d8428b1aa78799c5da",
+    "bytes": 5014,
+    "lines": 133
+  },
+  "resolved": {
+    "file": "resolved.java",
+    "blob": "59d09333577c50ee61c34b7a164dc504539eba68",
+    "bytes": 5682,
+    "lines": 148
+  },
+  "conflict_messages": [
+    "Auto-merging",
+    "CONFLICT (contents)"
+  ]
+}

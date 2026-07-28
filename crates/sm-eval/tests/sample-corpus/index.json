@@ -1,0 +1,707 @@
+[
+  {
+    "schema_version": 1,
+    "case_id": "0872090fa4fb-dubbo-rpc_dubbo-rpc-api_src_main_java_org_apache_dubbo_rpc_model_ApplicationModel.java",
+    "kind": "conflicted",
+    "repo": "apache/dubbo",
+    "repo_url": "https://github.com/apache/dubbo.git",
+    "license": "Apache-2.0",
+    "merge_commit": "0872090fa4fbd70ba302978ce3575f4cdafb7f1e",
+    "parents": [
+      "e261acc98ac0d46ed3239101f1871f9b08e4f136",
+      "13c01efd12340f1bf065c6b1ca329c63e384bf65"
+    ],
+    "base_commit": "346630e4132c9e45c547d9a2554c2b7702dabfad",
+    "path": "dubbo-rpc/dubbo-rpc-api/src/main/java/org/apache/dubbo/rpc/model/ApplicationModel.java",
+    "shape": "modify_modify",
+    "resolution_kind": "merged",
+    "contaminated": false,
+    "contaminating_lines": 0,
+    "base": {
+      "file": "base.java",
+      "blob": "33dcc908e1b1c7c183cb11ccc8e58031ef0297d9",
+      "bytes": 3318,
+      "lines": 93
+    },
+    "ours": {
+      "file": "ours.java",
+      "blob": "59c2374f7770952e613f098f44fd5bef37efa6fd",
+      "bytes": 3986,
+      "lines": 108
+    },
+    "theirs": {
+      "file": "theirs.java",
+      "blob": "7a7a4bef41faa709b40a94d8428b1aa78799c5da",
+      "bytes": 5014,
+      "lines": 133
+    },
+    "resolved": {
+      "file": "resolved.java",
+      "blob": "59d09333577c50ee61c34b7a164dc504539eba68",
+      "bytes": 5682,
+      "lines": 148
+    },
+    "conflict_messages": [
+      "Auto-merging",
+      "CONFLICT (contents)"
+    ]
+  },
+  {
+    "schema_version": 1,
+    "case_id": "27ad9858d215-maven-aether-provider_src_main_java_org_apache_maven_repository_internal_LocalSnapshotMetadataGenerator.java",
+    "kind": "conflicted",
+    "repo": "apache/maven",
+    "repo_url": "https://github.com/apache/maven.git",
+    "license": "Apache-2.0",
+    "merge_commit": "27ad9858d215e40ab4853428c144554ae1bbb981",
+    "parents": [
+      "39d063a4354ef28300ffa37af290824e7f656484",
+      "4fdcdbd26244ff81e242054fd38cf415d92499be"
+    ],
+    "base_commit": "c7c79e1f1a5ce5c6b213dfcca24108cf650aaedb",
+    "path": "maven-aether-provider/src/main/java/org/apache/maven/repository/internal/LocalSnapshotMetadataGenerator.java",
+    "shape": "modify_modify",
+    "resolution_kind": "took_theirs",
+    "contaminated": false,
+    "contaminating_lines": 0,
+    "base": {
+      "file": "base.java",
+      "blob": "1d318cd4ffb1136c006b64253e70614a653c7f83",
+      "bytes": 2748,
+      "lines": 82
+    },
+    "ours": {
+      "file": "ours.java",
+      "blob": "9476acc57d7ae880225fed1980f7de8c2868270c",
+      "bytes": 2736,
+      "lines": 82
+    },
+    "theirs": {
+      "file": "theirs.java",
+      "blob": "ee7c10b0c47ad574b2e21b019b3ff986908e69dc",
+      "bytes": 2730,
+      "lines": 82
+    },
+    "resolved": {
+      "file": "resolved.java",
+      "blob": "ee7c10b0c47ad574b2e21b019b3ff986908e69dc",
+      "bytes": 2730,
+      "lines": 82
+    },
+    "conflict_messages": [
+      "Auto-merging",
+      "CONFLICT (contents)"
+    ]
+  },
+  {
+    "schema_version": 1,
+    "case_id": "2947d147b47e-samples_server_petstore_springboot-spring-pageable-without-j8_src_main_java_org_openapitools_api_PetApi.java",
+    "kind": "conflicted",
+    "repo": "OpenAPITools/openapi-generator",
+    "repo_url": "https://github.com/OpenAPITools/openapi-generator.git",
+    "license": "Apache-2.0",
+    "merge_commit": "2947d147b47e165c1bee23503e8ff8bd02515146",
+    "parents": [
+      "3bd2a611bf39146fc5395080509f470423b8f82c",
+      "b0ce532bdc7436bf1ba377af5a72e5681565f2df"
+    ],
+    "base_commit": "e02ebd822abbf07c8fe9ad444e8f3d71e9df2799",
+    "path": "samples/server/petstore/springboot-spring-pageable-without-j8/src/main/java/org/openapitools/api/PetApi.java",
+    "shape": "modify_modify",
+    "resolution_kind": "merged",
+    "contaminated": false,
+    "contaminating_lines": 0,
+    "base": {
+      "file": "base.java",
+      "blob": "af451cf8321aca96b40921c2e2e4231eda061b2a",
+      "bytes": 16954,
+      "lines": 398
+    },
+    "ours": {
+      "file": "ours.java",
+      "blob": "76518260a295b07653c06c3b5dafaa849823b007",
+      "bytes": 16954,
+      "lines": 398
+    },
+    "theirs": {
+      "file": "theirs.java",
+      "blob": "f743d8db75c5244b39f7b6e978b91be825c13d71",
+      "bytes": 16885,
+      "lines": 397
+    },
+    "resolved": {
+      "file": "resolved.java",
+      "blob": "f6c886ac94c89f09bfb3cbcd9b65de2e5a79550f",
+      "bytes": 16894,
+      "lines": 397
+    },
+    "conflict_messages": [
+      "Auto-merging",
+      "CONFLICT (contents)"
+    ]
+  },
+  {
+    "schema_version": 1,
+    "case_id": "2f113ca1024b-rocketmq-tools_src_main_java_com_alibaba_rocketmq_tools_admin_MQAdminExt.java",
+    "kind": "conflicted",
+    "repo": "apache/rocketmq",
+    "repo_url": "https://github.com/apache/rocketmq.git",
+    "license": "Apache-2.0",
+    "merge_commit": "2f113ca1024bddd4e373268de3efab57c39cba29",
+    "parents": [
+      "60b3865056bfb5bd0ecd79617097d22171b40979",
+      "7abe00f67244b12d7ca7b719b77bb7eaeb149cf9"
+    ],
+    "base_commit": "2524ca9046eab15f2ca2c28ec768d4c2dbb2b0c5",
+    "path": "rocketmq-tools/src/main/java/com/alibaba/rocketmq/tools/admin/MQAdminExt.java",
+    "shape": "modify_modify",
+    "resolution_kind": "merged",
+    "contaminated": false,
+    "contaminating_lines": 0,
+    "base": {
+      "file": "base.java",
+      "blob": "3b4635e5e935f48449dc1e6c410273d45efe94c5",
+      "bytes": 19549,
+      "lines": 611
+    },
+    "ours": {
+      "file": "ours.java",
+      "blob": "501ab04761492df5070594a2203866522f3858e0",
+      "bytes": 18890,
+      "lines": 603
+    },
+    "theirs": {
+      "file": "theirs.java",
+      "blob": "db26eb4596cab32b055f6b0fb867a8b63a43fd5a",
+      "bytes": 20192,
+      "lines": 628
+    },
+    "resolved": {
+      "file": "resolved.java",
+      "blob": "a2e1f91b792283fbcd983953e0945fcb61e615f0",
+      "bytes": 19467,
+      "lines": 619
+    },
+    "conflict_messages": [
+      "Auto-merging",
+      "CONFLICT (contents)"
+    ]
+  },
+  {
+    "schema_version": 1,
+    "case_id": "53d5003630ce-http-server-netty_src_main_java_io_micronaut_http_server_netty_NettyHttpServer.java",
+    "kind": "conflicted",
+    "repo": "micronaut-projects/micronaut-core",
+    "repo_url": "https://github.com/micronaut-projects/micronaut-core.git",
+    "license": "Apache-2.0",
+    "merge_commit": "53d5003630ce9a4ad7d8cc02742475d293f748f0",
+    "parents": [
+      "8f9a7cf7f8174181520b2ebb10b2a0fd6d2aea63",
+      "161bf9c7204c4376c9c943896844cdbb8778f920"
+    ],
+    "base_commit": "62af70d233ff373e95c9db57debfbd069402e8a5",
+    "path": "http-server-netty/src/main/java/io/micronaut/http/server/netty/NettyHttpServer.java",
+    "shape": "modify_modify",
+    "resolution_kind": "took_theirs",
+    "contaminated": false,
+    "contaminating_lines": 0,
+    "base": {
+      "file": "base.java",
+      "blob": "d4569812dcd555a205209302929d2a8f71c58f77",
+      "bytes": 16540,
+      "lines": 391
+    },
+    "ours": {
+      "file": "ours.java",
+      "blob": "d68c2936b7141471692b1a1a934c2fffcb71308d",
+      "bytes": 16867,
+      "lines": 410
+    },
+    "theirs": {
+      "file": "theirs.java",
+      "blob": "6f9e37a11982b81a35ffb4e45ae66a69e9acfa80",
+      "bytes": 16307,
+      "lines": 386
+    },
+    "resolved": {
+      "file": "resolved.java",
+      "blob": "6f9e37a11982b81a35ffb4e45ae66a69e9acfa80",
+      "bytes": 16307,
+      "lines": 386
+    },
+    "conflict_messages": [
+      "Auto-merging",
+      "CONFLICT (contents)"
+    ]
+  },
+  {
+    "schema_version": 1,
+    "case_id": "57057f47496d-pmd-core_src_main_java_net_sourceforge_pmd_PMD.java",
+    "kind": "conflicted",
+    "repo": "pmd/pmd",
+    "repo_url": "https://github.com/pmd/pmd.git",
+    "license": "BSD-3-Clause",
+    "merge_commit": "57057f47496d7fe554bd8fba7bc8574ec37e7087",
+    "parents": [
+      "0b86bf124cf05e1ce2e24ed1b889520eecd3248c",
+      "36d18aefc64b01d0ec32b892ed9b2d92c40cd9f2"
+    ],
+    "base_commit": "d4eba4f45680edc9a5aac893a016a310fe5d77bf",
+    "path": "pmd-core/src/main/java/net/sourceforge/pmd/PMD.java",
+    "shape": "modify_modify",
+    "resolution_kind": "merged",
+    "contaminated": false,
+    "contaminating_lines": 0,
+    "base": {
+      "file": "base.java",
+      "blob": "7c3ab37f96ce959e1b8d2876c6f7902f12f02662",
+      "bytes": 22628,
+      "lines": 571
+    },
+    "ours": {
+      "file": "ours.java",
+      "blob": "086f4fd019d918016dabd07a775b37ab37a8bce4",
+      "bytes": 12055,
+      "lines": 297
+    },
+    "theirs": {
+      "file": "theirs.java",
+      "blob": "632761e0029174cd7884f03ef4b0259ec9bff1ee",
+      "bytes": 22909,
+      "lines": 576
+    },
+    "resolved": {
+      "file": "resolved.java",
+      "blob": "c4848fb7d8a37e300d18fb7f2241c5e92005a934",
+      "bytes": 12336,
+      "lines": 302
+    },
+    "conflict_messages": [
+      "Auto-merging",
+      "CONFLICT (contents)"
+    ]
+  },
+  {
+    "schema_version": 1,
+    "case_id": "61e597159433-sopremo_sopremo-common_src_main_java_eu_stratosphere_sopremo_testing_SopremoTestPlan.java",
+    "kind": "conflicted",
+    "repo": "apache/flink",
+    "repo_url": "https://github.com/apache/flink.git",
+    "license": "Apache-2.0",
+    "merge_commit": "61e59715943361df8b1a9acfd78ce58144608b61",
+    "parents": [
+      "3beba6b77cad114768bc880a2c6da57b82204443",
+      "b06833342f8a2e3372a99721e6f69f55e820b929"
+    ],
+    "base_commit": "3dfc560b1c9b7be3e51b0a9fb4f3a99aa631b559",
+    "path": "sopremo/sopremo-common/src/main/java/eu/stratosphere/sopremo/testing/SopremoTestPlan.java",
+    "shape": "modify_modify",
+    "resolution_kind": "merged",
+    "contaminated": false,
+    "contaminating_lines": 0,
+    "base": {
+      "file": "base.java",
+      "blob": "174534698e9b56f57940b7c9475c66bff915f199",
+      "bytes": 15000,
+      "lines": 487
+    },
+    "ours": {
+      "file": "ours.java",
+      "blob": "04773bfb04f36fdc5cde771150bd42845443876c",
+      "bytes": 15285,
+      "lines": 497
+    },
+    "theirs": {
+      "file": "theirs.java",
+      "blob": "3a733bac58cd3182e70e49d530ff6d8f2afc7f65",
+      "bytes": 14158,
+      "lines": 473
+    },
+    "resolved": {
+      "file": "resolved.java",
+      "blob": "951cff7a1a3f6a9f30b4b77ee2acfaa959fe2564",
+      "bytes": 14372,
+      "lines": 483
+    },
+    "conflict_messages": [
+      "Auto-merging",
+      "CONFLICT (contents)"
+    ]
+  },
+  {
+    "schema_version": 1,
+    "case_id": "6bfef6c19165-samples_server_petstore_springboot-beanvalidation-no-nullable_src_main_java_org_openapitools_api_AnotherFakeApi.java",
+    "kind": "conflicted",
+    "repo": "OpenAPITools/openapi-generator",
+    "repo_url": "https://github.com/OpenAPITools/openapi-generator.git",
+    "license": "Apache-2.0",
+    "merge_commit": "6bfef6c191659e2233ed1b880af84241e262dc33",
+    "parents": [
+      "c54b0623b8ccfb19d910802854bc67ff7894acdf",
+      "b88666b87acab1d59f5a1502c2445bf390ae8dfe"
+    ],
+    "base_commit": "8f3b63095cb1475cbb79e56ff309db06e61cf52e",
+    "path": "samples/server/petstore/springboot-beanvalidation-no-nullable/src/main/java/org/openapitools/api/AnotherFakeApi.java",
+    "shape": "modify_modify",
+    "resolution_kind": "took_ours",
+    "contaminated": false,
+    "contaminating_lines": 0,
+    "base": {
+      "file": "base.java",
+      "blob": "08c9361f61ad02889a26ba1d9ea76fd734020bb8",
+      "bytes": 2618,
+      "lines": 73
+    },
+    "ours": {
+      "file": "ours.java",
+      "blob": "98da5a29716bfb9cd3af771f33ac6a2fdbb9ebae",
+      "bytes": 2618,
+      "lines": 73
+    },
+    "theirs": {
+      "file": "theirs.java",
+      "blob": "df108e1fc7c6b84551d2009e2fba37537b9c2078",
+      "bytes": 2618,
+      "lines": 73
+    },
+    "resolved": {
+      "file": "resolved.java",
+      "blob": "98da5a29716bfb9cd3af771f33ac6a2fdbb9ebae",
+      "bytes": 2618,
+      "lines": 73
+    },
+    "conflict_messages": [
+      "Auto-merging",
+      "CONFLICT (contents)"
+    ]
+  },
+  {
+    "schema_version": 1,
+    "case_id": "823958bcc58c-spring-web_src_test_java_org_springframework_http_converter_protobuf_ProtobufHttpMessageConverterTests.java",
+    "kind": "conflicted",
+    "repo": "spring-projects/spring-framework",
+    "repo_url": "https://github.com/spring-projects/spring-framework.git",
+    "license": "Apache-2.0",
+    "merge_commit": "823958bcc58c981097927496171324e75144e37b",
+    "parents": [
+      "6e4551131dddffecd7adc00d96e3ecddd4c4911c",
+      "c4e362500be18bd2e277535d568f45e8a059b0db"
+    ],
+    "base_commit": "8f9a1cdc0c2ab2bee112dddad00a94bb501a3181",
+    "path": "spring-web/src/test/java/org/springframework/http/converter/protobuf/ProtobufHttpMessageConverterTests.java",
+    "shape": "modify_modify",
+    "resolution_kind": "merged",
+    "contaminated": false,
+    "contaminating_lines": 0,
+    "base": {
+      "file": "base.java",
+      "blob": "26106e13d3d2028fd0094caa4f0eb1d7a221ac12",
+      "bytes": 7969,
+      "lines": 204
+    },
+    "ours": {
+      "file": "ours.java",
+      "blob": "92705a4dcb107d67cd1d53e15c0d633e729c05ab",
+      "bytes": 7130,
+      "lines": 182
+    },
+    "theirs": {
+      "file": "theirs.java",
+      "blob": "01dc97d84f94a1a4664dbd901db8f2bbdb031e18",
+      "bytes": 8281,
+      "lines": 212
+    },
+    "resolved": {
+      "file": "resolved.java",
+      "blob": "7e03d05da84e132044a0ed5dc3f2bc8083352368",
+      "bytes": 7117,
+      "lines": 182
+    },
+    "conflict_messages": [
+      "Auto-merging",
+      "CONFLICT (contents)"
+    ]
+  },
+  {
+    "schema_version": 1,
+    "case_id": "9f110e9099c0-pmd-java_src_main_java_net_sourceforge_pmd_lang_java_rule_design_LoosePackageCouplingRule.java",
+    "kind": "conflicted",
+    "repo": "pmd/pmd",
+    "repo_url": "https://github.com/pmd/pmd.git",
+    "license": "BSD-3-Clause",
+    "merge_commit": "9f110e9099c0f0eb16770dee8b67d7ff05e7ef48",
+    "parents": [
+      "356c6e0d64e2378edbb0bf1f03b45924268b64c8",
+      "48f4517a6e49b350ca4665185709070430dc99de"
+    ],
+    "base_commit": "7384fd6fb2642f19c66bcfc109589215da0dfb50",
+    "path": "pmd-java/src/main/java/net/sourceforge/pmd/lang/java/rule/design/LoosePackageCouplingRule.java",
+    "shape": "modify_modify",
+    "resolution_kind": "took_theirs",
+    "contaminated": false,
+    "contaminating_lines": 0,
+    "base": {
+      "file": "base.java",
+      "blob": "6697414b0bd59d0cd6e9c8de8c2fbddd6c6dfcc2",
+      "bytes": 5047,
+      "lines": 136
+    },
+    "ours": {
+      "file": "ours.java",
+      "blob": "9b142b3fd5d1756e2184d5fc8919bd067593db9b",
+      "bytes": 5025,
+      "lines": 136
+    },
+    "theirs": {
+      "file": "theirs.java",
+      "blob": "4a168d4ea4b058e0182adf67a19e91b00cfbea91",
+      "bytes": 5051,
+      "lines": 136
+    },
+    "resolved": {
+      "file": "resolved.java",
+      "blob": "4a168d4ea4b058e0182adf67a19e91b00cfbea91",
+      "bytes": 5051,
+      "lines": 136
+    },
+    "conflict_messages": [
+      "Auto-merging",
+      "CONFLICT (contents)"
+    ]
+  },
+  {
+    "schema_version": 1,
+    "case_id": "a37c84b7c5d3-_java_org_springframework_boot_test_autoconfigure_web_servlet_MockMvcWebDriverAutoConfiguration.java-c4343ca6037c5deb",
+    "kind": "conflicted",
+    "repo": "spring-projects/spring-boot",
+    "repo_url": "https://github.com/spring-projects/spring-boot.git",
+    "license": "Apache-2.0",
+    "merge_commit": "a37c84b7c5d378e30225187afbc3018d25c73cc4",
+    "parents": [
+      "923f7d0ce1c10d195232fb22edd205c1c3344f71",
+      "d66b28fcba8aa61d66755adbe015cb9e5f267593"
+    ],
+    "base_commit": "72b78f7b47ed92b280d86082b1fefa5498ae14cd",
+    "path": "spring-boot-project/spring-boot-test-autoconfigure/src/main/java/org/springframework/boot/test/autoconfigure/web/servlet/MockMvcWebDriverAutoConfiguration.java",
+    "shape": "modify_modify",
+    "resolution_kind": "merged",
+    "contaminated": false,
+    "contaminating_lines": 0,
+    "base": {
+      "file": "base.java",
+      "blob": "6a45c59c7b21ee0008b58bb707e0f09a8e389af0",
+      "bytes": 3058,
+      "lines": 70
+    },
+    "ours": {
+      "file": "ours.java",
+      "blob": "92c3bb46f0c810c444aea3ca39bc65bb24e47222",
+      "bytes": 3060,
+      "lines": 70
+    },
+    "theirs": {
+      "file": "theirs.java",
+      "blob": "64a37e80201128bafcfe27471b7cc1ffd5d97763",
+      "bytes": 3061,
+      "lines": 70
+    },
+    "resolved": {
+      "file": "resolved.java",
+      "blob": "06a9a6d246858dc8b1c002997c604f71a4eb4eec",
+      "bytes": 3063,
+      "lines": 70
+    },
+    "conflict_messages": [
+      "Auto-merging",
+      "CONFLICT (contents)"
+    ]
+  },
+  {
+    "schema_version": 1,
+    "case_id": "a37c84b7c5d3-g-boot-tools_spring-boot-loader-tools_src_main_java_org_springframework_boot_loader_tools_Layer.java-b10116fcf54aa1d3",
+    "kind": "conflicted",
+    "repo": "spring-projects/spring-boot",
+    "repo_url": "https://github.com/spring-projects/spring-boot.git",
+    "license": "Apache-2.0",
+    "merge_commit": "a37c84b7c5d378e30225187afbc3018d25c73cc4",
+    "parents": [
+      "923f7d0ce1c10d195232fb22edd205c1c3344f71",
+      "d66b28fcba8aa61d66755adbe015cb9e5f267593"
+    ],
+    "base_commit": "72b78f7b47ed92b280d86082b1fefa5498ae14cd",
+    "path": "spring-boot-project/spring-boot-tools/spring-boot-loader-tools/src/main/java/org/springframework/boot/loader/tools/Layer.java",
+    "shape": "modify_modify",
+    "resolution_kind": "merged",
+    "contaminated": false,
+    "contaminating_lines": 0,
+    "base": {
+      "file": "base.java",
+      "blob": "544a7ec772c3a55fc392e1d9788625c712fdea28",
+      "bytes": 1881,
+      "lines": 71
+    },
+    "ours": {
+      "file": "ours.java",
+      "blob": "1141ec942a68f1bbba89cbab86b8caf48ea25b62",
+      "bytes": 1883,
+      "lines": 71
+    },
+    "theirs": {
+      "file": "theirs.java",
+      "blob": "f766c7f4cbd501e528c14092d80e289fb4e1fe6b",
+      "bytes": 1884,
+      "lines": 71
+    },
+    "resolved": {
+      "file": "resolved.java",
+      "blob": "1b016961ada92e4fea6054cd8d03b13827e2a09a",
+      "bytes": 1886,
+      "lines": 71
+    },
+    "conflict_messages": [
+      "Auto-merging",
+      "CONFLICT (contents)"
+    ]
+  },
+  {
+    "schema_version": 1,
+    "case_id": "bfdad831842f-junit-engine-api_src_main_java_org_junit_gen5_engine_TestDescriptor.java",
+    "kind": "conflicted",
+    "repo": "junit-team/junit-framework",
+    "repo_url": "https://github.com/junit-team/junit-framework.git",
+    "license": "EPL-2.0",
+    "merge_commit": "bfdad831842f3e839ee64e3103434b87316cbd2c",
+    "parents": [
+      "5b3b3645881550714eeba06a2c8d9739d3f350c7",
+      "5f85ec2ccecfb96df99da4fb99ae1b1b6b8c2f3b"
+    ],
+    "base_commit": "6a71651e421798be4667973bb71f6bd13b9a8ecf",
+    "path": "junit-engine-api/src/main/java/org/junit/gen5/engine/TestDescriptor.java",
+    "shape": "modify_modify",
+    "resolution_kind": "merged",
+    "contaminated": false,
+    "contaminating_lines": 0,
+    "base": {
+      "file": "base.java",
+      "blob": "0cd3efbd6ca3dc6a9af833ed9adda2f48fd497e0",
+      "bytes": 774,
+      "lines": 36
+    },
+    "ours": {
+      "file": "ours.java",
+      "blob": "3a0a90140585b8a8c42ebdc076e861b73a88357f",
+      "bytes": 1612,
+      "lines": 69
+    },
+    "theirs": {
+      "file": "theirs.java",
+      "blob": "c7b91d8a01a63b6b2fc7ed5a2d73a78c41c51389",
+      "bytes": 837,
+      "lines": 39
+    },
+    "resolved": {
+      "file": "resolved.java",
+      "blob": "65fc16eb1e55549e2a0f9d3107a99efebaae5616",
+      "bytes": 1648,
+      "lines": 71
+    },
+    "conflict_messages": [
+      "Auto-merging",
+      "CONFLICT (contents)"
+    ]
+  },
+  {
+    "schema_version": 1,
+    "case_id": "e41ffbc55565-vertx-core_src_test_java_io_vertx_test_core_ClusteredEventBusTest.java",
+    "kind": "conflicted",
+    "repo": "eclipse-vertx/vert.x",
+    "repo_url": "https://github.com/eclipse-vertx/vert.x.git",
+    "license": "EPL-2.0",
+    "merge_commit": "e41ffbc555658819bc40c0abadf90081a8c0a71b",
+    "parents": [
+      "12bde32dcc392453be5769125a6160f320582c97",
+      "11d3eee08075803808f065c6966f8fadddb8299d"
+    ],
+    "base_commit": "30365ab386aae80257be273648e2e69b288263da",
+    "path": "vertx-core/src/test/java/io/vertx/test/core/ClusteredEventBusTest.java",
+    "shape": "modify_modify",
+    "resolution_kind": "merged",
+    "contaminated": false,
+    "contaminating_lines": 0,
+    "base": {
+      "file": "base.java",
+      "blob": "7e8380bd970cc0b9448c9a84ac8e92f66a97a524",
+      "bytes": 8181,
+      "lines": 290
+    },
+    "ours": {
+      "file": "ours.java",
+      "blob": "1cd6bd5b310946e7ebda3c653041c1802d63f74e",
+      "bytes": 8116,
+      "lines": 289
+    },
+    "theirs": {
+      "file": "theirs.java",
+      "blob": "8685c20df53ea20284c163101497fc8e0996dbe4",
+      "bytes": 6859,
+      "lines": 246
+    },
+    "resolved": {
+      "file": "resolved.java",
+      "blob": "70734d597630acd71a268d8f1ada42cbb5cbb24e",
+      "bytes": 6856,
+      "lines": 246
+    },
+    "conflict_messages": [
+      "Auto-merging",
+      "CONFLICT (contents)"
+    ]
+  },
+  {
+    "schema_version": 1,
+    "case_id": "e6f229da6321-core_src_test_java_com_netflix_conductor_core_execution_TestConfiguration.java",
+    "kind": "conflicted",
+    "repo": "Netflix/conductor",
+    "repo_url": "https://github.com/Netflix/conductor.git",
+    "license": "Apache-2.0",
+    "merge_commit": "e6f229da6321e418df5a575f59d27256a251a0b9",
+    "parents": [
+      "3b9fc7dff56536e40223a1c08ea889874d930c18",
+      "8281b4525b70d0efcbf5e1d1076a1542cee3981b"
+    ],
+    "base_commit": "8ec2d22a89328bc39932a4abff70313a3f9a4697",
+    "path": "core/src/test/java/com/netflix/conductor/core/execution/TestConfiguration.java",
+    "shape": "modify_modify",
+    "resolution_kind": "merged",
+    "contaminated": false,
+    "contaminating_lines": 0,
+    "base": {
+      "file": "base.java",
+      "blob": "a3a0cc0a2978639e1bb4b814e433fe16c88d32e9",
+      "bytes": 1766,
+      "lines": 96
+    },
+    "ours": {
+      "file": "ours.java",
+      "blob": "4f4465d747657533f0f94da289563851218d940f",
+      "bytes": 1886,
+      "lines": 101
+    },
+    "theirs": {
+      "file": "theirs.java",
+      "blob": "6eb5c1a6b174dab5f908844889d06b3c96518b24",
+      "bytes": 2445,
+      "lines": 132
+    },
+    "resolved": {
+      "file": "resolved.java",
+      "blob": "503921bed115686ea80e977f9ef85532569acd0f",
+      "bytes": 2565,
+      "lines": 137
+    },
+    "conflict_messages": [
+      "Auto-merging",
+      "CONFLICT (contents)"
+    ]
+  }
+]
