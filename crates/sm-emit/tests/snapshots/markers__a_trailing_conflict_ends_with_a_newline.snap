@@ -1,0 +1,9 @@
+---
+source: crates/sm-emit/tests/markers.rs
+expression: text
+---
+<<<<<<< ours
+class D {}
+=======
+class E {}
+>>>>>>> theirs

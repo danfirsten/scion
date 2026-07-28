@@ -1,0 +1,13 @@
+---
+source: crates/sm-emit/tests/reindentation.rs
+expression: m.text()
+---
+class C {
+  void a() {
+    if (ok) {
+      /* one
+         two */
+      x2();
+    }
+  }
+}

@@ -1,0 +1,15 @@
+---
+source: crates/sm-merge/tests/child_lists.rs
+expression: run.render()
+---
+rebuilt ours program
+  rebuilt ours class_declaration
+    splice ours class "class"
+    splice theirs identifier "C" lead=ours" "
+    rebuilt ours class_body lead=ours" "
+      splice ours { "{"
+      splice theirs method_declaration "void a() {}" lead=ours"\n  "
+      splice ours method_declaration "void shared() { s(); }" lead=ours"\n\n  "
+      splice ours method_declaration "void ourOwn() { o(); }" lead=ours"\n\n  "
+      splice theirs method_declaration "void theirOwn() { t(); }" lead=theirs"\n\n  "
+      splice ours } "}" lead=ours"\n"

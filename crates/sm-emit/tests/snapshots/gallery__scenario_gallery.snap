@@ -1,0 +1,303 @@
+---
+source: crates/sm-emit/tests/gallery.rs
+expression: gallery(false)
+---
+=== disjoint_edits_in_one_method [java]
+conflicts: none
+reindented lines: 0  synthesized bytes: 0
+---
+class C {
+  void a() {
+    int i = 11;
+    int j = 22;
+  }
+}
+
+=== both_add_a_different_method [java]
+conflicts: none
+reindented lines: 0  synthesized bytes: 0
+---
+class C {
+  void a() {}
+
+  void ours() {}
+
+  void theirs() {}
+}
+
+=== both_add_the_same_method [java]
+conflicts: none
+reindented lines: 0  synthesized bytes: 0
+---
+class C {
+  void a() {}
+
+  void shared() { s(); }
+
+  void ourOwn() {}
+
+  void theirOwn() {}
+}
+
+=== both_add_an_import_at_the_same_spot [java]
+conflicts: none
+reindented lines: 0  synthesized bytes: 0
+---
+package p;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+class C {}
+
+=== import_replaced_on_one_side_added_on_the_other [java]
+conflicts: none
+reindented lines: 0  synthesized bytes: 0
+---
+import java.util.Optional;
+import java.util.List;
+
+class C {}
+
+=== we_move_a_method_they_edit_its_body [java]
+conflicts: none
+reindented lines: 0  synthesized bytes: 0
+---
+class C {
+  void b() {
+    y();
+  }
+
+  void a() {
+    x();
+    z();
+  }
+}
+
+=== update_update_the_same_literal [java]
+conflicts: update_update@field_declaration
+reindented lines: 0  synthesized bytes: 0
+---
+class C {
+<<<<<<< ours
+  int x = 2;
+=======
+  int x = 3;
+>>>>>>> theirs
+}
+
+=== delete_versus_modify [java]
+conflicts: delete_update@method_declaration
+reindented lines: 0  synthesized bytes: 0
+---
+class C {
+<<<<<<< ours
+=======
+  void a() { x(); z(); }
+>>>>>>> theirs
+  void b() {}
+}
+
+=== both_delete_the_same_member [java]
+conflicts: none
+reindented lines: 0  synthesized bytes: 0
+---
+class C {
+  void b() {}
+}
+
+=== wrapped_block_with_an_inner_edit [java]
+conflicts: none
+reindented lines: 3  synthesized bytes: 0
+---
+class C {
+  void a() {
+    if (ok) {
+      x();
+      y2();
+    }
+  }
+}
+
+=== enum_constants_inserted_on_both_sides [java]
+conflicts: ordered_insert_collision@enum_declaration
+reindented lines: 0  synthesized bytes: 0
+---
+<<<<<<< ours
+enum E {
+  A,
+  X,
+  B
+}
+=======
+enum E {
+  A,
+  Y,
+  B
+}
+>>>>>>> theirs
+
+=== reorder_versus_edit_in_a_class_body [java]
+conflicts: none
+reindented lines: 0  synthesized bytes: 0
+---
+class C {
+  void c() { z(); }
+
+  void a() { x(); }
+
+  void b() { y2(); }
+}
+
+=== comment_edited_on_one_side_code_on_the_other [java]
+conflicts: none
+reindented lines: 0  synthesized bytes: 0
+---
+class C {
+  // new
+  void a() { x(); z(); }
+}
+
+=== a_trailing_comment_rides_its_moved_owner [java]
+conflicts: none
+reindented lines: 0  synthesized bytes: 0
+---
+class C {
+  int b = 22;
+
+  int a = 1; // about a
+}
+
+=== a_javadoc_rides_its_moved_owner [java]
+conflicts: none
+reindented lines: 0  synthesized bytes: 0
+---
+class C {
+  void b() { changed(); }
+
+  /** Doc for a. */
+  void a() {}
+}
+
+=== text_block_interior_is_never_reindented [java]
+conflicts: none
+reindented lines: 3  synthesized bytes: 0
+---
+class C {
+  void a() {
+    if (ok) {
+      String s = """
+        keep
+          me
+        """;
+      after();
+    }
+  }
+}
+
+=== divergent_operators [java]
+conflicts: kind_clash@expression_statement
+reindented lines: 0  synthesized bytes: 0
+---
+class C {
+  void f(int i) {
+<<<<<<< ours
+    i += 1;
+=======
+    i -= 1;
+>>>>>>> theirs
+  }
+}
+
+=== insertions_at_the_same_anchor_of_a_statement_list [java]
+conflicts: ordered_insert_collision@expression_statement
+reindented lines: 0  synthesized bytes: 0
+---
+class C {
+  void a() {
+    p();
+<<<<<<< ours
+    ours();
+=======
+    theirs();
+>>>>>>> theirs
+    q();
+  }
+}
+
+=== disjoint_insertions_into_a_statement_list [java]
+conflicts: none
+reindented lines: 0  synthesized bytes: 0
+---
+class C {
+  void a() {
+    first();
+    p();
+    q();
+    last();
+  }
+}
+
+=== a_reformat_on_one_side_an_edit_on_the_other [java]
+conflicts: none
+reindented lines: 0  synthesized bytes: 0
+---
+class C { int f() { return 2; } }
+
+=== unicode_identifiers_and_literals [java]
+conflicts: none
+reindented lines: 0  synthesized bytes: 0
+---
+class C {
+  String s = "héllo wörld";
+  int café = 2;
+}
+
+=== typescript_class_members [ts]
+conflicts: none
+reindented lines: 0  synthesized bytes: 0
+---
+class C {
+  a() { return 1; }
+  b() { return 2; }
+  c() { return 3; }
+}
+
+=== typescript_named_imports_commute [ts]
+conflicts: none
+reindented lines: 0  synthesized bytes: 0
+---
+import { a, b, c } from "m";
+
+export const x = a;
+
+=== typescript_conflicting_constants [ts]
+conflicts: update_update@lexical_declaration
+reindented lines: 0  synthesized bytes: 0
+---
+<<<<<<< ours
+const x = 2;
+=======
+const x = 3;
+>>>>>>> theirs
+
+=== no_trailing_newline [java]
+conflicts: none
+reindented lines: 0  synthesized bytes: 0
+---
+class C {
+  int x = 2;
+  int y = 9;
+}<no trailing newline>
+
+=== leading_and_trailing_blank_lines [java]
+conflicts: none
+reindented lines: 0  synthesized bytes: 0
+---
+
+
+class C {
+  int x = 2;
+  int y = 9;
+}

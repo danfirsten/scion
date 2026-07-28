@@ -1,0 +1,13 @@
+---
+source: crates/sm-emit/tests/markers.rs
+expression: text
+---
+class C {
+  void a() {
+<<<<<<< ours
+    ours();
+=======
+    theirs();
+>>>>>>> theirs
+  }
+}

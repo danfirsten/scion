@@ -1,0 +1,13 @@
+---
+source: crates/sm-merge/tests/moves.rs
+expression: render
+---
+rebuilt ours program
+  rebuilt ours class_declaration
+    splice ours class "class"
+    splice theirs identifier "C" lead=ours" "
+    rebuilt ours class_body lead=ours" "
+      splice ours { "{"
+      splice theirs method_declaration "void b() {\n    y();\n  }" lead=ours"\n  "
+      splice theirs method_declaration "void a() {\n    x();\n    z();\n  }" lead=ours"\n\n  "
+      splice ours } "}" lead=ours"\n"

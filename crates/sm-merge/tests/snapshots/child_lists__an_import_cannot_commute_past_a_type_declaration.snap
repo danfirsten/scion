@@ -1,0 +1,17 @@
+---
+source: crates/sm-merge/tests/child_lists.rs
+expression: run.render()
+---
+rebuilt ours program
+  splice theirs package_declaration "package p;"
+  splice ours import_declaration "import a.B;" lead=ours"\n\n"
+  splice ours import_declaration "import a.D;" lead=ours"\n"
+  splice theirs import_declaration "import a.E;" lead=theirs"\n"
+  rebuilt ours class_declaration lead=ours"\n\n"
+    splice ours class "class"
+    splice theirs identifier "C" lead=ours" "
+    rebuilt ours class_body lead=ours" "
+      splice ours { "{"
+      splice ours field_declaration "int ours;" lead=ours" "
+      splice theirs field_declaration "int theirs;" lead=theirs" "
+      splice ours } "}" lead=ours" "

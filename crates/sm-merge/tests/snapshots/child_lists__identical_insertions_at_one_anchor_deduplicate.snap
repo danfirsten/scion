@@ -1,0 +1,25 @@
+---
+source: crates/sm-merge/tests/child_lists.rs
+expression: run.render()
+---
+rebuilt ours program
+  rebuilt ours class_declaration
+    splice ours class "class"
+    splice theirs identifier "C" lead=ours" "
+    rebuilt ours class_body lead=ours" "
+      splice ours { "{"
+      rebuilt ours method_declaration lead=ours"\n  "
+        splice theirs void_type "void"
+        splice theirs identifier "a" lead=ours" "
+        splice theirs formal_parameters "()"
+        rebuilt ours block lead=ours" "
+          splice ours { "{"
+          splice theirs expression_statement "p();" lead=ours"\n    "
+          splice ours expression_statement "both();" lead=ours"\n    "
+          splice theirs expression_statement "q();" lead=ours"\n    "
+          conflict ordered_insert_collision lead=ours"\n    "
+            base: <none>
+            ours: "onlyOurs();"
+            theirs: "onlyTheirs();"
+          splice ours } "}" lead=ours"\n  "
+      splice ours } "}" lead=ours"\n"

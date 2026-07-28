@@ -1,0 +1,15 @@
+---
+source: crates/sm-emit/tests/reindentation.rs
+expression: text
+---
+class C {
+  void a() {
+    if (ok) {
+      String s = """
+        keep
+          me
+        """;
+      after();
+    }
+  }
+}

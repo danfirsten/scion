@@ -1,0 +1,14 @@
+---
+source: crates/sm-emit/tests/reindentation.rs
+expression: m.text()
+---
+class C {
+  void a() {
+    if (p) {
+      if (q) {
+        x();
+        y2();
+      }
+    }
+  }
+}

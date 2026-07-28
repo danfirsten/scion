@@ -1,0 +1,9 @@
+---
+source: crates/sm-merge/tests/child_lists.rs
+expression: run.render()
+---
+rebuilt ours program
+  splice ours import_declaration "import java.util.List;"
+  splice ours import_declaration "import java.util.Map;" lead=ours"\n"
+  splice theirs import_declaration "import java.util.Set;" lead=theirs"\n"
+  splice theirs class_declaration "class C {}" lead=ours"\n\n"

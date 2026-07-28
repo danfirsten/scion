@@ -1,0 +1,22 @@
+---
+source: crates/sm-merge/tests/moves.rs
+expression: run.render()
+---
+rebuilt ours program
+  rebuilt ours class_declaration
+    splice ours class "class"
+    splice theirs identifier "C" lead=ours" "
+    rebuilt ours class_body lead=ours" "
+      splice ours { "{"
+      rebuilt ours method_declaration lead=ours"\n  "
+        splice theirs void_type "void"
+        splice theirs identifier "a" lead=ours" "
+        splice theirs formal_parameters "()"
+        rebuilt ours block lead=ours" "
+          splice ours { "{"
+          rebuilt ours if_statement lead=ours"\n    "
+            splice ours if "if"
+            splice ours parenthesized_expression "(ok)" lead=ours" "
+            splice theirs block "{\n    x();\n    y2();\n  }" lead=ours" "
+          splice ours } "}" lead=ours"\n  "
+      splice ours } "}" lead=ours"\n"
