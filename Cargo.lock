@@ -400,6 +400,7 @@ dependencies = [
  "clap",
  "serde_json",
  "sm-cst",
+ "sm-diff",
  "sm-match",
 ]
 
@@ -419,10 +420,25 @@ dependencies = [
 [[package]]
 name = "sm-diff"
 version = "0.0.0"
+dependencies = [
+ "insta",
+ "serde",
+ "serde_json",
+ "sm-cst",
+ "sm-match",
+]
 
 [[package]]
 name = "sm-emit"
 version = "0.0.0"
+dependencies = [
+ "insta",
+ "serde",
+ "serde_json",
+ "sm-cst",
+ "sm-match",
+ "sm-merge",
+]
 
 [[package]]
 name = "sm-eval"
@@ -448,6 +464,13 @@ dependencies = [
 [[package]]
 name = "sm-merge"
 version = "0.0.0"
+dependencies = [
+ "insta",
+ "serde",
+ "serde_json",
+ "sm-cst",
+ "sm-match",
+]
 
 [[package]]
 name = "streaming-iterator"

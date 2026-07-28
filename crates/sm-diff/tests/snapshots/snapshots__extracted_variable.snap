@@ -1,0 +1,10 @@
+---
+source: crates/sm-diff/tests/snapshots.rs
+expression: "script_snapshot(\"extracted_variable\", \"java\")"
+---
+case: extracted_variable
+
+summary: 2 inserts, 0 deletes, 0 updates, 1 move (1 reparent, 0 reorder)
+insert   b#26   local_variable_declaration b:5          parent=b#24 pos=0
+insert   b#52   identifier               b:6          parent=b#51 pos=0
+move     a#29   → b#32   binary_expression        a:5          → b:5            reparent

@@ -1,0 +1,8 @@
+---
+source: crates/sm-diff/tests/snapshots.rs
+expression: "script_snapshot(\"reordered_statements\", \"java\")"
+---
+case: reordered_statements
+
+summary: 0 inserts, 0 deletes, 0 updates, 1 move (0 reparent, 1 reorder)
+move     a#43   → b#22   expression_statement     a:8          → b:5            reorder

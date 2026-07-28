@@ -30,7 +30,7 @@ pub enum Profile {
 }
 
 impl Profile {
-    fn config(self) -> MatchConfig {
+    pub fn config(self) -> MatchConfig {
         match self {
             Self::Base => MatchConfig::base_to_side(),
             Self::Strict => MatchConfig::ours_to_theirs(),

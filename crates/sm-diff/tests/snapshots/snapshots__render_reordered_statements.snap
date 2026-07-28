@@ -1,0 +1,10 @@
+---
+source: crates/sm-diff/tests/snapshots.rs
+expression: "render(&loaded.view(), &RenderOptions::default())"
+---
+--- a  reordered_statements/a.java
++++ b  reordered_statements/b.java
+
+~ reorder  expression_statement "four();"   a:8 → b:5   [unchanged]
+
+0 inserts, 0 deletes, 0 updates, 1 move (0 reparent, 1 reorder)

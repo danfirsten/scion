@@ -1,0 +1,10 @@
+---
+source: crates/sm-diff/tests/snapshots.rs
+expression: "render(&loaded.view(), &RenderOptions::default())"
+---
+--- a  moved_across_classes/a.java
++++ b  moved_across_classes/b.java
+
+~ reparent method_declaration "checksum"   a:12-14 → b:22-24   [unchanged]
+
+0 inserts, 0 deletes, 0 updates, 1 move (1 reparent, 0 reorder)

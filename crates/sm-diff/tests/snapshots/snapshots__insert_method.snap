@@ -1,0 +1,8 @@
+---
+source: crates/sm-diff/tests/snapshots.rs
+expression: "script_snapshot(\"insert_method\", \"java\")"
+---
+case: insert_method
+
+summary: 1 insert, 0 deletes, 0 updates, 0 moves (0 reparent, 0 reorder)
+insert   b#37   method_declaration       b:8-10       parent=b#10 pos=1

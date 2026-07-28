@@ -1,0 +1,9 @@
+---
+source: crates/sm-diff/tests/snapshots.rs
+expression: "script_snapshot(\"wrapped_in_if\", \"java\")"
+---
+case: wrapped_in_if
+
+summary: 1 insert, 0 deletes, 0 updates, 1 move (1 reparent, 0 reorder)
+insert   b#23   block                    b:4-10       parent=b#12 pos=4
+move     a#23   → b#37   block                    a:4-8        → b:5-9          reparent

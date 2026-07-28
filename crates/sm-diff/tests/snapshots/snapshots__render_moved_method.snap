@@ -1,0 +1,8 @@
+---
+source: crates/sm-diff/tests/snapshots.rs
+expression: "render(&loaded.view(), &RenderOptions::default())"
+---
+--- a  moved_method/a.java
++++ b  moved_method/b.java
+
+no structural changes (formatting and comments aside)

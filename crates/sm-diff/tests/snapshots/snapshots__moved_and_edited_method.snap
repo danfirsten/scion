@@ -1,0 +1,9 @@
+---
+source: crates/sm-diff/tests/snapshots.rs
+expression: "script_snapshot(\"moved_and_edited_method\", \"java\")"
+---
+case: moved_and_edited_method
+
+summary: 2 inserts, 0 deletes, 0 updates, 0 moves (0 reparent, 0 reorder)
+insert   b#50   expression_statement     b:9          parent=b#48 pos=0
+insert   b#76   expression_statement     b:11         parent=b#48 pos=2

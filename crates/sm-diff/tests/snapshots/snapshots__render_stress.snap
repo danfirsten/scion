@@ -1,0 +1,44 @@
+---
+source: crates/sm-diff/tests/snapshots.rs
+expression: "render(&loaded.view(), &RenderOptions::default())"
+---
+--- a  stress/a.java
++++ b  stress/b.java
+
+! change   identifier   a:3 → b:4   "List" → "Optional"
+      3 - import java.util.⟨List⟩;
+      4 + import java.util.⟨Optional⟩;
+
++ insert   block   b:14-19
+     14 +     public Order lookup(String id) ⟨{⟩
+     15 +         if (id != null) {
+  ~ reparent block   a:9-11 → b:15-17   [body unchanged, reindented +4]
+     18 +         return null;
+     19 +     }
+
+! change   identifier   a:9 → b:14   "find" → "lookup"
+      9 -     public Order ⟨find⟩(String id) {
+     14 +     public Order ⟨lookup⟩(String id) {
+
+- delete   formal_parameters "(String id)"   a:9
+      9 -     public Order find⟨(String id)⟩ {
+
+- delete   modifiers "public"   a:13
+     13 -     ⟨public⟩ int total(Order order) {
+
++ insert   local_variable_declaration "goods"   b:10
+     10 +         int goods = order.units() * order.unitPrice();
+  ~ reparent binary_expression "order.units() * order.unitPrice()"   a:14 → b:10   [unchanged]
+
++ insert   binary_expression "goods + order.shipping()"   b:11
+     11 +         return ⟨goods + order.shipping()⟩;
+
+- delete   method_declaration "drop"   a:17-19
+     17 -     public void drop(String id) {
+  ~ reparent formal_parameters "(String id)"   a:17 → b:14   [unchanged]
+     18 -         byId.remove(id);
+     19 -     }
+
+… and 3 unchanged small nodes that merely changed place: identifier×1, modifiers×2
+
+3 inserts, 3 deletes, 2 updates, 6 moves (6 reparent, 0 reorder)

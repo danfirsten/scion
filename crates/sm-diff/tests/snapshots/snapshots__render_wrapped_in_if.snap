@@ -1,0 +1,14 @@
+---
+source: crates/sm-diff/tests/snapshots.rs
+expression: "render(&loaded.view(), &RenderOptions::default())"
+---
+--- a  wrapped_in_if/a.java
++++ b  wrapped_in_if/b.java
+
++ insert   block   b:4-10
+      4 +     public void run(Job job) ⟨{⟩
+      5 +         if (job.isReady()) {
+  ~ reparent block   a:4-8 → b:5-9   [body unchanged, reindented +4]
+     10 +     }
+
+1 insert, 0 deletes, 0 updates, 1 move (1 reparent, 0 reorder)

@@ -1,0 +1,8 @@
+---
+source: crates/sm-diff/tests/snapshots.rs
+expression: "script_snapshot(\"import_shuffle\", \"java\")"
+---
+case: import_shuffle
+
+summary: 0 inserts, 0 deletes, 0 updates, 0 moves (0 reparent, 0 reorder)
+(empty edit script)

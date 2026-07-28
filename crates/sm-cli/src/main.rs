@@ -1,12 +1,15 @@
 //! `sm` — the `semantic-merge` command-line front end (SPEC.md §4.7).
 //!
-//! Two subcommands so far. `sm parse` makes the CST layer inspectable (M0);
+//! Three subcommands so far. `sm parse` makes the CST layer inspectable (M0);
 //! `sm match` makes a matching inspectable (M2), which SPEC.md §4.3 requires
 //! because "matching bugs are almost invisible in assertions and obvious
-//! visually". The merge driver (`sm merge %O %A %B %L %P`) and `sm diff` land
-//! in M4 and M3; neither is registered here yet, because a subcommand that
-//! exists and does nothing is worse than one that does not exist.
+//! visually"; `sm diff` renders the edit script derived from that matching
+//! (M3), and is the milestone's demo-able moment. The merge driver
+//! (`sm merge %O %A %B %L %P`) lands in M4 and is not registered here yet,
+//! because a subcommand that exists and does nothing is worse than one that
+//! does not exist.
 
+mod cmd_diff;
 mod cmd_match;
 
 use std::path::{Path, PathBuf};
@@ -25,8 +28,9 @@ const EXIT_USAGE: u8 = 2;
     about = "semantic-merge: an AST-aware three-way merge driver for git",
     long_about = "semantic-merge parses source with tree-sitter and merges on the tree \
                   rather than on lines.\n\n\
-                  Status: M2 — CST layer and structural matching. `sm parse` and \
-                  `sm match` are implemented; the merge driver lands in M4."
+                  Status: M3 — CST layer, structural matching and structural diff. \
+                  `sm parse`, `sm match` and `sm diff` are implemented; the merge \
+                  driver lands in M4."
 )]
 struct Cli {
     #[command(subcommand)]
@@ -39,6 +43,8 @@ enum Command {
     Parse(ParseArgs),
     /// Match two files structurally and show the result side by side.
     Match(cmd_match::MatchArgs),
+    /// Diff two files structurally, reporting moves as moves.
+    Diff(cmd_diff::DiffArgs),
 }
 
 #[derive(clap::Args, Debug)]
@@ -66,6 +72,7 @@ fn main() -> ExitCode {
     match cli.command {
         Command::Parse(args) => run_parse(&args),
         Command::Match(args) => cmd_match::run(&args),
+        Command::Diff(args) => cmd_diff::run(&args),
     }
 }
 

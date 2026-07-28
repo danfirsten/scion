@@ -1,0 +1,57 @@
+---
+source: crates/sm-diff/tests/snapshots.rs
+expression: "serde_json::to_string_pretty(&report).expect(\"serializing the report\")"
+---
+{
+  "schema_version": 1,
+  "src": {
+    "path": "moved_and_edited_method/a.java",
+    "language": "java",
+    "nodes": 70,
+    "lines": 12,
+    "has_errors": false
+  },
+  "dst": {
+    "path": "moved_and_edited_method/b.java",
+    "language": "java",
+    "nodes": 88,
+    "lines": 14,
+    "has_errors": false
+  },
+  "summary": {
+    "inserts": 2,
+    "deletes": 0,
+    "updates": 0,
+    "moves": 0,
+    "reparents": 0,
+    "reorders": 0
+  },
+  "ops": [
+    {
+      "op": "insert",
+      "dst": {
+        "id": 50,
+        "kind": "expression_statement",
+        "start_byte": 148,
+        "end_byte": 163,
+        "start_line": 9,
+        "end_line": 9
+      },
+      "dst_parent": 48,
+      "position": 0
+    },
+    {
+      "op": "insert",
+      "dst": {
+        "id": 76,
+        "kind": "expression_statement",
+        "start_byte": 208,
+        "end_byte": 227,
+        "start_line": 11,
+        "end_line": 11
+      },
+      "dst_parent": 48,
+      "position": 2
+    }
+  ]
+}

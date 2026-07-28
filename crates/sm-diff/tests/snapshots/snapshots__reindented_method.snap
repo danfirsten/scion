@@ -1,0 +1,9 @@
+---
+source: crates/sm-diff/tests/snapshots.rs
+expression: "script_snapshot(\"reindented_method\", \"java\")"
+---
+case: reindented_method
+
+summary: 1 insert, 0 deletes, 0 updates, 1 move (1 reparent, 0 reorder)
+insert   b#30   block                    b:4-10       parent=b#12 pos=4
+move     a#30   → b#41   block                    a:4-7        → b:5-8          reparent

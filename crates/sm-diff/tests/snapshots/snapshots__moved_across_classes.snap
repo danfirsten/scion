@@ -1,0 +1,8 @@
+---
+source: crates/sm-diff/tests/snapshots.rs
+expression: "script_snapshot(\"moved_across_classes\", \"java\")"
+---
+case: moved_across_classes
+
+summary: 0 inserts, 0 deletes, 0 updates, 1 move (1 reparent, 0 reorder)
+move     a#55   → b#106  method_declaration       a:12-14      → b:22-24        reparent

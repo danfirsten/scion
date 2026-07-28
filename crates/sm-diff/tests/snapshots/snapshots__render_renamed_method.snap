@@ -1,0 +1,12 @@
+---
+source: crates/sm-diff/tests/snapshots.rs
+expression: "render(&loaded.view(), &RenderOptions::default())"
+---
+--- a  renamed_method/a.java
++++ b  renamed_method/b.java
+
+! change   identifier   a:4 → b:4   "total" → "sum"
+      4 -     public int ⟨total⟩(int a, int b) {
+      4 +     public int ⟨sum⟩(int a, int b) {
+
+0 inserts, 0 deletes, 1 update, 0 moves (0 reparent, 0 reorder)

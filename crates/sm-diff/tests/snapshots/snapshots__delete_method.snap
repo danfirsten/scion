@@ -1,0 +1,8 @@
+---
+source: crates/sm-diff/tests/snapshots.rs
+expression: "script_snapshot(\"delete_method\", \"java\")"
+---
+case: delete_method
+
+summary: 0 inserts, 1 delete, 0 updates, 0 moves (0 reparent, 0 reorder)
+delete   a#37   method_declaration       a:8-10

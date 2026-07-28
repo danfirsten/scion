@@ -1,0 +1,8 @@
+---
+source: crates/sm-diff/tests/snapshots.rs
+expression: "script_snapshot(\"renamed_method\", \"java\")"
+---
+case: renamed_method
+
+summary: 0 inserts, 0 deletes, 1 update, 0 moves (0 reparent, 0 reorder)
+update   a#17   → b#17   identifier               a:4          → b:4            "total" → "sum"

@@ -1,0 +1,21 @@
+---
+source: crates/sm-diff/tests/snapshots.rs
+expression: "script_snapshot(\"stress\", \"java\")"
+---
+case: stress
+
+summary: 3 inserts, 3 deletes, 2 updates, 6 moves (6 reparent, 0 reorder)
+update   a#13   → b#23   identifier               a:3          → b:4            "List" → "Optional"
+insert   b#109  block                    b:14-19      parent=b#98 pos=4
+move     a#48   → b#48   modifiers                a:9          → b:9            reparent
+update   a#51   → b#102  identifier               a:9          → b:14           "find" → "lookup"
+delete   a#52   formal_parameters        a:9         
+move     a#58   → b#120  block                    a:9-11       → b:15-17        reparent
+delete   a#73   modifiers                a:13        
+insert   b#61   local_variable_declaration b:10         parent=b#59 pos=0
+insert   b#86   binary_expression        b:11         parent=b#84 pos=0
+move     a#88   → b#67   binary_expression        a:14         → b:10           reparent
+delete   a#106  method_declaration       a:17-19     
+move     a#107  → b#99   modifiers                a:17         → b:14           reparent
+move     a#111  → b#103  formal_parameters        a:17         → b:14           reparent
+move     a#126  → b#116  identifier               a:18         → b:15           reparent

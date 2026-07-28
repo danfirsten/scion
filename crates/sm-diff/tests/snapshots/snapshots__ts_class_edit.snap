@@ -1,0 +1,10 @@
+---
+source: crates/sm-diff/tests/snapshots.rs
+expression: "script_snapshot(\"ts_class_edit\", \"ts\")"
+---
+case: ts_class_edit
+
+summary: 1 insert, 0 deletes, 1 update, 1 move (1 reparent, 0 reorder)
+insert   b#61   statement_block          b:8-12       parent=b#46 pos=3
+move     a#39   → b#75   statement_block          a:4-6        → b:9-11         reparent
+update   a#57   → b#25   property_identifier      a:8          → b:4            "size" → "count"
