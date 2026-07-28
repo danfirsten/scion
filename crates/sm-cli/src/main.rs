@@ -1,14 +1,15 @@
 //! `sm` — the `semantic-merge` command-line front end (SPEC.md §4.7).
 //!
-//! Five subcommands. `sm merge` is the one git runs and the only one that
+//! Six subcommands. `sm merge` is the one git runs and the only one that
 //! writes to a file the user cares about; its contract, its exit codes and its
 //! fallback ladder are documented in the `merge` module, which is the place to
-//! start. `sm install-driver` registers it. The other three are inspection
+//! start. `sm install-driver` registers it. The other four are inspection
 //! tools: `sm parse` for the CST layer (M0), `sm match` for a matching (M2) —
 //! which SPEC.md §4.3 requires because "matching bugs are almost invisible in
-//! assertions and obvious visually" — and `sm diff` for the edit script derived
-//! from it (M3).
+//! assertions and obvious visually" — `sm diff` for the edit script derived
+//! from it (M3), and `sm check` for M6's semantic check over three revisions.
 
+mod cmd_check;
 mod cmd_diff;
 mod cmd_install;
 mod cmd_match;
@@ -59,6 +60,11 @@ enum Command {
     Match(cmd_match::MatchArgs),
     /// Diff two files structurally, reporting moves as moves.
     Diff(cmd_diff::DiffArgs),
+    /// Merge three revisions of a file and report the names the merge broke.
+    ///
+    /// The same check `sm merge --semantic` runs, on files you name, with no
+    /// git repository involved. Exits 1 when it finds something.
+    Check(cmd_check::CheckArgs),
 }
 
 #[derive(clap::Args, Debug)]
@@ -89,6 +95,7 @@ fn main() -> ExitCode {
         Command::Parse(args) => run_parse(&args),
         Command::Match(args) => cmd_match::run(&args),
         Command::Diff(args) => cmd_diff::run(&args),
+        Command::Check(args) => cmd_check::run(&args),
     }
 }
 

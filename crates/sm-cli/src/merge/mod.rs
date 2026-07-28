@@ -49,6 +49,7 @@
 //! |---|---|---|
 //! | 0 | merged cleanly | the merged result |
 //! | 1 | conflicts remain | the merged result, with conflict markers |
+//! | 1 | `--semantic=conflict` found a name-binding conflict | the merged result, **with no markers** — see the [`semantic`] module |
 //! | ≥2 | the driver failed | **untouched** — still valid "ours" for git |
 //!
 //! Exit 2 is the one that has to be right. Git treats any non-zero exit as
@@ -115,11 +116,12 @@
 //! 5. **Timeout** (default 5000 ms; `0` disables) → line merge.
 //! 6. **Panic** anywhere in parse, match, merge or emit → line merge.
 //! 7. **An output self-check fails** → line merge. For a clean merge: zero
-//!    conflict markers, zero synthesized bytes, output reparses without errors,
-//!    and **every token in the output is a token of one of the inputs**. For a
-//!    conflicted merge: at least one marker. The token check is the one that
-//!    earns its keep — see [`fabricated_token`], which explains the real bug it
-//!    catches and why reparsing alone does not.
+//!    conflict markers, no synthesized bytes other than token separators (see
+//!    below), output reparses without errors, and **every token in the output
+//!    is a token of one of the inputs**. For a conflicted merge: at least one
+//!    marker. The token check is the one that earns its keep — see
+//!    [`fabricated_token`], which explains the real bug it catches and why
+//!    reparsing alone does not.
 //! 8. **The line merge itself failed** → exit 2, `%A` untouched.
 //!
 //! # 5. Panic safety
@@ -161,7 +163,17 @@
 //! check in every inner loop of code whose correctness is the point of the
 //! project, to save a few megabytes for a few milliseconds. Not worth it.
 //!
-//! # 7. What this module deliberately does not do
+//! # 7. The semantic check
+//!
+//! `--semantic=off|report|conflict`, default `report`. It runs M6's
+//! name-binding check ([`sm_bind`]) over the candidate merge, and only when the
+//! semantic path produced a **clean** result. What each mode does, why the fast
+//! path skips it, and why `conflict` exits 1 without writing markers, are all in
+//! the [`semantic`] module's documentation — the exit-code decision in
+//! particular is a UX choice with a real tradeoff and it is argued there rather
+//! than summarised here.
+//!
+//! # 8. What this module deliberately does not do
 //!
 //! - **No per-subtree line fallback.** docs/prior-art.md §2.3's
 //!   `LineBasedMerge` node type would let one bad method degrade while the rest
@@ -176,6 +188,7 @@
 pub mod atomic;
 pub mod linemerge;
 pub mod record;
+pub mod semantic;
 
 use std::io::Read as _;
 use std::path::{Path, PathBuf};
@@ -189,9 +202,10 @@ use sm_emit::{ConflictStyle, EmitOptions, EmitResult, emit};
 use sm_merge::{MergeConfig, MergeOutcome};
 
 use record::{
-    FallbackReason, InputRecord, LabelRecord, LineMergeRecord, PathTaken, Record, SemanticRecord,
-    StatsRecord, ms,
+    FallbackReason, InputRecord, LabelRecord, LineMergeRecord, PathTaken, Record,
+    SemanticCheckRecord, SemanticRecord, StatsRecord, ms,
 };
+use semantic::SemanticMode;
 
 /// Merged cleanly.
 pub const EXIT_CLEAN: u8 = 0;
@@ -287,6 +301,22 @@ pub struct MergeArgs {
     /// Include the ancestor's text in conflict markers (git's `diff3` style).
     #[arg(long)]
     diff3: bool,
+
+    /// What to do with M6's name-binding check (see the `merge::semantic`
+    /// module docs).
+    ///
+    /// It runs only when the semantic path produced a **clean** merge, which is
+    /// where the dangerous case lives: a file that already has conflict markers
+    /// in it is going to be read anyway. `report` prints findings and leaves
+    /// the exit code alone; `conflict` additionally exits 1, leaving the clean
+    /// merged text in `%A` and the file unmerged for git.
+    #[arg(
+        long = "semantic",
+        value_enum,
+        default_value_t = SemanticMode::Report,
+        value_name = "MODE"
+    )]
+    semantic_check: SemanticMode,
 
     /// Suppress the one-line summary on stderr.
     #[arg(long, short = 'q')]
@@ -467,7 +497,7 @@ fn drive(args: &MergeArgs, rec: &mut Record) -> u8 {
     }
     .with_labels(&labels.ours, &labels.theirs, &labels.base);
 
-    match run_semantic(inputs, lang, opts, args.timeout_ms) {
+    match run_semantic(inputs, lang, opts, args.timeout_ms, args.semantic_check) {
         Ok(done) => {
             rec.inputs.base.parse_errors = Some(done.parse_errors[0]);
             rec.inputs.ours.parse_errors = Some(done.parse_errors[1]);
@@ -482,16 +512,41 @@ fn drive(args: &MergeArgs, rec: &mut Record) -> u8 {
                 conflict_reasons: done.conflict_reasons,
                 output_bytes: done.bytes.len() as u64,
                 synthesized_bytes: done.synthesized_bytes,
+                synthesized_separators: done.synthesized_separators,
                 reindented_lines: done.reindented_lines,
                 stats: done.stats,
             });
+            if done.synthesized_separators != 0 {
+                rec.warn(format!(
+                    "the emitter wrote {} token separator(s): two spliced items met with \
+                     nothing between them and no revision had a usable gap",
+                    done.synthesized_separators
+                ));
+            }
             rec.path_taken = PathTaken::Semantic;
             rec.conflicts = done.conflict_count;
-            let code = if done.clean {
+            let mut code = if done.clean {
                 EXIT_CLEAN
             } else {
                 EXIT_CONFLICTS
             };
+            if let Some(check) = &done.check {
+                rec.timings_ms.semantic_check = Some(done.timings[4]);
+                rec.semantic_check = Some(SemanticCheckRecord::from_report(
+                    check,
+                    args.semantic_check.as_str(),
+                ));
+                if !args.quiet {
+                    semantic::report(check, &display_path(args), args.semantic_check);
+                }
+                if args.semantic_check == SemanticMode::Conflict && !check.conflicts.is_empty() {
+                    // The text merged; the names did not. `%A` gets the clean
+                    // merge and git is told the path is unmerged. The `semantic`
+                    // module documents why this is the least-surprising answer
+                    // and what it costs.
+                    code = EXIT_CONFLICTS;
+                }
+            }
             write_out(rec, destination, &done.bytes, code)
         }
         Err(failure) => {
@@ -708,11 +763,15 @@ struct Done {
     conflict_count: u32,
     conflict_reasons: Vec<String>,
     synthesized_bytes: u64,
+    synthesized_separators: u64,
     reindented_lines: u64,
     stats: StatsRecord,
+    /// M6's name-binding check, when it ran. `None` means it was switched off
+    /// or the merge was not clean; see the `semantic` module.
+    check: Option<sm_bind::CheckReport>,
     parse_errors: [bool; 3],
-    /// parse, merge, emit, verify — in milliseconds.
-    timings: [f64; 4],
+    /// parse, merge, emit, verify, semantic check — in milliseconds.
+    timings: [f64; 5],
 }
 
 struct Failure {
@@ -798,10 +857,11 @@ fn run_semantic(
     lang: &'static dyn Language,
     opts: EmitOptions,
     timeout_ms: u64,
+    mode: SemanticMode,
 ) -> Result<Done, Failure> {
     // The worker takes ownership of the three input buffers, so nothing it
     // touches is visible here except through the channel (module docs §6).
-    let outcome = in_worker(move || semantic(&inputs, lang, &opts), timeout_ms);
+    let outcome = in_worker(move || semantic(&inputs, lang, &opts, mode), timeout_ms);
     match outcome {
         Ok(Outcome::Done(done)) => Ok(*done),
         Ok(Outcome::Failed(failure)) => Err(failure),
@@ -829,7 +889,12 @@ fn run_semantic(
 }
 
 /// Parse, merge, emit and self-check. Runs on the worker thread; does no I/O.
-fn semantic(inputs: &Inputs, lang: &'static dyn Language, opts: &EmitOptions) -> Outcome {
+fn semantic(
+    inputs: &Inputs,
+    lang: &'static dyn Language,
+    opts: &EmitOptions,
+    mode: SemanticMode,
+) -> Outcome {
     let t = Instant::now();
     let trees: [Result<SourceTree, sm_cst::ParseError>; 3] = [
         sm_cst::parse(&inputs.base, lang),
@@ -893,6 +958,15 @@ fn semantic(inputs: &Inputs, lang: &'static dyn Language, opts: &EmitOptions) ->
     }
     let verify_ms = ms(t.elapsed());
 
+    // M6's name-binding check. Inside the worker, so it is covered by the same
+    // timeout and the same `catch_unwind` as everything else, and so its cost
+    // is on the semantic path's budget rather than added to it afterwards. Only
+    // for a clean merge — see the `semantic` module's docs.
+    let t = Instant::now();
+    let check = (mode != SemanticMode::Off && outcome.is_clean())
+        .then(|| sm_bind::check_report(&outcome, base, ours, theirs, lang));
+    let check_ms = ms(t.elapsed());
+
     Outcome::Done(Box::new(Done {
         clean: outcome.is_clean(),
         conflict_count: u32::try_from(result.conflict_count).unwrap_or(u32::MAX),
@@ -902,11 +976,13 @@ fn semantic(inputs: &Inputs, lang: &'static dyn Language, opts: &EmitOptions) ->
             .map(|c| format!("{}@{}", c.reason.tag(), c.kind))
             .collect(),
         synthesized_bytes: result.synthesized_bytes as u64,
+        synthesized_separators: result.synthesized_separators as u64,
         reindented_lines: result.reindented_lines as u64,
         stats: StatsRecord::from_stats(&outcome.stats),
+        check,
         bytes: result.bytes,
         parse_errors,
-        timings: [parse_ms, merge_ms, emit_ms, verify_ms],
+        timings: [parse_ms, merge_ms, emit_ms, verify_ms, check_ms],
     }))
 }
 
@@ -930,10 +1006,24 @@ fn self_check(
                 result.conflict_count
             ));
         }
-        if result.synthesized_bytes != 0 {
+        // Byte preservation, with the one exception SPEC.md §5 allows.
+        //
+        // `sm-emit` may write a single space between two items whose tokens
+        // would otherwise lex as one (its crate docs, "Token separation"), and
+        // counts those bytes in both counters. Everything else — invented
+        // *layout*, i.e. a `Gap::Synthesized` — is still refused outright, and
+        // the two are told apart by comparing the counters rather than by
+        // trusting a flag. A separator is safe on its own terms: it is one
+        // U+0020 between two tokens that came from real inputs, it cannot
+        // change what the program means, and the token check below still runs
+        // over the result. It is reported as a warning because it means the
+        // merge's own gap repair had nothing to work with, which is worth
+        // knowing at corpus scale.
+        if result.synthesized_bytes != result.synthesized_separators {
             return Err(format!(
-                "a clean merge synthesized {} bytes; SPEC.md §5 requires a pure splice",
-                result.synthesized_bytes
+                "a clean merge synthesized {} bytes, {} of them token separators; \
+                 SPEC.md §5 requires a pure splice",
+                result.synthesized_bytes, result.synthesized_separators
             ));
         }
         // Parse stability (SPEC.md §5). Costs one parse of a file already
@@ -970,8 +1060,7 @@ fn parses_cleanly(bytes: &[u8], lang: &dyn Language) -> bool {
 /// A splicing emitter's characteristic failure is not producing garbage, it is
 /// producing two spliced ranges with nothing between them, so that the last
 /// token of one and the first of the next lex as a single token. M4b's corpus
-/// dry run found this happening for real (see
-/// `crates/sm-emit/tests/token_fusion.rs`), and the reduced cases are alarming:
+/// dry run found this happening for real, and the reduced case is alarming:
 ///
 /// ```text
 /// ours:   int a = 2;          theirs: static int a = 1;
@@ -981,7 +1070,16 @@ fn parses_cleanly(bytes: &[u8], lang: &dyn Language) -> bool {
 /// `staticint a = 2;` **parses without error** — `tree-sitter-java` reads
 /// `staticint` as a type name — so the reparse check above waves it through.
 /// It is a silently wrong merge of exactly the kind SPEC.md §0.4 says is never
-/// acceptable, and it would reach a user's file.
+/// acceptable, and it would have reached a user's file.
+///
+/// That bug is fixed — `sm-merge` validates the gap it copies and `sm-emit`
+/// carries a lexical backstop, both documented in their crates and pinned by
+/// `crates/sm-emit/tests/token_fusion.rs`. **This check stays anyway.** It is
+/// the only one here that does not take the libraries' word for anything: it
+/// re-derives the answer from the four trees rather than from a counter the
+/// emitter maintained, so it is exactly the check that still works when the fix
+/// above has a hole in it. The class of bug it guards is one whose entire
+/// symptom is output that looks fine.
 ///
 /// The invariant that does catch it is a direct reading of SPEC.md §5's byte
 /// preservation, applied to tokens: **`sm-emit` only ever copies byte ranges,
@@ -1029,8 +1127,59 @@ fn fabricated_token(output: &SourceTree, inputs: [&SourceTree; 3]) -> Option<Str
 #[cfg(test)]
 mod tests {
     use super::{
-        DEFAULT_MARKER_SIZE, WorkerFailure, in_worker, install_panic_hook, resolve_marker_size,
+        DEFAULT_MARKER_SIZE, WorkerFailure, fabricated_token, in_worker, install_panic_hook,
+        resolve_marker_size,
     };
+
+    /// **The token check still catches a fused token.**
+    ///
+    /// The bug that motivated it is fixed — `sm-merge` validates the gap it
+    /// copies and `sm-emit` carries a lexical backstop — so no input reaches it
+    /// any more, which is precisely why it is worth testing directly instead of
+    /// deleting. It guards a class of failure whose only symptom is output that
+    /// looks fine, and it re-derives its answer from the four trees rather than
+    /// trusting a counter, so it is the rung that still works when the fix above
+    /// develops a hole.
+    ///
+    /// The "output" here is hand-built: the exact bytes the corpus case used to
+    /// produce, against the inputs it used to produce them from.
+    #[test]
+    fn the_token_check_catches_a_fused_token_that_parses() {
+        let lang = sm_cst::languages::detect(std::path::Path::new("x.java")).expect("java");
+        let parse = |src: &str| sm_cst::parse(src.as_bytes(), lang).expect("parse");
+
+        let base = parse("class C {\n    int a = 1;\n}\n");
+        let ours = parse("class C {\n    int a = 2;\n}\n");
+        let theirs = parse("class C {\n    static int a = 1;\n}\n");
+
+        let fused = parse("class C {\n    staticint a = 2;\n}\n");
+        assert!(
+            !fused.has_errors(),
+            "the fused form must parse, or this test proves nothing"
+        );
+        assert_eq!(
+            fabricated_token(&fused, [&base, &ours, &theirs]).as_deref(),
+            Some("staticint")
+        );
+
+        // And it does not fire on the output the merge now actually produces.
+        let good = parse("class C {\n    static int a = 2;\n}\n");
+        assert_eq!(fabricated_token(&good, [&base, &ours, &theirs]), None);
+    }
+
+    /// The other half of the same invariant: a **split** token is caught too.
+    #[test]
+    fn the_token_check_catches_a_split_token() {
+        let lang = sm_cst::languages::detect(std::path::Path::new("x.java")).expect("java");
+        let parse = |src: &str| sm_cst::parse(src.as_bytes(), lang).expect("parse");
+
+        let base = parse("class C {\n    int counter = 1;\n}\n");
+        let split = parse("class C {\n    int coun ter = 1;\n}\n");
+        assert_eq!(
+            fabricated_token(&split, [&base, &base, &base]).as_deref(),
+            Some("coun")
+        );
+    }
 
     #[test]
     fn marker_size_comes_from_git_when_git_gave_one() {

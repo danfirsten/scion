@@ -279,6 +279,42 @@
 //!      it had a preceding sibling to measure against.
 //! - A conflict's gap comes from ours, then the ancestor, then theirs.
 //!
+//! ## When a copied gap is not reusable
+//!
+//! The rule above says which *revision* to copy layout from. It said nothing
+//! about the fact that a gap is not a property of an item: it is a property of
+//! a **pair** of items. A gap was measured from the end of a particular
+//! predecessor, and it only still describes anything once the merge has put
+//! that same predecessor back in front.
+//!
+//! Ignoring that produced a real wrong merge, found by M4b's corpus dry run
+//! (`oracle/graal`) and reduced in `sm-emit/tests/token_fusion.rs`: they add
+//! `public` to a declaration whose next token, on our side, was **first** in
+//! the list and therefore had an empty gap. Two empty gaps in a row and the
+//! output reads `publicinterface`. The same shape hits `int a = 1;` versus
+//! `static int a = 1;` — and `staticint a = 2;` *parses*, which is what made it
+//! dangerous rather than merely ugly.
+//!
+//! So a gap gets one validity check. If the item's predecessor in the merged
+//! list is not the predecessor the chosen gap was measured against:
+//!
+//! 1. take the gap some revision wrote for **exactly this pair**, framing side
+//!    first — the layout a human actually wrote for this adjacency;
+//! 2. otherwise keep the chosen gap, unless it is **empty**, in which case take
+//!    any whitespace-only gap this item has elsewhere in the list. An empty gap
+//!    between two items that did not use to be adjacent is the fusion case, and
+//!    anything is better than nothing.
+//!
+//! A substituted gap is only ever whitespace or nothing — never one holding a
+//! floating comment, which would duplicate the comment. The repair is therefore
+//! still a pure splice: it copies different real bytes, it does not invent any.
+//! `sm-emit` carries a lexical backstop for the case where no revision has a
+//! usable gap at all; see its crate docs, "Token separation".
+//!
+//! Step 1 also fixes the mirror-image cosmetic bug — a member moved to the
+//! front of a class body used to keep the blank line that separated it from its
+//! *old* predecessor, which appeared as a stray blank line under the `{`.
+//!
 //! Nothing else touches whitespace. The only bytes this crate can produce that
 //! are in no input are [`Gap::Synthesized`], which the merge does not currently
 //! emit at all; the variant exists so SPEC.md §5's byte-preservation property is

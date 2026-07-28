@@ -80,6 +80,44 @@
 //!   which begins with one anyway. At end of file the emitter adds it. This is
 //!   what stops a blank line appearing after every conflict.
 //!
+//! # Token separation
+//!
+//! A splicing emitter's characteristic failure is writing two ranges with
+//! nothing between them, so that the last byte of one and the first byte of the
+//! next lex as a single token. `sm-merge`'s corpus dry run found it happening
+//! for real — `public` + `interface` → `publicinterface`, `static` + `int` →
+//! `staticint` — and the `staticint` form *parses*, so nothing downstream
+//! notices.
+//!
+//! The invariant this crate now maintains:
+//!
+//! > **Between two adjacent emitted items there is at least one byte, whenever
+//! > the last byte of the first and the first byte of the second would lex
+//! > together.**
+//!
+//! It is defended in two places, and the order matters:
+//!
+//! 1. **`sm-merge` picks a gap that is actually valid** (its crate docs, §9): a
+//!    copied gap describes a relationship to a particular predecessor, and when
+//!    the merge changes that predecessor an *empty* gap is discarded in favour
+//!    of a whitespace-only one from a revision where the relationship existed.
+//!    This is where the fix belongs — the separator is then a real byte from a
+//!    real revision, indented the way that revision indents it, and the output
+//!    is still a pure splice.
+//! 2. **This crate is the backstop.** If two items still meet with no bytes
+//!    between them and [`fuses`] says they would lex together, one space is
+//!    written and counted in [`EmitResult::synthesized_separators`]. SPEC.md §5
+//!    permits "an explicitly synthesized token"; counting it separately is what
+//!    lets the driver keep asserting that nothing *else* was invented.
+//!
+//! [`fuses`] is deliberately a **curated pair list**, not "both bytes are
+//! punctuation". Java and TypeScript both write token pairs that must stay
+//! adjacent — `new ArrayList<>()` puts `<` next to `>`, `Map<String,List<X>>`
+//! puts `>` next to `>` — and a rule that separated those would corrupt output
+//! to prevent a problem that is not there. Missing a fusion is caught by `sm
+//! merge`'s own token self-check and costs a fallback; inventing a separator
+//! that is not needed changes bytes. The list errs towards the first.
+//!
 //! # The invariant
 //!
 //! *Zero conflicts and one side entirely unchanged ⇒ output is byte-identical
@@ -130,6 +168,7 @@ pub fn emit(
         out: Vec::with_capacity(ours.source().len() + 64),
         conflict_count: 0,
         synthesized_bytes: 0,
+        synthesized_separators: 0,
         reindented_lines: 0,
         pending_newline: false,
     };
@@ -141,8 +180,55 @@ pub fn emit(
         bytes: emitter.out,
         conflict_count: emitter.conflict_count,
         synthesized_bytes: emitter.synthesized_bytes,
+        synthesized_separators: emitter.synthesized_separators,
         reindented_lines: emitter.reindented_lines,
     }
+}
+
+/// Would these two bytes, written next to each other, lex as one token?
+///
+/// A **sound-by-omission** approximation: every pair here definitely fuses, and
+/// pairs that merely might are left out on purpose. See the crate docs, "Token
+/// separation", for why that direction is the safe one.
+///
+/// - Two identifier bytes. Letters, digits, `_`, `$` and anything ≥ `0x80`
+///   (Java and TypeScript identifiers are Unicode, and a UTF-8 lead or
+///   continuation byte is never a delimiter). This is the case the corpus hit:
+///   `static` + `int`, `public` + `interface`.
+/// - Anything that opens or closes a **comment**: `//`, `/*`, `*/`. The worst
+///   outcome in the family — it would swallow the rest of the line.
+/// - `++` and `--`, which change an expression's meaning rather than break it.
+/// - A trailing `=` after an operator, making `==`, `<=`, `+=` and friends.
+/// - `&&`, `||`, `::`, `..`, `->`, `=>`.
+///
+/// Deliberately excluded: `<` followed by `>` (`new ArrayList<>()`), `>`
+/// followed by `>` (`Map<String, List<X>>`), and `<` followed by `<`. Those
+/// pairs are written adjacent in ordinary source, so separating them would be
+/// the emitter corrupting correct output.
+#[must_use]
+pub fn fuses(a: u8, b: u8) -> bool {
+    const fn ident(c: u8) -> bool {
+        c.is_ascii_alphanumeric() || c == b'_' || c == b'$' || c >= 0x80
+    }
+    if ident(a) && ident(b) {
+        return true;
+    }
+    matches!(
+        (a, b),
+        (b'/', b'/' | b'*')
+            | (b'*', b'/')
+            | (b'+', b'+')
+            | (b'-', b'-')
+            | (
+                b'=' | b'!' | b'<' | b'>' | b'+' | b'-' | b'*' | b'/' | b'%' | b'&' | b'|' | b'^',
+                b'='
+            )
+            | (b'&', b'&')
+            | (b'|', b'|')
+            | (b':', b':')
+            | (b'.', b'.')
+            | (b'-' | b'=', b'>')
+    )
 }
 
 struct Emitter<'a> {
@@ -154,6 +240,7 @@ struct Emitter<'a> {
     out: Vec<u8>,
     conflict_count: usize,
     synthesized_bytes: usize,
+    synthesized_separators: usize,
     reindented_lines: usize,
     /// The last thing written was a `>>>>>>>` line with no newline after it.
     pending_newline: bool,
@@ -270,12 +357,41 @@ impl<'a> Emitter<'a> {
                 self.span(*side, &head, shift.as_ref());
                 for &child in children {
                     let lead = tree.lead(child).clone();
+                    // Where this child's first byte lands, so the separator
+                    // backstop can look at the join afterwards. Taken before
+                    // the gap, because an empty gap is exactly the case at
+                    // issue.
+                    let join = self.out.len();
                     self.gap(&lead, shift.as_ref());
                     self.node(tree, child, false, shift.as_ref());
+                    self.separate_at(join);
                 }
                 self.span(*side, &tail, shift.as_ref());
             }
             MergedNode::Conflict(conflict) => self.conflict(conflict),
+        }
+    }
+
+    /// The token-separation backstop (crate docs, "Token separation").
+    ///
+    /// `join` is the offset the child's gap was about to be written at. If
+    /// nothing was written there — the gap was empty — the bytes on either side
+    /// of `join` are the two items' touching tokens, and if they would fuse a
+    /// single space goes in between.
+    ///
+    /// Inserting rather than checking ahead is what makes this exact: "the
+    /// first byte this child will write" is a recursive question over splices,
+    /// rebuilt frames and empty ranges, and the answer is simply `out[join]`
+    /// once the child has been written. The cost is one `Vec::insert` in a case
+    /// that is already a bug, and none at all otherwise.
+    fn separate_at(&mut self, join: usize) {
+        if join == 0 || join >= self.out.len() {
+            return;
+        }
+        if fuses(self.out[join - 1], self.out[join]) {
+            self.out.insert(join, b' ');
+            self.synthesized_bytes += 1;
+            self.synthesized_separators += 1;
         }
     }
 

@@ -521,6 +521,7 @@ dependencies = [
  "proptest",
  "serde",
  "serde_json",
+ "sm-bind",
  "sm-cst",
  "sm-diff",
  "sm-emit",

@@ -86,6 +86,23 @@ impl Repo {
         self.dir.path()
     }
 
+    /// Rewrite the stored driver line with extra flags appended.
+    ///
+    /// This is how a team turns `--semantic=conflict` on: `install-driver`
+    /// writes the plain line, and the flag is a one-word edit to
+    /// `merge.semantic.driver`. Doing it here rather than adding an
+    /// `install-driver` option is deliberate — the README documents the same
+    /// edit, so the test and the instructions exercise the same mechanism.
+    fn add_driver_flags(&self, flags: &[&str]) {
+        let driver = format!(
+            "{} {} {}",
+            env!("CARGO_BIN_EXE_sm"),
+            "merge %O %A %B %L %P %S %X %Y",
+            flags.join(" ")
+        );
+        self.git(&["config", "merge.semantic.driver", &driver]);
+    }
+
     fn write(&self, name: &str, text: &str) {
         let path = self.path().join(name);
         if let Some(parent) = path.parent() {
@@ -573,4 +590,228 @@ fn files_outside_gitattributes_still_use_gits_own_merge() {
     assert!(has_markers(&merged), "{merged}");
     // git's own labels, which our driver never sees.
     assert!(merged.contains("<<<<<<< HEAD"), "{merged}");
+}
+
+// ---------------------------------------------- the semantic check (M6)
+
+/// Base, ours and theirs for the semantic-check scenario.
+///
+/// Two independent things happen at once, and both are needed:
+///
+/// - We move `a` below `b`; they edit `a`'s body. Git cannot merge that, so the
+///   driver takes the semantic path — which is the only path the check runs on.
+/// - We rename `getUser` to `fetchUser` and fix the one call site we can see;
+///   they add a method that calls `getUser`. Different lines, no textual
+///   disagreement, and the merged file calls a method that no longer exists.
+///
+/// This is SPEC.md §1's opening example with a witness attached.
+const SEM_BASE: &str = "\
+class Repo {
+  void a() {
+    x();
+  }
+
+  void b() {
+    y();
+  }
+
+  User getUser(String id) {
+    return store.find(id);
+  }
+
+  User cached(String id) {
+    return getUser(id);
+  }
+}
+";
+const SEM_OURS: &str = "\
+class Repo {
+  void b() {
+    y();
+  }
+
+  void a() {
+    x();
+  }
+
+  User fetchUser(String id) {
+    return store.find(id);
+  }
+
+  User cached(String id) {
+    return fetchUser(id);
+  }
+}
+";
+const SEM_THEIRS: &str = "\
+class Repo {
+  void a() {
+    x2();
+  }
+
+  void b() {
+    y();
+  }
+
+  User getUser(String id) {
+    return store.find(id);
+  }
+
+  User cached(String id) {
+    return getUser(id);
+  }
+
+  User first() {
+    return getUser(\"1\");
+  }
+}
+";
+
+/// **Default (`report`): git commits the merge, and the warning is on stderr.**
+///
+/// The exit code is untouched, so from git's point of view this is an ordinary
+/// successful merge — which is the whole argument for `report` being the
+/// default. The user is told; nothing is blocked.
+#[test]
+fn the_semantic_check_warns_without_blocking_the_merge() {
+    assert!(
+        plain_git_merge("Repo.java", SEM_BASE, SEM_OURS, SEM_THEIRS),
+        "the fixture must be a real git conflict, or the driver's fast path takes it"
+    );
+
+    let repo = Repo::new();
+    let out = repo.three_way("Repo.java", SEM_BASE, SEM_OURS, SEM_THEIRS);
+    assert!(
+        out.status.success(),
+        "report mode must not block the merge:\n{}",
+        repo.transcript()
+    );
+
+    let err = String::from_utf8_lossy(&out.stderr);
+    assert!(
+        err.contains("semantic-merge: warning:") && err.contains("getUser"),
+        "git did not pass the driver's stderr through:\n{err}"
+    );
+
+    let merged = repo.read("Repo.java");
+    assert!(!has_markers(&merged), "{merged}");
+    assert!(parses_cleanly(&merged), "{merged}");
+    assert!(
+        merged.contains("x2();") && merged.contains("User first()"),
+        "{merged}"
+    );
+
+    // Committed, and the tree is clean.
+    assert!(
+        String::from_utf8_lossy(&repo.git(&["status", "--porcelain"]).stdout)
+            .trim()
+            .is_empty(),
+        "{}",
+        repo.transcript()
+    );
+}
+
+/// **`conflict` mode: exactly what git shows the user.**
+///
+/// This is the test the `merge::semantic` module's UX argument stands on. Every
+/// assertion below is a thing a user actually sees, measured rather than
+/// assumed:
+///
+/// - `git merge` fails and prints `CONFLICT (content): Merge conflict in
+///   Repo.java` — git's standard sentence, because a non-zero exit from a merge
+///   driver *is* a content conflict as far as git is concerned.
+/// - `git status --porcelain` shows `UU Repo.java`: unmerged, both modified.
+/// - `MERGE_HEAD` exists, so the merge is in progress and nothing was
+///   committed.
+/// - All three stages are in the index, so `git checkout --ours/--theirs` and
+///   `git merge --abort` all work normally.
+/// - **The working-tree file has no conflict markers in it.** It is the clean
+///   merged result. That is the surprising part, and it is why the driver also
+///   says so on stderr.
+///
+/// The resolution flow is ordinary: read the explanation, fix the call (or
+/// decide it is fine), `git add`, `git commit`.
+#[test]
+fn conflict_mode_leaves_git_with_an_unmerged_but_marker_free_file() {
+    let repo = Repo::new();
+    repo.add_driver_flags(&["--semantic=conflict"]);
+    let out = repo.three_way("Repo.java", SEM_BASE, SEM_OURS, SEM_THEIRS);
+
+    assert!(
+        !out.status.success(),
+        "conflict mode must make git treat this as a conflict:\n{}",
+        repo.transcript()
+    );
+    let stdout = String::from_utf8_lossy(&out.stdout);
+    let stderr = String::from_utf8_lossy(&out.stderr);
+    assert!(
+        stdout.contains("Merge conflict in Repo.java")
+            || stderr.contains("Merge conflict in Repo.java"),
+        "git did not report a conflict:\nstdout: {stdout}\nstderr: {stderr}"
+    );
+    assert!(
+        stderr.contains("semantic-merge: warning:") && stderr.contains("getUser"),
+        "the reason has to reach the user:\n{stderr}"
+    );
+    assert!(
+        stderr.contains("has no conflict markers"),
+        "the user must be told why the file looks fine:\n{stderr}"
+    );
+
+    // git's view: unmerged, both modified, merge still in progress.
+    let status = String::from_utf8_lossy(&repo.git(&["status", "--porcelain"]).stdout).into_owned();
+    assert!(
+        status.lines().any(|l| l.starts_with("UU Repo.java")),
+        "expected `UU Repo.java` in git status:\n{status}"
+    );
+    assert!(
+        repo.path().join(".git/MERGE_HEAD").exists(),
+        "the merge should still be in progress"
+    );
+    let stages = String::from_utf8_lossy(&repo.git(&["ls-files", "-u", "Repo.java"]).stdout)
+        .lines()
+        .count();
+    assert_eq!(stages, 3, "all three stages must be in the index");
+
+    // The file itself: the clean merge, no markers, and it compiles as far as
+    // the parser is concerned.
+    let merged = repo.read("Repo.java");
+    assert!(
+        !has_markers(&merged),
+        "conflict mode must not invent markers:\n{merged}"
+    );
+    assert!(parses_cleanly(&merged), "{merged}");
+    assert!(merged.contains("x2();"), "lost their edit:\n{merged}");
+    assert!(
+        merged.contains("User fetchUser"),
+        "lost our rename:\n{merged}"
+    );
+    assert!(
+        merged.contains("return getUser(\"1\");"),
+        "the broken call is the finding; it must still be visible:\n{merged}"
+    );
+
+    // And the ordinary resolution flow works: the user decides the file is what
+    // they want, stages it, and commits.
+    repo.git(&["add", "Repo.java"]);
+    repo.git(&["commit", "-qm", "resolved"]);
+    let parents =
+        String::from_utf8_lossy(&repo.git(&["rev-list", "--parents", "-n1", "HEAD"]).stdout)
+            .split_whitespace()
+            .count();
+    assert_eq!(parents, 3, "HEAD is not a merge commit");
+}
+
+/// `--semantic=off` restores the pre-M6 behaviour exactly.
+#[test]
+fn the_semantic_check_can_be_turned_off_in_the_driver_line() {
+    let repo = Repo::new();
+    repo.add_driver_flags(&["--semantic=off"]);
+    let out = repo.three_way("Repo.java", SEM_BASE, SEM_OURS, SEM_THEIRS);
+    assert!(out.status.success(), "{}", repo.transcript());
+    assert!(
+        !String::from_utf8_lossy(&out.stderr).contains("semantic-merge:"),
+        "off must be silent:\n{}",
+        String::from_utf8_lossy(&out.stderr)
+    );
 }

@@ -720,6 +720,281 @@ fn diff3_style_includes_the_ancestor() {
     assert!(text.contains("count = 0"), "the ancestor's line: {text}");
 }
 
+// ------------------------------------------------- the semantic check (M6)
+
+/// A triple that trips `sm-bind`'s `BrokenReference`, **and reaches the
+/// semantic path**.
+///
+/// The rename-plus-new-call shape on its own is not enough: git merges it
+/// cleanly, so the driver's fast path ships git's bytes and never builds a tree
+/// for the check to walk. That is the documented gap (see the driver's
+/// `semantic` module), and testing through it rather than around it is the
+/// point — so these revisions carry a *second*, unrelated change that git
+/// genuinely cannot merge (we move `a` below `b`, they edit `a`'s body), which
+/// is what sends the driver down the semantic path in the first place.
+///
+/// So: git conflicts, the tree merge is clean and applies all three edits, and
+/// the merged file still calls a method that no longer exists.
+const SEM_BASE: &str = "\
+class Repo {
+  void a() {
+    x();
+  }
+
+  void b() {
+    y();
+  }
+
+  User getUser(String id) {
+    return store.find(id);
+  }
+
+  User cached(String id) {
+    return getUser(id);
+  }
+}
+";
+const SEM_OURS: &str = "\
+class Repo {
+  void b() {
+    y();
+  }
+
+  void a() {
+    x();
+  }
+
+  User fetchUser(String id) {
+    return store.find(id);
+  }
+
+  User cached(String id) {
+    return fetchUser(id);
+  }
+}
+";
+const SEM_THEIRS: &str = "\
+class Repo {
+  void a() {
+    x2();
+  }
+
+  void b() {
+    y();
+  }
+
+  User getUser(String id) {
+    return store.find(id);
+  }
+
+  User cached(String id) {
+    return getUser(id);
+  }
+
+  User first() {
+    return getUser(\"1\");
+  }
+}
+";
+
+/// The merged text every mode below produces: clean, no markers, all three
+/// edits applied, and `getUser("1")` still there — which is the bug.
+fn assert_the_merge_itself_is_clean_and_complete(text: &str) {
+    assert!(
+        !text.contains("<<<<<<<"),
+        "markers in a clean merge:\n{text}"
+    );
+    assert!(text.contains("x2();"), "lost their edit:\n{text}");
+    assert!(text.contains("User fetchUser"), "lost our rename:\n{text}");
+    assert!(
+        text.contains("User first()"),
+        "lost their new method:\n{text}"
+    );
+    assert!(
+        text.contains("return getUser(\"1\");"),
+        "the broken call should still be there — it is what the check found:\n{text}"
+    );
+}
+
+/// **`report` is the default**: findings on stderr, exit code untouched.
+#[test]
+fn the_semantic_check_reports_by_default() {
+    let case = Case::new(SEM_BASE, SEM_OURS, SEM_THEIRS);
+    let run = case.run("app/Repo.java", &[]);
+
+    assert_eq!(run.code(), 0, "report mode must not change the exit code");
+    assert_eq!(run.path_taken(), "semantic");
+    assert_the_merge_itself_is_clean_and_complete(&case.ours_text());
+
+    let err = run.stderr();
+    assert!(
+        err.contains("semantic-merge: warning:"),
+        "no warning prefix:\n{err}"
+    );
+    assert!(err.contains("getUser"), "the name is not named:\n{err}");
+    assert!(
+        err.contains("1 semantic conflict (broken_reference)"),
+        "no count line:\n{err}"
+    );
+    assert!(
+        err.contains("the merge itself was clean"),
+        "report mode should say the merge was fine:\n{err}"
+    );
+
+    let check = &run.record()["semantic_check"];
+    assert_eq!(check["mode"], "report");
+    assert_eq!(check["conflicts"], 1);
+    assert_eq!(check["kinds"][0], "broken_reference");
+}
+
+/// `off` does not run it at all, and says so by leaving the record's
+/// `semantic_check` null rather than reporting zero findings.
+#[test]
+fn the_semantic_check_can_be_switched_off() {
+    let case = Case::new(SEM_BASE, SEM_OURS, SEM_THEIRS);
+    let run = case.run("app/Repo.java", &["--semantic=off"]);
+
+    assert_eq!(run.code(), 0);
+    assert_the_merge_itself_is_clean_and_complete(&case.ours_text());
+    assert!(
+        !run.stderr().contains("semantic-merge:"),
+        "off must be silent:\n{}",
+        run.stderr()
+    );
+    assert!(run.record()["semantic_check"].is_null());
+    assert!(run.record()["timings_ms"]["semantic_check"].is_null());
+}
+
+/// **`conflict` exits 1 and writes the clean merge anyway.**
+///
+/// This is the UX decision the `semantic` module argues: there is no textual
+/// disagreement to bracket, so there are no markers; git sees a non-zero exit
+/// and leaves the path unmerged; the user reads stderr, opens a perfectly
+/// well-formed file, and decides. `dogfood.rs` checks what git actually shows
+/// them.
+#[test]
+fn the_semantic_check_can_make_the_merge_a_conflict() {
+    let case = Case::new(SEM_BASE, SEM_OURS, SEM_THEIRS);
+    let run = case.run("app/Repo.java", &["--semantic=conflict"]);
+
+    assert_eq!(run.code(), 1, "conflict mode must exit 1");
+    let text = case.ours_text();
+    assert_the_merge_itself_is_clean_and_complete(&text);
+
+    let err = run.stderr();
+    assert!(err.contains("getUser"), "{err}");
+    assert!(
+        err.contains("has no conflict markers"),
+        "the user has to be told why a clean-looking file is conflicted:\n{err}"
+    );
+
+    // The record distinguishes the two reasons for exit 1: no *textual*
+    // conflict regions, one semantic one.
+    assert_eq!(run.record()["exit_code"], 1);
+    assert_eq!(run.record()["conflicts"], 0);
+    assert_eq!(run.record()["semantic"]["clean"], true);
+    assert_eq!(run.record()["semantic_check"]["conflicts"], 1);
+}
+
+/// `--quiet` silences the findings but not the exit code, so a scripted caller
+/// can have the gate without the prose.
+#[test]
+fn quiet_suppresses_the_findings_but_not_the_verdict() {
+    let case = Case::new(SEM_BASE, SEM_OURS, SEM_THEIRS);
+    let run = case.run("app/Repo.java", &["--semantic=conflict", "--quiet"]);
+    assert_eq!(run.code(), 1);
+    assert!(
+        !run.stderr().contains("semantic-merge:"),
+        "{}",
+        run.stderr()
+    );
+    assert_eq!(run.record()["semantic_check"]["conflicts"], 1);
+}
+
+/// **The fast path skips the check**, which is the gap the `semantic` module
+/// documents. Pinned so that closing it later is a deliberate change to this
+/// test rather than a surprise.
+#[test]
+fn the_fast_path_does_not_run_the_semantic_check() {
+    // Rename on one side, a new call on the other, and nothing else: git merges
+    // this cleanly, so the driver never builds a tree.
+    let base = "\
+class R {
+  User getUser(String id) {
+    return store.find(id);
+  }
+
+  User cached(String id) {
+    return getUser(id);
+  }
+}
+";
+    let ours = "\
+class R {
+  User fetchUser(String id) {
+    return store.find(id);
+  }
+
+  User cached(String id) {
+    return fetchUser(id);
+  }
+}
+";
+    let theirs = "\
+class R {
+  User getUser(String id) {
+    return store.find(id);
+  }
+
+  User cached(String id) {
+    return getUser(id);
+  }
+
+  User first() {
+    return getUser(\"1\");
+  }
+}
+";
+
+    let case = Case::new(base, ours, theirs);
+    let run = case.run("app/R.java", &["--semantic=conflict"]);
+    assert_eq!(run.path_taken(), "fast");
+    assert_eq!(
+        run.code(),
+        0,
+        "the fast path cannot report what it never ran"
+    );
+    assert!(run.record()["semantic_check"].is_null());
+
+    // And with the fast path off, the very same triple is caught. This is the
+    // measurement M5's corpus scan will make offline.
+    let case = Case::new(base, ours, theirs);
+    let run = case.run("app/R.java", &["--semantic=conflict", "--no-fast-path"]);
+    assert_eq!(run.path_taken(), "semantic");
+    assert_eq!(run.code(), 1);
+    assert_eq!(run.record()["semantic_check"]["conflicts"], 1);
+}
+
+/// A merge that is *not* clean does not get checked: the file already has
+/// markers in it and a human is about to read every line of it.
+#[test]
+fn a_conflicted_merge_does_not_get_a_semantic_check() {
+    let case = Case::new(BASE, OURS_CONFLICTING, THEIRS_CONFLICTING);
+    let run = case.run("app/Service.java", &["--semantic=conflict"]);
+    assert_eq!(run.code(), 1);
+    assert!(case.ours_text().contains("<<<<<<<"));
+    assert!(run.record()["semantic_check"].is_null());
+}
+
+/// A fallback never gets one either — there is no merge plan to walk.
+#[test]
+fn a_fallback_does_not_get_a_semantic_check() {
+    let case = Case::new(SEM_BASE, SEM_OURS, SEM_THEIRS);
+    let run = case.run("app/Repo.cobol", &["--semantic=conflict"]);
+    assert_eq!(run.path_taken(), "fallback");
+    assert!(run.record()["semantic_check"].is_null());
+}
+
 // ------------------------------------------------------------- debug json
 
 /// The `--debug-json` record is M5's input, so its shape is asserted rather
@@ -752,6 +1027,7 @@ fn the_debug_record_has_the_documented_shape() {
     assert_eq!(sem["clean"], true);
     assert_eq!(sem["conflicts"], 0);
     assert_eq!(sem["synthesized_bytes"], 0);
+    assert_eq!(sem["synthesized_separators"], 0);
     assert!(sem["output_bytes"].as_u64().expect("bytes") > 0);
     for key in [
         "base_nodes",
@@ -783,6 +1059,67 @@ fn the_debug_record_has_the_documented_shape() {
     assert!(t["total"].as_f64().expect("total") > 0.0);
     // A stage that did not run reports null, never a misleading zero.
     assert!(t["fast_path_verify"].is_null());
+
+    // The semantic check ran (clean semantic merge, default `report`) and found
+    // nothing, which is a different thing from not having run — see the
+    // `semantic_check` object's docs in `merge::record`.
+    let check = &rec["semantic_check"];
+    assert_eq!(check["mode"], "report");
+    assert_eq!(check["conflicts"], 0);
+    assert!(check["kinds"].as_array().expect("kinds").is_empty());
+    assert!(check["findings"].as_array().expect("findings").is_empty());
+    for key in [
+        "references",
+        "resolved_in_origin",
+        "unresolved_in_origin",
+        "origin_not_found",
+        "conflict_regions",
+        "conflicts",
+    ] {
+        assert!(
+            check["stats"][key].is_u64(),
+            "semantic_check.stats.{key} missing"
+        );
+    }
+    assert!(
+        t["semantic_check"].is_f64(),
+        "the check's timing is missing"
+    );
+}
+
+/// The `semantic_check` object in full, on a record that actually has findings.
+///
+/// It is an **additive** schema change: `schema_version` stays 1, a consumer
+/// that does not know the field ignores it, and one that does gets the same
+/// `SemanticConflict` shape `sm-bind` serializes everywhere else.
+#[test]
+fn the_debug_record_carries_the_semantic_check_findings() {
+    let case = Case::new(SEM_BASE, SEM_OURS, SEM_THEIRS);
+    let run = case.run("app/Repo.java", &[]);
+    let rec = run.record();
+
+    assert_eq!(rec["schema_version"], 1, "this is an additive change");
+    let check = &rec["semantic_check"];
+    assert_eq!(check["mode"], "report");
+    assert_eq!(check["conflicts"], 1);
+    assert_eq!(check["kinds"], serde_json::json!(["broken_reference"]));
+
+    let finding = &check["findings"][0];
+    assert_eq!(finding["kind"], "broken_reference");
+    assert_eq!(finding["name"], "getUser");
+    assert_eq!(finding["reference"]["side"], "theirs");
+    assert_eq!(finding["origin_declaration"]["kind"], "method");
+    assert!(finding["merged_declaration"].is_null());
+    assert!(
+        finding["explanation"]
+            .as_str()
+            .expect("explanation")
+            .contains("fetchUser"),
+        "{finding}"
+    );
+
+    assert_eq!(check["stats"]["conflicts"], 1);
+    assert!(check["stats"]["references"].as_u64().expect("references") > 0);
 }
 
 /// The fast path's parse gate actually runs, and its answer is recorded.
@@ -833,50 +1170,40 @@ fn the_fast_path_verifies_its_answer_by_parsing_it() {
     assert_eq!(run.code(), 0, "git merged this one cleanly");
 }
 
-/// The self-check refuses a clean merge that fabricated a token.
+/// **The token-fusion case now merges, and correctly.**
 ///
-/// This is not a hypothetical: the three revisions below are the reduction of a
-/// real case from the mined corpus (`oracle/graal`). The tree merge resolves
-/// them cleanly and correctly *as a decision* — our value change and their
-/// `static` both apply — but the emitter writes `staticint a = 2;`, with the
-/// two tokens fused. Crucially **that output parses**: `tree-sitter-java` reads
-/// `staticint` as a type name, so the reparse check passes it.
+/// These three revisions are the reduction of a real case from the mined corpus
+/// (`oracle/graal`). The tree merge always resolved them correctly *as a
+/// decision* — our value change and their `static` both apply — but the emitter
+/// used to write `staticint a = 2;`, with the two tokens fused, and **that
+/// output parses**: `tree-sitter-java` reads `staticint` as a type name, so the
+/// reparse gate passed it. Only the token check below it refused the file, at
+/// the cost of the resolve.
 ///
-/// Without the token check this would reach the user's file as exit 0. With it,
-/// the driver falls back and the user gets git's conflict markers instead — a
-/// lost resolve in exchange for never shipping code that does not compile,
-/// which is the trade SPEC.md §0.4 mandates.
-///
-/// `crates/sm-emit/tests/token_fusion.rs` pins the underlying emitter bug.
+/// The bug is fixed in the libraries (`crates/sm-emit/tests/token_fusion.rs` is
+/// the regression suite), so what this asserts now is the whole chain
+/// end-to-end: the driver takes the semantic path, writes a correct
+/// `static int a = 2;`, exits 0, and reports a pure splice with no separator
+/// synthesized on the way.
 #[test]
-fn a_clean_merge_that_fabricates_a_token_is_refused() {
+fn the_corpus_token_fusion_case_merges_cleanly_and_correctly() {
     let case = Case::new(
         "class C {\n    int a = 1;\n}\n",
         "class C {\n    int a = 2;\n}\n",
         "class C {\n    static int a = 1;\n}\n",
     );
-    let expected = line_merge(&case).expect("git merge-file");
     let run = case.run("app/C.java", &["--no-fast-path"]);
 
-    assert_eq!(run.fallback_reason().as_deref(), Some("invariant_failed"));
-    assert_eq!(run.path_taken(), "fallback");
+    assert_eq!(run.code(), 0);
+    assert_eq!(run.path_taken(), "semantic");
     assert!(
-        run.record()["warnings"]
-            .as_array()
-            .expect("array")
-            .iter()
-            .any(|w| w.as_str().is_some_and(|s| s.contains("staticint"))),
-        "the warning does not name the fabricated token: {:?}",
-        run.record()["warnings"]
+        run.fallback_reason().is_none(),
+        "{:?}",
+        run.fallback_reason()
     );
-
-    let text = case.ours_text();
-    assert!(
-        !text.contains("staticint"),
-        "the fused token was written:\n{text}"
-    );
-    assert_eq!(case.ours_bytes(), expected.1, "not git's line merge");
-    assert_eq!(run.code(), 1);
+    assert_eq!(case.ours_text(), "class C {\n    static int a = 2;\n}\n");
+    assert_eq!(run.record()["semantic"]["synthesized_bytes"], 0);
+    assert_eq!(run.record()["semantic"]["synthesized_separators"], 0);
 }
 
 // -------------------------------------------- the driver-level property

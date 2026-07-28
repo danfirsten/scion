@@ -15,6 +15,7 @@ path = "src/main.rs"
 clap = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
+sm-bind = { workspace = true }
 sm-cst = { workspace = true }
 sm-diff = { workspace = true }
 sm-emit = { workspace = true }

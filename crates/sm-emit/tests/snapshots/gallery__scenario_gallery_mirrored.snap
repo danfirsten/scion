@@ -65,10 +65,10 @@ conflicts: none
 reindented lines: 0  synthesized bytes: 0
 ---
 class C {
-
   void b() {
     y();
   }
+
   void a() {
     x();
     z();
@@ -144,8 +144,8 @@ conflicts: none
 reindented lines: 0  synthesized bytes: 0
 ---
 class C {
-
   void c() { z(); }
+
   void a() { x(); }
 
   void b() { y2(); }
@@ -165,8 +165,8 @@ conflicts: none
 reindented lines: 0  synthesized bytes: 0
 ---
 class C {
-
   int b = 22;
+
   int a = 1; // about a
 }
 
@@ -175,8 +175,8 @@ conflicts: none
 reindented lines: 0  synthesized bytes: 0
 ---
 class C {
-
   void b() { changed(); }
+
   /** Doc for a. */
   void a() {}
 }

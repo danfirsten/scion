@@ -103,6 +103,21 @@ pub struct EmitResult {
     /// §5's byte-preservation property, which is about text a reader would
     /// mistake for their own code.
     pub synthesized_bytes: usize,
+    /// Of [`EmitResult::synthesized_bytes`], how many were single spaces the
+    /// emitter inserted to stop two adjacent tokens lexing as one.
+    ///
+    /// Counted separately because the two are not the same kind of event. A
+    /// [`sm_merge::Gap::Synthesized`] is invented *layout*; a separator here is
+    /// the emitter refusing to write `staticint`, and it is only ever one
+    /// U+0020 between two tokens that came from real inputs. The driver's
+    /// self-check uses the distinction: `synthesized_bytes ==
+    /// synthesized_separators` still means "a pure splice, plus the separators
+    /// the lexical invariant required". See `crate::emit`'s docs.
+    ///
+    /// Normally zero: `sm-merge` repairs the gap it copies (its crate docs, §9)
+    /// and this backstop never fires. It is not zero *by construction*, which
+    /// is why it is reported rather than asserted.
+    pub synthesized_separators: usize,
     /// How many lines had their leading whitespace rewritten by the
     /// reindenter.
     pub reindented_lines: usize,

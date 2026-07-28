@@ -85,6 +85,11 @@ pub struct Record {
     pub inputs: Inputs,
     pub line_merge: Option<LineMergeRecord>,
     pub semantic: Option<SemanticRecord>,
+    /// M6's name-binding check. `null` when it did not run: `--semantic=off`,
+    /// or a path other than the semantic one, or a merge that was not clean.
+    /// Added after `schema_version` 1 was published; a new object is a
+    /// compatible change, so the version does not move (see the module docs).
+    pub semantic_check: Option<SemanticCheckRecord>,
     pub timings_ms: Timings,
     /// Human-readable notes: a caught panic's message, a rejected fast path,
     /// an old-git label fallback. Never load-bearing; always worth reading.
@@ -137,8 +142,65 @@ pub struct SemanticRecord {
     pub conflict_reasons: Vec<String>,
     pub output_bytes: u64,
     pub synthesized_bytes: u64,
+    /// Of `synthesized_bytes`, how many were single spaces the emitter wrote to
+    /// stop two adjacent tokens lexing as one. Normally zero — see `sm-emit`'s
+    /// crate docs, "Token separation".
+    pub synthesized_separators: u64,
     pub reindented_lines: u64,
     pub stats: StatsRecord,
+}
+
+/// M6's name-binding check, as it appears in the record.
+///
+/// The conflicts are carried through as [`sm_bind::SemanticConflict`] values —
+/// they already derive `Serialize` and their shape is `sm-bind`'s to define, so
+/// re-flattening them here would create a second definition to keep in step. The
+/// counters *are* flattened, for the same reason [`StatsRecord`] is: this file
+/// is a wire format and M5 reads it.
+#[derive(Serialize)]
+pub struct SemanticCheckRecord {
+    /// `off`, `report` or `conflict` — what the driver was told to do with the
+    /// result. Present even when there are no conflicts, so a corpus scan can
+    /// tell "checked, found nothing" from "not checked".
+    pub mode: &'static str,
+    /// How many conflicts were reported.
+    pub conflicts: u32,
+    /// One `kind` tag per conflict, in merged-program order.
+    pub kinds: Vec<&'static str>,
+    /// The findings themselves.
+    pub findings: Vec<sm_bind::SemanticConflict>,
+    pub stats: CheckStatsRecord,
+}
+
+/// A flattened copy of [`sm_bind::CheckStats`].
+#[derive(Serialize)]
+pub struct CheckStatsRecord {
+    pub references: u64,
+    pub resolved_in_origin: u64,
+    pub unresolved_in_origin: u64,
+    pub origin_not_found: u64,
+    pub conflict_regions: u64,
+    pub conflicts: u64,
+}
+
+impl SemanticCheckRecord {
+    pub fn from_report(report: &sm_bind::CheckReport, mode: &'static str) -> Self {
+        let s = &report.stats;
+        Self {
+            mode,
+            conflicts: u32::try_from(report.conflicts.len()).unwrap_or(u32::MAX),
+            kinds: report.conflicts.iter().map(|c| c.kind.tag()).collect(),
+            findings: report.conflicts.clone(),
+            stats: CheckStatsRecord {
+                references: s.references as u64,
+                resolved_in_origin: s.resolved_in_origin as u64,
+                unresolved_in_origin: s.unresolved_in_origin as u64,
+                origin_not_found: s.origin_not_found as u64,
+                conflict_regions: s.conflict_regions as u64,
+                conflicts: s.conflicts as u64,
+            },
+        }
+    }
 }
 
 /// A flattened copy of [`sm_merge::MergeStats`]. Flattened on purpose: this
@@ -185,6 +247,8 @@ pub struct Timings {
     pub merge: Option<f64>,
     pub emit: Option<f64>,
     pub verify: Option<f64>,
+    /// M6's name-binding check. `null` when it did not run.
+    pub semantic_check: Option<f64>,
     pub write: Option<f64>,
     pub total: f64,
 }
@@ -227,6 +291,7 @@ impl Record {
             },
             line_merge: None,
             semantic: None,
+            semantic_check: None,
             timings_ms: Timings::default(),
             warnings: Vec::new(),
         }

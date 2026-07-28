@@ -283,7 +283,69 @@ fn conflicting_output_is_well_formed_even_though_it_does_not_parse() {
 
 // ------------------------------------------------------- byte preservation
 
+/// **Every token of a clean output is a token of one of the inputs.**
+///
+/// SPEC.md §5's byte preservation, read at token granularity, and the general
+/// statement of the property `tests/token_fusion.rs` is the adversarial table
+/// for: a splicing emitter can only write tokens it was given, so a token that
+/// is in no input is either two inputs' tokens fused together or one of them
+/// split apart. `sm merge`'s own self-check asks the identical question of the
+/// bytes about to reach a user's file; this asserts it of the library.
+///
+/// Comments and multi-line leaves are excluded because the reindenter is
+/// allowed to rewrite their interior whitespace.
+#[test]
+fn no_clean_output_contains_a_token_from_no_input() {
+    let mut checked = 0usize;
+    for sc in scenarios() {
+        for case in [sc.mirrored(), sc] {
+            let m = run_scenario(&case);
+            if !m.is_clean() {
+                continue;
+            }
+            let output = m.reparse();
+            let mut known: std::collections::HashSet<&[u8]> = std::collections::HashSet::new();
+            for tree in [&m.base, &m.ours, &m.theirs] {
+                for id in tree.leaves() {
+                    known.insert(tree.node_bytes(id));
+                }
+            }
+            for id in output.leaves() {
+                let node = output.node(id);
+                if node.is_extra || node.kind.contains("comment") {
+                    continue;
+                }
+                let text = output.node_bytes(id);
+                if text.is_empty()
+                    || text.contains(&b'\n')
+                    || text.iter().all(u8::is_ascii_whitespace)
+                    || known.contains(text)
+                {
+                    continue;
+                }
+                panic!(
+                    "{}: the token {:?} is in none of the three inputs\n{}",
+                    case.name,
+                    String::from_utf8_lossy(text),
+                    m.text()
+                );
+            }
+            checked += 1;
+        }
+    }
+    assert!(checked > 20, "only {checked} clean outputs were checked");
+}
+
 /// Nothing in a clean merge is synthesised: every byte came from an input.
+///
+/// This stays an exact zero. `sm-merge`'s gap-validity rule (its crate docs,
+/// §9) repairs a fusable join by copying *different real bytes*, not by
+/// inventing any, so the emitter's separator backstop never fires on this
+/// corpus. If it ever did it would show up in
+/// [`sm_emit::EmitResult::synthesized_separators`], which is asserted here
+/// separately so that the two failures are distinguishable: a synthesized
+/// separator is a sound but second-best answer, a synthesized *gap* would be
+/// the merge inventing layout.
 #[test]
 fn a_clean_merge_synthesises_nothing() {
     for sc in scenarios() {
@@ -291,6 +353,11 @@ fn a_clean_merge_synthesises_nothing() {
         if !m.is_clean() {
             continue;
         }
+        assert_eq!(
+            m.result.synthesized_separators, 0,
+            "{}: the gap repair should have made a separator unnecessary",
+            sc.name
+        );
         assert_eq!(
             m.result.synthesized_bytes, 0,
             "{}: clean output must be a pure splice",

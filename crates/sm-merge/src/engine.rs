@@ -49,6 +49,52 @@ enum Key {
     Text(u64),
 }
 
+/// What precedes an item in a child list.
+///
+/// The point of naming this is the whitespace rule's validity condition: a
+/// leading gap was *measured* against some predecessor, and it is only reusable
+/// where that same predecessor is still there. See [`ListCtx::lead_for`].
+#[derive(Clone, Copy, Debug)]
+enum Neighbour {
+    /// Nothing precedes it: the item sits directly after the container's head.
+    Start,
+    /// The identity of the item in front of it.
+    Item(Key),
+    /// A conflict region, or an item that is not in this list's aligned
+    /// sequence. Never equal to anything, including itself.
+    Opaque,
+}
+
+impl Neighbour {
+    /// Deliberately not `PartialEq`: `Opaque` must not equal `Opaque`.
+    fn same_as(self, other: Self) -> bool {
+        match (self, other) {
+            (Self::Start, Self::Start) => true,
+            (Self::Item(a), Self::Item(b)) => a == b,
+            _ => false,
+        }
+    }
+}
+
+/// What a leading gap's bytes look like, precomputed so the repair rule can ask
+/// without holding a borrow of the source.
+#[derive(Clone, Copy, Debug)]
+struct GapShape {
+    /// No bytes at all — the case that can fuse two tokens together.
+    empty: bool,
+    /// Non-empty and **whitespace only**: it separates two tokens and carries
+    /// nothing else. Only such a gap may be substituted for another, because a
+    /// gap that holds a floating comment would duplicate that comment.
+    separating: bool,
+    /// Contains a newline. Used only to prefer the least disruptive repair.
+    newline: bool,
+    len: u32,
+    /// Hash of the bytes. A "repair" that would copy the same bytes out of a
+    /// different revision changes nothing about the output and is not made, so
+    /// that the framing side keeps its provenance wherever the layout agrees.
+    hash: u64,
+}
+
 /// Where a base node will be emitted.
 #[derive(Clone, Copy, PartialEq, Eq, Hash, Debug)]
 enum Home {
@@ -621,6 +667,15 @@ impl<'a> Engine<'a> {
         let lead_t: Vec<_> = (0..items_t.len())
             .map(|i| self.theirs.lead(t, &items_t, i))
             .collect();
+        let shape_b: Vec<_> = lead_b.iter().map(|r| shape_of(self.base.tree, r)).collect();
+        let shape_o: Vec<_> = lead_o.iter().map(|r| shape_of(self.ours.tree, r)).collect();
+        let shape_t: Vec<_> = lead_t
+            .iter()
+            .map(|r| shape_of(self.theirs.tree, r))
+            .collect();
+        let rpos_b = reverse(&idx_b, items_b.len());
+        let rpos_o = reverse(&idx_o, items_o.len());
+        let rpos_t = reverse(&idx_t, items_t.len());
 
         // Where the framing revision has each key, for the whitespace rule.
         let mut frame_index: HashMap<Key, usize> = HashMap::new();
@@ -647,11 +702,20 @@ impl<'a> Engine<'a> {
             lead_b,
             lead_o,
             lead_t,
+            shape_b,
+            shape_o,
+            shape_t,
+            rpos_b,
+            rpos_o,
+            rpos_t,
             frame_index,
         };
 
         let mut children: Vec<MergedId> = Vec::new();
         let mut promo: Promo = None;
+        // What the merged list has put in front of the next item, which is what
+        // decides whether a copied gap is still valid. See `ListCtx::lead_for`.
+        let mut prev = Neighbour::Start;
 
         for hunk in hunks {
             let mut kind = hunk.kind;
@@ -679,7 +743,7 @@ impl<'a> Engine<'a> {
                     } else {
                         hunk.theirs.clone()
                     };
-                    self.emit_run(&ctx, frame, range, &mut children, &mut promo);
+                    self.emit_run(&ctx, frame, range, &mut children, &mut promo, &mut prev);
                 }
                 HunkKind::OursOnly => {
                     self.emit_run(
@@ -688,6 +752,7 @@ impl<'a> Engine<'a> {
                         hunk.ours.clone(),
                         &mut children,
                         &mut promo,
+                        &mut prev,
                     );
                 }
                 HunkKind::TheirsOnly => self.emit_run(
@@ -696,15 +761,17 @@ impl<'a> Engine<'a> {
                     hunk.theirs.clone(),
                     &mut children,
                     &mut promo,
+                    &mut prev,
                 ),
                 HunkKind::Conflicting => {
                     if forced.is_none()
-                        && self.try_set_merge(&ctx, &hunk, &mut children, &mut promo)
+                        && self.try_set_merge(&ctx, &hunk, &mut children, &mut promo, &mut prev)
                     {
                         self.stats.set_merged_regions += 1;
                     } else {
                         let reason = forced.unwrap_or_else(|| self.conflict_reason(&ctx, &hunk));
                         self.emit_conflict(&ctx, &hunk, reason, &mut children, &mut promo);
+                        prev = Neighbour::Opaque;
                     }
                 }
             }
@@ -853,6 +920,7 @@ impl<'a> Engine<'a> {
         range: Range<usize>,
         out: &mut Vec<MergedId>,
         promo: &mut Promo,
+        prev: &mut Neighbour,
     ) {
         for pos in range {
             let item_idx = ctx.idx_of(from)[pos];
@@ -878,9 +946,10 @@ impl<'a> Engine<'a> {
                     Key::Text(_) | Key::Token(_) => self.splice(from, item.node),
                 }
             };
-            let gap = ctx.lead_for(from, item_idx, key);
+            let gap = ctx.lead_for(from, item_idx, key, *prev);
             self.set_lead(child, gap);
             out.push(child);
+            *prev = Neighbour::Item(key);
         }
     }
 
@@ -906,6 +975,7 @@ impl<'a> Engine<'a> {
         hunk: &Hunk,
         out: &mut Vec<MergedId>,
         promo: &mut Promo,
+        prev: &mut Neighbour,
     ) -> bool {
         let mut tokens_present = false;
         for (side, range) in [
@@ -949,9 +1019,9 @@ impl<'a> Engine<'a> {
             if duplicates != 0 && duplicates != their_elements.len() {
                 return false;
             }
-            self.emit_run(ctx, Side::Ours, hunk.ours.clone(), out, promo);
+            self.emit_run(ctx, Side::Ours, hunk.ours.clone(), out, promo, prev);
             if duplicates == 0 {
-                self.emit_run(ctx, Side::Theirs, hunk.theirs.clone(), out, promo);
+                self.emit_run(ctx, Side::Theirs, hunk.theirs.clone(), out, promo, prev);
             }
             return true;
         }
@@ -981,14 +1051,14 @@ impl<'a> Engine<'a> {
             if base_keys.contains(&key) && !theirs_keys.contains(&key) {
                 continue; // they deleted it
             }
-            self.emit_run(ctx, Side::Ours, pos..pos + 1, out, promo);
+            self.emit_run(ctx, Side::Ours, pos..pos + 1, out, promo, prev);
         }
         for pos in hunk.theirs.clone() {
             let key = ctx.seq_t[pos];
             if base_keys.contains(&key) || ours_keys.contains(&key) {
                 continue;
             }
-            self.emit_run(ctx, Side::Theirs, pos..pos + 1, out, promo);
+            self.emit_run(ctx, Side::Theirs, pos..pos + 1, out, promo, prev);
         }
         true
     }
@@ -1190,6 +1260,14 @@ struct ListCtx {
     lead_b: Vec<Range<u32>>,
     lead_o: Vec<Range<u32>>,
     lead_t: Vec<Range<u32>>,
+    shape_b: Vec<GapShape>,
+    shape_o: Vec<GapShape>,
+    shape_t: Vec<GapShape>,
+    /// Item index → position in that side's aligned sequence. `usize::MAX` for
+    /// an item filtered out of the sequence (one that moved away).
+    rpos_b: Vec<usize>,
+    rpos_o: Vec<usize>,
+    rpos_t: Vec<usize>,
     frame_index: HashMap<Key, usize>,
 }
 
@@ -1226,24 +1304,148 @@ impl ListCtx {
         }
     }
 
-    /// The whitespace-ownership rule. See the crate docs.
-    fn lead_for(&self, from: Side, item_idx: usize, key: Key) -> Gap {
+    fn shape(&self, side: Side, item_idx: usize) -> GapShape {
+        match side {
+            Side::Base => self.shape_b[item_idx],
+            Side::Ours => self.shape_o[item_idx],
+            Side::Theirs => self.shape_t[item_idx],
+        }
+    }
+
+    fn rpos(&self, side: Side, item_idx: usize) -> Option<usize> {
+        let pos = match side {
+            Side::Base => self.rpos_b[item_idx],
+            Side::Ours => self.rpos_o[item_idx],
+            Side::Theirs => self.rpos_t[item_idx],
+        };
+        (pos != usize::MAX).then_some(pos)
+    }
+
+    /// What preceded `items[item_idx]` in revision `side` — i.e. the neighbour
+    /// that side's leading gap for it was measured against.
+    fn neighbour_in(&self, side: Side, item_idx: usize) -> Neighbour {
+        match self.rpos(side, item_idx) {
+            Some(0) => Neighbour::Start,
+            Some(pos) => Neighbour::Item(self.seq_of(side)[pos - 1]),
+            None => Neighbour::Opaque,
+        }
+    }
+
+    /// Which revision and slot the whitespace-ownership rule picks, before the
+    /// validity check. See the crate docs, §9.
+    fn lead_source(&self, from: Side, item_idx: usize, key: Key) -> (Side, usize) {
         if from == self.frame {
-            return Gap::Copied {
-                side: from,
-                range: self.lead_range(from, item_idx),
-            };
+            return (from, item_idx);
         }
         if let Some(&pos) = self.frame_index.get(&key) {
-            let idx = self.idx_of(self.frame)[pos];
-            return Gap::Copied {
-                side: self.frame,
-                range: self.lead_range(self.frame, idx),
-            };
+            return (self.frame, self.idx_of(self.frame)[pos]);
         }
-        Gap::Copied {
-            side: from,
-            range: self.lead_range(from, item_idx),
+        (from, item_idx)
+    }
+
+    /// The whitespace-ownership rule, plus its validity condition. See the
+    /// crate docs, §9.
+    ///
+    /// `prev` is what the merged list actually puts in front of this item. A
+    /// copied gap was *measured* against some predecessor in the revision it
+    /// came from, and it only describes a relationship that still exists if
+    /// that predecessor is still the one in front. When it is not:
+    ///
+    /// 1. Prefer a gap from a revision where this item really did follow this
+    ///    predecessor — the layout some human actually wrote for this very
+    ///    pair.
+    /// 2. Failing that, keep the chosen gap, **unless it is empty**: an empty
+    ///    gap holds no separator, so the two items are written with nothing
+    ///    between them and their tokens fuse (`static` + `int` →
+    ///    `staticint`). Then take any whitespace-only gap this item has
+    ///    elsewhere in the list.
+    ///
+    /// A substituted gap is only ever whitespace or nothing, never a gap
+    /// holding a floating comment — that would duplicate the comment. So the
+    /// repair cannot invent, move or lose anything a reader would see, and the
+    /// output remains a pure splice with zero synthesized bytes.
+    fn lead_for(&self, from: Side, item_idx: usize, key: Key, prev: Neighbour) -> Gap {
+        let (side, idx) = self.lead_source(from, item_idx, key);
+        let chosen = Gap::Copied {
+            side,
+            range: self.lead_range(side, idx),
+        };
+        if matches!(prev, Neighbour::Opaque) || self.neighbour_in(side, idx).same_as(prev) {
+            return chosen;
+        }
+        let shape = self.shape(side, idx);
+        let repair = self
+            .matching_gap(key, prev)
+            .or_else(|| shape.empty.then(|| self.any_gap(key))?)
+            // Same bytes out of a different revision is not a repair. Skipping
+            // it keeps the framing side's provenance wherever the two agree,
+            // which is what every other tie in this crate does.
+            .filter(|&(s, i)| self.shape(s, i).hash != shape.hash);
+        repair.map_or(chosen, |(s, i)| Gap::Copied {
+            side: s,
+            range: self.lead_range(s, i),
+        })
+    }
+
+    /// The gap a revision wrote for exactly this `prev`→`key` pair.
+    ///
+    /// Framing side first, so this breaks the same way as every other tie in
+    /// the crate; a gap carrying a comment is never eligible.
+    fn matching_gap(&self, key: Key, prev: Neighbour) -> Option<(Side, usize)> {
+        for side in self.search_order() {
+            let seq = self.seq_of(side);
+            for (pos, k) in seq.iter().enumerate() {
+                if *k != key {
+                    continue;
+                }
+                let here = if pos == 0 {
+                    Neighbour::Start
+                } else {
+                    Neighbour::Item(seq[pos - 1])
+                };
+                if !here.same_as(prev) {
+                    continue;
+                }
+                let idx = self.idx_of(side)[pos];
+                let shape = self.shape(side, idx);
+                if shape.empty || shape.separating {
+                    return Some((side, idx));
+                }
+            }
+        }
+        None
+    }
+
+    /// Any whitespace-only gap this item has where it *did* have a predecessor
+    /// — the last resort that stops two tokens fusing. The shortest, and
+    /// newline-free by preference, so the repair is the smallest separator any
+    /// revision wrote here.
+    fn any_gap(&self, key: Key) -> Option<(Side, usize)> {
+        let mut best: Option<(Side, usize, bool, u32)> = None;
+        for side in self.search_order() {
+            let seq = self.seq_of(side);
+            for (pos, k) in seq.iter().enumerate().skip(1) {
+                if *k != key {
+                    continue;
+                }
+                let idx = self.idx_of(side)[pos];
+                let shape = self.shape(side, idx);
+                if !shape.separating {
+                    continue;
+                }
+                if best.is_none_or(|(_, _, nl, len)| (shape.newline, shape.len) < (nl, len)) {
+                    best = Some((side, idx, shape.newline, shape.len));
+                }
+            }
+        }
+        best.map(|(side, idx, _, _)| (side, idx))
+    }
+
+    fn search_order(&self) -> [Side; 3] {
+        if self.frame == Side::Theirs {
+            [Side::Theirs, Side::Ours, Side::Base]
+        } else {
+            [Side::Ours, Side::Theirs, Side::Base]
         }
     }
 
@@ -1275,6 +1477,38 @@ fn filter(keys: &[Key], keep: &[bool]) -> Vec<Key> {
         .zip(keep)
         .filter_map(|(k, &keep)| keep.then_some(*k))
         .collect()
+}
+
+/// Classify a gap's bytes once, so [`ListCtx::lead_for`] can reason about it
+/// without carrying a borrow of the source around.
+fn shape_of(tree: &SourceTree, range: &Range<u32>) -> GapShape {
+    let bytes = &tree.source()[range.start as usize..range.end as usize];
+    GapShape {
+        empty: bytes.is_empty(),
+        separating: !bytes.is_empty() && bytes.iter().all(u8::is_ascii_whitespace),
+        newline: bytes.contains(&b'\n'),
+        len: bytes.len() as u32,
+        hash: hash_bytes(bytes),
+    }
+}
+
+fn hash_bytes(bytes: &[u8]) -> u64 {
+    let mut h = 0xcbf2_9ce4_8422_2325u64;
+    for &b in bytes {
+        h ^= u64::from(b);
+        h = h.wrapping_mul(0x0000_0100_0000_01b3);
+    }
+    h
+}
+
+/// Invert `indices`: sequence position for each item index, `usize::MAX` for an
+/// item the filter dropped.
+fn reverse(idx: &[usize], items: usize) -> Vec<usize> {
+    let mut out = vec![usize::MAX; items];
+    for (pos, &i) in idx.iter().enumerate() {
+        out[i] = pos;
+    }
+    out
 }
 
 fn indices(keep: &[bool]) -> Vec<usize> {
